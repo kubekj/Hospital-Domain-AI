@@ -113,3 +113,33 @@ class FrontierBestFirst(Frontier):
 
     def get_name(self):
         return "best-first search using {}".format(self.heuristic)
+
+
+class FrontierIW(FrontierBFS):
+    def __init__(self, width):
+        super().__init__()
+        self.width = width
+        self.explored = set()
+        print(f"Initialized frontier with width {self.width}")
+
+    def add(self, state: 'State'):
+        union = self.explored.union(set(state.literals))
+        if len(union) - len(self.explored) >= self.width:
+            super().add(state)
+            # TO FINISH
+            self.explored = union
+
+    def pop(self) -> 'State':
+        return super().pop()
+
+    def is_empty(self) -> 'bool':
+        return super().is_empty()
+
+    def size(self) -> 'int':
+        return super().size()
+
+    def contains(self, state: 'State') -> 'bool':
+        return super().contains(state)
+
+    def get_name(self):
+        return 'iterated-width search'

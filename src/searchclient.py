@@ -7,7 +7,7 @@ import debugpy
 import memory
 from color import Color
 from info import Info
-from frontier import Frontier, FrontierBFS, FrontierDFS, FrontierBestFirst
+from frontier import Frontier, FrontierBFS, FrontierDFS, FrontierBestFirst, FrontierIW
 from graphsearch import Info, search
 from heuristic import Heuristic, HeuristicAStar, HeuristicWeightedAStar, HeuristicGreedy, HeuristicType
 from state import State
@@ -88,6 +88,8 @@ class SearchClient:
             frontier = FrontierBestFirst(HeuristicWeightedAStar(initial_state, args.wastar))
         elif args.greedy:
             frontier = FrontierBestFirst(HeuristicGreedy(initial_state))
+        if args.iw:
+            frontier = FrontierIW(1)
         else:
             # Default to BFS search.
             frontier = FrontierBFS()
@@ -156,6 +158,7 @@ if __name__ == '__main__':
     strategy_group = parser.add_mutually_exclusive_group()
     strategy_group.add_argument('-bfs', action='store_true', dest='bfs', help='Use the BFS strategy.')
     strategy_group.add_argument('-dfs', action='store_true', dest='dfs', help='Use the DFS strategy.')
+    strategy_group.add_argument('-iw', action='store_true', dest='iw', help='Use the IW strategy.')
     strategy_group.add_argument('-astar', action='store_true', dest='astar', help='Use the A* strategy.')
     strategy_group.add_argument('-wastar', action='store', dest='wastar', nargs='?', type=int, default=False, const=5,
                                 help='Use the WA* strategy.')

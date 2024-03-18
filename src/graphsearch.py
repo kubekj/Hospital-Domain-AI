@@ -6,7 +6,7 @@ import time
 
 import memory
 from action import Action
-from frontier import Frontier
+from frontier import Frontier, FrontierIW
 from state import State
 from info import Info
 
@@ -32,10 +32,18 @@ def search(initial_state: State, frontier: Frontier):
         #     return None
 
         if frontier.is_empty():
-            return None
+            if isinstance(frontier, FrontierIW):
+                frontier = FrontierIW(frontier.width+1)
+                frontier.add(initial_state)
+                explored = set()
+                if frontier.is_empty():
+                    return None
+            else:
+                return None
 
         state: State = frontier.pop()
         explored.add(state)
+        
 
         if state.is_goal_state():
             plan = state.extract_plan()
@@ -48,7 +56,7 @@ def search(initial_state: State, frontier: Frontier):
                 frontier.add(expanded_state)
 
 
-def print_search_status(explored:list[State], frontier):
+def print_search_status(explored:set[State], frontier):
     status_template = ('#Expanded: {:8,}, '
                        '#Frontier: {:8,}, '
                        '#Generated: {:8,}, '
@@ -59,7 +67,7 @@ def print_search_status(explored:list[State], frontier):
                                  memory.get_usage(), memory.max_usage), file=sys.stderr, flush=True)
 
 
-def save_run_information(explored:list[State], frontier, plan: list[list[Action]], information=None):
+def save_run_information(explored:set[State], frontier, plan: list[list[Action]], information=None):
     elapsed_time = time.perf_counter() - start_time
     folder_path = Info.test_folder
     # Check if the folder exists, create it if it doesn't

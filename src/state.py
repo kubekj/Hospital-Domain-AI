@@ -63,12 +63,13 @@ class State:
                 elif c == '+' or c=='\n':
                     walls[row][col] = True
                 else:
-                    literals += [Free(Location(row,col))]
+                    # literals += [Free(Location(row,col))]
+                    pass
             row += 1
 
         # Create all rigid literals relating to Locations
         Location.calculate_all_neighbours(walls)
-
+        Free.walls = walls
         # Read goal state.
         # line is currently "#goal".
         goal_literals = []
@@ -152,18 +153,18 @@ class State:
         State._RNG.shuffle(expanded_states)
         return expanded_states
 
-    def is_applicable(self, agent: int, action: Action) -> bool:
+    def is_applicable(self, agent: int, action: Action, literals: list[Atom]) -> bool:
         if isinstance(action, Move):
-            return Move(agent, action.agtfrom, action.agtto).check_preconditions(self.literals)
+            return Move(agent, action.agtfrom, action.agtto).check_preconditions(literals)
         elif isinstance(action, Action):
-            return Action(agent).check_preconditions(self.literals)
+            return Action(agent).check_preconditions(literals)
         return False
     
-    def get_applicable_actions(self, agent: int) -> bool:
+    def get_applicable_actions(self, agent: int) -> Action:
         agtfrom = self.agent_locations[agent]
         possibilities = []
-        for pos_action in PossibleAction:
-            action = pos_action.value[1]
+        possible_actions = [Action, Move]
+        for action in possible_actions:
             if action is Move:
                 for agtto in agtfrom.neighbours:
                     possibilities.append(Move(agent, agtfrom, agtto))
@@ -177,7 +178,7 @@ class State:
         # effect of the other, either CellCon ict(ai aj) or BoxCon ict(ai aj) holds.
         literals = self.literals[:]
         for agt, action in enumerate(joint_action):
-            if self.is_applicable(agt, action):
+            if self.is_applicable(agt, action, literals):
                 literals = action.apply_effects(literals)
             else:
                 return True
@@ -207,12 +208,9 @@ class State:
             return True
         if not isinstance(other, State):
             return False
-        if self.literals != other.literals:
-            return False
-        if State.agent_colors != other.agent_colors:
-            return False
-        if State.box_colors != other.box_colors:
-            return False
-        if State.goal_literals != other.goal_literals:
+        if set(self.literals) != set(other.literals):
             return False
         return True
+
+    def __repr__(self):
+        return f"||{'^'.join(str(lit) for lit in self.literals)}||"

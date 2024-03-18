@@ -75,7 +75,11 @@ class BoxAt(Atom):
         self.loc = loc
 
 class Free(Atom):
+    walls = None
     def __init__(self, loc:Location):
         super().__init__("Free", (loc))
         self.loc = loc
-
+    def eval(self, literals: list[Atom]):
+        agentatlits = [lit for lit in literals if isinstance(lit, AgentAt)]
+        return (not self.walls[self.loc.row][self.loc.col] 
+                and not any([lit.loc==self.loc for lit in agentatlits]))

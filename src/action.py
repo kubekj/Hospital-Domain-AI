@@ -29,8 +29,10 @@ class Move(Action):
         - Free(agtto)
         """
         return (AgentAt(self.agt, self.agtfrom) in literals and
-                Neighbour(self.agtfrom, self.agtto).eval() and
-                Free(self.agtto) in literals)
+                Neighbour(self.agtfrom, self.agtto).eval() 
+                and Free(self.agtto).eval(literals)
+                # and Free(self.agtto) in literals
+                )
 
     def apply_effects(self, literals: list[Atom]):
         """
@@ -47,9 +49,9 @@ class Move(Action):
             # AgentAt(agt,agtto)
             literals.append(AgentAt(self.agt, self.agtto))
             # ~Free(agtto)
-            literals.remove(Free(self.agtto))
+            # literals.remove(Free(self.agtto))
             # Free(agtfrom)
-            literals.append(Free(self.agtfrom))
+            # literals.append(Free(self.agtfrom))
             return literals
         else:
             raise Exception("Preconditions not satisfied for the Move action.")
