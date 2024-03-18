@@ -33,7 +33,7 @@ def search(initial_state: State, frontier: Frontier):
 
         if frontier.is_empty():
             if isinstance(frontier, FrontierIW):
-                frontier = FrontierIW(frontier.width+1)
+                frontier = FrontierIW(frontier.heuristic,frontier.width+1)
                 frontier.add(initial_state)
                 explored = set()
                 if frontier.is_empty():
@@ -50,8 +50,17 @@ def search(initial_state: State, frontier: Frontier):
             save_run_information(explored, frontier, plan)
             return plan
 
+        # Assuming expanded_states is obtained from some state.get_expanded_states() method
         expanded_states = state.get_expanded_states()
-        for expanded_state in expanded_states:
+
+        # Assuming heuristics is a list of heuristic values for each state in expanded_states
+        heuristics = [frontier.heuristic.h(s) for s in expanded_states]
+
+        # Combine expanded_states with their corresponding heuristics, sort by heuristic, and extract states
+        sorted_states = [(h, state) for h, state in sorted(zip(heuristics, expanded_states), key=lambda x: x[0])]
+
+        # Now sorted_states contains the states ordered by their heuristic values
+        for expanded_state in [s for (_,s) in sorted_states]:
             if not frontier.contains(expanded_state) and expanded_state not in explored:
                 frontier.add(expanded_state)
 

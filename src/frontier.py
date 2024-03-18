@@ -3,6 +3,7 @@ import itertools
 from abc import ABCMeta, abstractmethod
 from collections import deque
 from heuristic import Heuristic
+from itertools import combinations
 
 
 class Frontier(metaclass=ABCMeta):
@@ -115,19 +116,16 @@ class FrontierBestFirst(Frontier):
         return "best-first search using {}".format(self.heuristic)
 
 
-class FrontierIW(FrontierBFS):
-    def __init__(self, width):
-        super().__init__()
+class FrontierIW(FrontierBestFirst):
+    def __init__(self, heuristic: "Heuristic", width = 1):
+        super().__init__(heuristic)
         self.width = width
-        self.explored = set()
+        self.known_combinations = set()
         print(f"Initialized frontier with width {self.width}")
 
     def add(self, state: 'State'):
-        union = self.explored.union(set(state.literals))
-        if len(union) - len(self.explored) >= self.width:
+        if self.is_novel_combination(state.literals):
             super().add(state)
-            # TO FINISH
-            self.explored = union
 
     def pop(self) -> 'State':
         return super().pop()
@@ -143,3 +141,24 @@ class FrontierIW(FrontierBFS):
 
     def get_name(self):
         return 'iterated-width search'
+    
+    def is_novel_combination(self, elements):
+        """
+        Check if there's a new combination of elements of size i.
+        
+        :param elements: A set of elements to check for novelty.
+        :param i: The size of the combinations to check.
+        :return: True if there's a novel combination, False otherwise.
+        """
+
+        # Generate all combinations of size i from the elements
+        new_combinations = set(combinations(elements, self.width))
+
+        # Check if there's any combination that we have not seen before
+        novel = not new_combinations.issubset(self.known_combinations)
+
+        # If there is a novel combination, add it to the set of known combinations
+        if novel:
+            self.known_combinations.update(new_combinations)
+
+        return novel

@@ -1,4 +1,6 @@
 from abc import ABCMeta, abstractmethod
+from info import Info
+from atom import AgentAt, BoxAt, Free, Location
 from state import State
 from enum import Enum, unique
 # from graphsearch import Info
@@ -21,22 +23,22 @@ class Heuristic(metaclass=ABCMeta):
     def __init__(self, initial_state: 'State'):
         self.box_goal_positions = {}
         self.agent_goal_positions = {}
-        for (row, col) in State.goals_coords:
-            goal = initial_state.goals[row][col]
-            if 'A' <= goal <= 'Z':  # Goals for boxes are uppercase letters
-                self.box_goal_positions[goal] = (row, col)
-            elif '0' <= goal <= '9':  # Goals for agents are numerical characters
-                self.agent_goal_positions[goal] = (row, col)
-        num_rows = len(State.walls)
-        num_cols = len(State.walls[0])
+        for lit in State.goal_literals:
+            if isinstance(lit, AgentAt):
+                self.agent_goal_positions[lit.agt] = lit.loc
+            elif isinstance(lit, BoxAt):
+                self.box_goal_positions[lit.box] = lit.loc
+
+        num_rows = len(Free.walls)
+        num_cols = len(Free.walls[0])
         match Heuristic.strategy:
             case HeuristicType.SimpleDijkstra:
                 self.distances_from_agent_goals = {}
                 self.distances_from_box_goals = {}
                 self.initial_distances_from_box = {}
-                for agent, (row, col) in self.agent_goal_positions.items():
+                for agent, loc in self.agent_goal_positions.items():
                     self.distances_from_agent_goals[agent] = create_dijsktra_mapping(
-                        initial_state, row, col, num_rows, num_cols
+                        initial_state, loc.row, loc.col, num_rows, num_cols
                     )
             case HeuristicType.ComplexDijkstra:
                 self.create_all_dijkstra_mappings(initial_state)
@@ -89,8 +91,8 @@ class Heuristic(metaclass=ABCMeta):
 
     def h(self, state: 'State') -> 'int':
         total_distance = 0
-        if len(state.boxes_dict) != sum([len(v) for b,v in State.agent_box_dict.items()]):
-            return math.inf
+        # if len(state.boxes_dict) != sum([len(v) for b,v in State.agent_box_dict.items()]):
+        #     return math.inf
         match Heuristic.strategy:
             case HeuristicType.Simple:
                 for agent_index, (agent_row, agent_col) in enumerate(
@@ -106,11 +108,12 @@ class Heuristic(metaclass=ABCMeta):
                     if state.boxes[row][col] != box:
                         total_distance += 1
             case HeuristicType.SimpleDijkstra:
-                for agent_index, (agent_row, agent_col) in enumerate(zip(state.agent_rows, state.agent_cols)):
-                    agent = str(agent_index)
+                for agent_index, agent_loc in state.agent_locations.items():
+                    # agent = str(agent_index)
+                    agent = agent_index
                     try:
                         if agent in self.distances_from_agent_goals:
-                            total_distance += self.distances_from_agent_goals[agent][agent_row][agent_col]
+                            total_distance += self.distances_from_agent_goals[agent][agent_loc.row][agent_loc.col]
                     except Exception as ex:
                         print(Info.level_name)
                         print(ex)
@@ -207,17 +210,17 @@ class Heuristic(metaclass=ABCMeta):
         raise NotImplementedError
 
     def create_all_dijkstra_mappings(self, state):
-        num_rows = len(State.walls)
-        num_cols = len(State.walls[0])
+        num_rows = len(Free.walls)
+        num_cols = len(Free.walls[0])
         self.distances_from_agent_goals = {}
         self.distances_from_box_goals = {}
         self.initial_distances_from_box = {}
-        for agent, (row, col) in self.agent_goal_positions.items():
-            self.distances_from_agent_goals[agent] = create_dijsktra_mapping(state, row, col, num_rows, num_cols)
-        for box, (row, col) in self.box_goal_positions.items():
-            self.distances_from_box_goals[box] = create_dijsktra_mapping(state, row, col, num_rows, num_cols)
-        for box, (row, col) in state.boxes_dict.items():
-            self.initial_distances_from_box[box] = create_dijsktra_mapping(state, row, col, num_rows, num_cols)
+        for agent, loc in self.agent_goal_positions.items():
+            self.distances_from_agent_goals[agent] = create_dijsktra_mapping(state, loc.row, loc.col, num_rows, num_cols)
+        for box, loc in self.box_goal_positions.items():
+            self.distances_from_box_goals[box] = create_dijsktra_mapping(state, loc.row, loc.col, num_rows, num_cols)
+        for box, loc in state.boxes_dict.items():
+            self.initial_distances_from_box[box] = create_dijsktra_mapping(state, loc.row, loc.col, num_rows, num_cols)
 
 
 class HeuristicAStar(Heuristic):
@@ -264,11 +267,11 @@ def create_dijsktra_mapping(state:State, row, col, num_rows, num_cols, take_boxe
      the distance will be math.inf '''
     distances = [[math.inf for _ in range(num_cols)] for _ in range(num_rows)]
 
-    def my_is_free(my_row, my_col):
+    def my_is_free(row, col):
         if take_boxes_into_account:
-            return state.is_free(my_row, my_col)
+            return Free(Location(row,col)).eval(state.literals)
         else:
-            return State.walls[my_row][my_col]
+            return Free.walls[row][col]
 
     # Check if the initial position is a wall
     if my_is_free(row, col):

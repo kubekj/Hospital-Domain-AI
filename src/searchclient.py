@@ -89,7 +89,7 @@ class SearchClient:
         elif args.greedy:
             frontier = FrontierBestFirst(HeuristicGreedy(initial_state))
         if args.iw:
-            frontier = FrontierIW(1)
+            frontier = FrontierIW(HeuristicAStar(initial_state), 1)
         else:
             # Default to BFS search.
             frontier = FrontierBFS()
