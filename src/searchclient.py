@@ -89,7 +89,7 @@ class SearchClient:
         elif args.greedy:
             frontier = FrontierBestFirst(HeuristicGreedy(initial_state))
         if args.iw:
-            frontier = FrontierIW(HeuristicAStar(initial_state), 1)
+            frontier = FrontierIW(HeuristicGreedy(initial_state), 1)
         else:
             # Default to BFS search.
             frontier = FrontierBFS()
@@ -128,19 +128,18 @@ class SearchClient:
                     answers = response.split('|')
                     failed = [a.strip() != 'true' for a in answers]
                     if any(failed):
-                        print(f'''Failed move in s
-                              tep: {ip}. @@ {"|".join(f"#{a.name_}#" for a in joint_action)} @@ {response}''',
+                        print(f'''Failed move in step: {ip}. @@ {"|".join(f"#{a.get_name()}#" for a in joint_action)} @@ {response}''',
                               flush=True)
 
                 if True:
-                    # states[ip + 1] = states[ip].result(joint_action)
-                    # states[ip].is_conflicting(joint_action)
+                    states[ip + 1] = states[ip].result(joint_action)
+                    states[ip].is_conflicting(joint_action)
                     # states[ip].is_applicable(0, joint_action[0])
                     pass
 
 
 debug = False
-fail_info = False
+fail_info = True
 if __name__ == '__main__':
     if debug:
         debugpy.listen(("localhost", 1234))  # Open a debugging server at localhost:1234

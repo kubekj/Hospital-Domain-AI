@@ -96,7 +96,7 @@ class State:
         State.agent_box_dict = {i: [chr(j + ord('A')) for j, b in enumerate(box_colors) if b is not None and b == a] for
                                 i, a in enumerate(agent_colors) if a is not None}
         State.goal_literals = goal_literals
-        print(literals)
+        # print(literals)
         return State(literals)
 
     def result(self, joint_action: list[Action]) -> Self:
@@ -153,11 +153,11 @@ class State:
         State._RNG.shuffle(expanded_states)
         return expanded_states
 
-    def is_applicable(self, agent: int, action: Action, literals: list[Atom]) -> bool:
+    def is_applicable(self, action: Action, literals: list[Atom]) -> bool:
         if isinstance(action, Move):
-            return Move(agent, action.agtfrom, action.agtto).check_preconditions(literals)
+            return Move(action.agt, action.agtfrom, action.agtto).check_preconditions(literals)
         elif isinstance(action, Action):
-            return Action(agent).check_preconditions(literals)
+            return Action(action.agt).check_preconditions(literals)
         return False
     
     def get_applicable_actions(self, agent: int) -> Action:
@@ -167,7 +167,9 @@ class State:
         for action in possible_actions:
             if action is Move:
                 for agtto in agtfrom.neighbours:
-                    possibilities.append(Move(agent, agtfrom, agtto))
+                    action = Move(agent, agtfrom, agtto)
+                    if self.is_applicable(action, self.literals[:]):
+                        possibilities.append(Move(agent, agtfrom, agtto))
             elif action is Action:
                 possibilities.append(Action(agent))
         return possibilities
@@ -178,7 +180,7 @@ class State:
         # effect of the other, either CellCon ict(ai aj) or BoxCon ict(ai aj) holds.
         literals = self.literals[:]
         for agt, action in enumerate(joint_action):
-            if self.is_applicable(agt, action, literals):
+            if self.is_applicable(action, literals):
                 literals = action.apply_effects(literals)
             else:
                 return True
