@@ -269,7 +269,7 @@ def create_dijsktra_mapping(state:State, row, col, num_rows, num_cols, take_boxe
 
     def my_is_free(row, col):
         if take_boxes_into_account:
-            return Free(Location(row,col)).eval(state.literals)
+            return Free(Location(row, col)).eval(state.literals)
         else:
             return Free.walls[row][col]
 

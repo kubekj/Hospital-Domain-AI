@@ -29,7 +29,7 @@ class Move(Action):
         - Free(agtto)
         """
         return (AgentAt(self.agt, self.agtfrom) in literals and
-                Neighbour(self.agtfrom, self.agtto).eval() 
+                Neighbour(self.agtfrom, self.agtto).eval()
                 and Free(self.agtto).eval(literals)
                 # and Free(self.agtto) in literals
                 )

@@ -1,17 +1,15 @@
 import argparse
 import sys
 import time
-
 import debugpy
-
 import memory
-from color import Color
-from info import Info
+
+from action import Action
 from frontier import Frontier, FrontierBFS, FrontierDFS, FrontierBestFirst, FrontierIW
 from graphsearch import Info, search
 from heuristic import Heuristic, HeuristicAStar, HeuristicWeightedAStar, HeuristicGreedy, HeuristicType
 from state import State
-from action import Action
+
 
 class SearchClient:
     @staticmethod
@@ -27,7 +25,7 @@ class SearchClient:
 
         # Read initial state.
         # line is currently "#initial".
-        
+
         return State.make_initial_state(server_messages)
 
     @staticmethod
@@ -64,7 +62,7 @@ class SearchClient:
         Info.test_name = args.test_name
         Info.test_folder = args.test_folder
 
-        ############ START: TO EDIT
+        # START: TO EDIT #
 
         if args.simple:
             Heuristic.strategy = HeuristicType.Simple
@@ -88,7 +86,7 @@ class SearchClient:
             frontier = FrontierBestFirst(HeuristicWeightedAStar(initial_state, args.wastar))
         elif args.greedy:
             frontier = FrontierBestFirst(HeuristicGreedy(initial_state))
-        if args.iw:
+        elif args.iw:
             frontier = FrontierIW(HeuristicGreedy(initial_state), 1)
         else:
             # Default to BFS search.
@@ -97,8 +95,7 @@ class SearchClient:
                   'Use arguments -bfs, -dfs, -astar, -wastar, or -greedy to set the search strategy.',
                   file=sys.stderr,
                   flush=True)
-        ############ END: TO EDIT
-
+        # END: TO EDIT #
 
         # Search for a plan.
         print('Starting {}.'.format(frontier.get_name()), file=sys.stderr, flush=True)
@@ -115,21 +112,23 @@ class SearchClient:
             for ip, joint_action in enumerate(plan):
                 states[ip + 1] = states[ip].result(joint_action)
                 if Heuristic.strategy == HeuristicType.ComplexDijkstra:
-                    my_message = str(frontier.heuristic.f(states[ip + 1])) 
+                    my_message = str(frontier.heuristic.f(states[ip + 1]))
                     action = Action.PullNE
                     if states[ip].is_applicable(0, action):
-                        my_message  += "-" + str(frontier.heuristic.f(states[ip].result([action])))
+                        my_message += "-" + str(frontier.heuristic.f(states[ip].result([action])))
                 else:
                     my_message = None
-                print("|".join(a.get_name() + '@' + (my_message if my_message is not None else a.get_name()) for a in joint_action), flush=True)
+                print("|".join(a.get_name() + '@' + (my_message if my_message is not None else a.get_name()) for a in
+                               joint_action), flush=True)
                 # We must read the server's response to not fill up the stdin buffer and block the server.
                 response = server_messages.readline()
                 if fail_info:
                     answers = response.split('|')
                     failed = [a.strip() != 'true' for a in answers]
                     if any(failed):
-                        print(f'''Failed move in step: {ip}. @@ {"|".join(f"#{a.get_name()}#" for a in joint_action)} @@ {response}''',
-                              flush=True)
+                        print(
+                            f'''Failed move in step: {ip}. @@ {"|".join(f"#{a.get_name()}#" for a in joint_action)} @@ {response}''',
+                            flush=True)
 
                 if True:
                     states[ip + 1] = states[ip].result(joint_action)
@@ -168,7 +167,8 @@ if __name__ == '__main__':
     strategy_group2.add_argument('-s_dij', action='store_true', dest='s_dij', help='Use the Simple Dijkstra Heuristic.')
     strategy_group2.add_argument('-c_dij', action='store_true', dest='c_dij',
                                  help='Use the Complex Dijkstra Heuristic.')
-    strategy_group2.add_argument('-manhattan', action='store_true', dest='manhattan', help='Use the Manhattan Heuristic.')
+    strategy_group2.add_argument('-manhattan', action='store_true', dest='manhattan',
+                                 help='Use the Manhattan Heuristic.')
 
     args = parser.parse_args()
 

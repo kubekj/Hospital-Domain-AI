@@ -3,8 +3,8 @@ import os
 import os.path
 import sys
 import time
-
 import memory
+
 from action import Action
 from frontier import Frontier, FrontierIW
 from state import State
@@ -33,7 +33,7 @@ def search(initial_state: State, frontier: Frontier):
 
         if frontier.is_empty():
             if isinstance(frontier, FrontierIW):
-                frontier = FrontierIW(frontier.heuristic,frontier.width+1)
+                frontier = FrontierIW(frontier.heuristic, frontier.width + 1)
                 frontier.add(initial_state)
                 explored = set()
                 if frontier.is_empty():
@@ -43,7 +43,6 @@ def search(initial_state: State, frontier: Frontier):
 
         state: State = frontier.pop()
         explored.add(state)
-        
 
         if state.is_goal_state():
             plan = state.extract_plan()
@@ -60,12 +59,12 @@ def search(initial_state: State, frontier: Frontier):
         sorted_states = [(h, state) for h, state in sorted(zip(heuristics, expanded_states), key=lambda x: x[0])]
 
         # Now sorted_states contains the states ordered by their heuristic values
-        for expanded_state in [s for (_,s) in sorted_states]:
+        for expanded_state in [s for (_, s) in sorted_states]:
             if not frontier.contains(expanded_state) and expanded_state not in explored:
                 frontier.add(expanded_state)
 
 
-def print_search_status(explored:set[State], frontier):
+def print_search_status(explored: set[State], frontier):
     status_template = ('#Expanded: {:8,}, '
                        '#Frontier: {:8,}, '
                        '#Generated: {:8,}, '
@@ -76,15 +75,14 @@ def print_search_status(explored:set[State], frontier):
                                  memory.get_usage(), memory.max_usage), file=sys.stderr, flush=True)
 
 
-def save_run_information(explored:set[State], frontier, plan: list[list[Action]], information=None):
+def save_run_information(explored: set[State], frontier, plan: list[list[Action]], information=None):
     elapsed_time = time.perf_counter() - start_time
     folder_path = Info.test_folder
-    # Check if the folder exists, create it if it doesn't
+
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
         print(f"Folder '{folder_path}' created.")
 
-    # Define the full path for the file
     file_path = os.path.join(folder_path, Info.test_name + '.json')
     all_data = deserialize_from_json_file(file_path)
     if information is None:
@@ -111,13 +109,13 @@ def serialize_to_json_file(data, file_path: str):
     try:
         with open(file_path, 'w') as json_file:
             json.dump(data, json_file, indent=4)  # Pretty printing with 4 spaces indentation
-        # print(f"Data successfully serialized to {file_path}")
+        print(f"Data successfully serialized to {file_path}")
     except Exception as e:
-        # print(f"An error occurred during serialization: {e}")
+        print(f"An error occurred during serialization: {e}")
         pass
 
 
-def deserialize_from_json_file(file_path:str):
+def deserialize_from_json_file(file_path: str):
     """
     Deserializes JSON data from a file into a Python object.
 
@@ -127,11 +125,11 @@ def deserialize_from_json_file(file_path:str):
     try:
         with open(file_path, 'r') as json_file:
             data = json.load(json_file)
-        # print(f"Data successfully deserialized from {file_path}")
+        print(f"Data successfully deserialized from {file_path}")
         return dict(data)
     except FileNotFoundError:
-        # print(f"File not found: {file_path}")
+        print(f"File not found: {file_path}")
         return {}
     except Exception as e:
-        # print(f"An error occurred during deserialization: {e}")
+        print(f"An error occurred during deserialization: {e}")
         return {}

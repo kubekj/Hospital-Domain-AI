@@ -1,20 +1,21 @@
 import random
-from atom import Atom,AgentAt, BoxAt, Free, Location
+from atom import Atom, AgentAt, BoxAt, Free, Location
 from color import Color
 from action import Action, Move, PossibleAction
 from typing import Self
+
 
 class State:
     _RNG = random.Random(1)
     agent_colors = []
     box_colors = []
     agent_box_dict = {}
-    goal_literals:list[Atom] = []
+    goal_literals: list[Atom] = []
 
     def __init__(self, literals):
         self.literals: list[Atom] = literals
-        self.agent_locations = {lit.agt: lit.loc for lit in self.literals if isinstance(lit,AgentAt)}
-        
+        self.agent_locations = {lit.agt: lit.loc for lit in self.literals if isinstance(lit, AgentAt)}
+
         self.parent = None
         self.joint_action = None
         self.g = 0
@@ -37,7 +38,6 @@ class State:
                     box_colors[ord(e) - ord('A')] = color
             line = server_messages.readline()
 
-
         literals = []
         num_rows = 0
         num_cols = 0
@@ -56,11 +56,11 @@ class State:
             for col, c in enumerate(line):
                 if '0' <= c <= '9':
                     agent = ord(c) - ord('0')
-                    literals += [AgentAt(agent, Location(row,col))]
+                    literals += [AgentAt(agent, Location(row, col))]
                     num_agents += 1
                 elif 'A' <= c <= 'Z':
-                    literals += [BoxAt(agent, Location(row,col))]
-                elif c == '+' or c=='\n':
+                    literals += [BoxAt(agent, Location(row, col))]
+                elif c == '+' or c == '\n':
                     walls[row][col] = True
                 else:
                     # literals += [Free(Location(row,col))]
@@ -79,17 +79,16 @@ class State:
             for col, c in enumerate(line):
                 if '0' <= c <= '9':
                     agent = ord(c) - ord('0')
-                    goal_literals += [AgentAt(agent, Location(row,col))]
+                    goal_literals += [AgentAt(agent, Location(row, col))]
                     num_agents += 1
                 elif 'A' <= c <= 'Z':
-                    goal_literals += [BoxAt(agent, Location(row,col))]
+                    goal_literals += [BoxAt(agent, Location(row, col))]
 
             row += 1
             line = server_messages.readline()
 
         # End.
         # line is currently "#end".
-
 
         State.agent_colors = agent_colors
         State.box_colors = box_colors
@@ -103,7 +102,7 @@ class State:
         copy_literals = self.literals[:]
         for action in joint_action:
             copy_literals = action.apply_effects(copy_literals)
-        
+
         copy_state = State(copy_literals)
         copy_state.parent = self
         copy_state.joint_action = joint_action[:]
@@ -115,7 +114,7 @@ class State:
             if goal not in self.literals:
                 return False
         return True
-    
+
     def get_expanded_states(self) -> list[Self]:
         num_agents = len(self.agent_locations)
 
@@ -159,7 +158,7 @@ class State:
         elif isinstance(action, Action):
             return Action(action.agt).check_preconditions(literals)
         return False
-    
+
     def get_applicable_actions(self, agent: int) -> Action:
         agtfrom = self.agent_locations[agent]
         possibilities = []

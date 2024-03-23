@@ -1,9 +1,12 @@
 import heapq
 import itertools
+
 from abc import ABCMeta, abstractmethod
 from collections import deque
 from heuristic import Heuristic
 from itertools import combinations
+
+from state import State
 
 
 class Frontier(metaclass=ABCMeta):
@@ -117,7 +120,7 @@ class FrontierBestFirst(Frontier):
 
 
 class FrontierIW(FrontierBestFirst):
-    def __init__(self, heuristic: "Heuristic", width = 1):
+    def __init__(self, heuristic: "Heuristic", width=1):
         super().__init__(heuristic)
         self.width = width
         self.known_combinations = set()
@@ -141,7 +144,7 @@ class FrontierIW(FrontierBestFirst):
 
     def get_name(self):
         return 'iterated-width search'
-    
+
     def is_novel_combination(self, elements):
         """
         Check if there's a new combination of elements of size i.
