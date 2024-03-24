@@ -17,6 +17,7 @@ saved_once = False
 def search(initial_state: State, frontier: Frontier):
     if not saved_once:
         save_run_information(None, None, None, {'Passed': False})
+
     frontier.add(initial_state)
     explored = set()
 

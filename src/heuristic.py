@@ -1,12 +1,11 @@
+import math
+import heapq
+
 from abc import ABCMeta, abstractmethod
 from info import Info
 from atom import AgentAt, BoxAt, Free, Location
 from state import State
 from enum import Enum, unique
-# from graphsearch import Info
-import math
-import heapq
-
 
 @unique
 class HeuristicType(Enum):
@@ -15,11 +14,14 @@ class HeuristicType(Enum):
     ComplexDijkstra = 2
     Manhattan = 3
 
+
 NO_CHOKEPOINT = -1
+
 
 class Heuristic(metaclass=ABCMeta):
     strategy: HeuristicType = HeuristicType.Simple
     FIRST_ERROR = False
+
     def __init__(self, initial_state: 'State'):
         self.box_goal_positions = {}
         self.agent_goal_positions = {}
@@ -44,6 +46,7 @@ class Heuristic(metaclass=ABCMeta):
                 self.create_all_dijkstra_mappings(initial_state)
                 self.chokepoint_detection = [[None for _ in range(num_cols)] for _ in range(num_rows)]
                 self.chokepoint_count = {}
+
                 def name_chokepoints(row, col, id):
                     if State.walls[row][col]:
                         print("ERROR: Started name_chokepoints in a wall.")
@@ -53,7 +56,7 @@ class Heuristic(metaclass=ABCMeta):
                         possible_moves += [(row + 1, col)]
 
                     if 0 <= row - 1 and not State.walls[row - 1][col]:
-                        possible_moves +=  [(row - 1, col)]
+                        possible_moves += [(row - 1, col)]
 
                     if len(State.walls[row]) > col + 1 and not State.walls[row][col + 1]:
                         possible_moves += [(row, col + 1)]
@@ -73,19 +76,20 @@ class Heuristic(metaclass=ABCMeta):
                             if self.chokepoint_detection[row][col] == NO_CHOKEPOINT:
                                 id += 1
                             name_chokepoints(move[0], move[1], id)
+
                 break_outter_loop = False
                 # print(State.walls)
                 for row in range(len(State.walls)):
                     for col in range(len(State.walls[0])):
                         if not State.walls[row][col]:
-                            name_chokepoints(row,col,0)
+                            name_chokepoints(row, col, 0)
                             break_outter_loop = True
                             break
                     if break_outter_loop: break
                 # for row in range(len(State.walls)):
-                    # print(State.walls[row])
-                    # print(self.chokepoint_detection[row])
-                    
+                # print(State.walls[row])
+                # print(self.chokepoint_detection[row])
+
             case _:
                 pass
 
@@ -96,7 +100,7 @@ class Heuristic(metaclass=ABCMeta):
         match Heuristic.strategy:
             case HeuristicType.Simple:
                 for agent_index, (agent_row, agent_col) in enumerate(
-                    zip(state.agent_rows, state.agent_cols)
+                        zip(state.agent_rows, state.agent_cols)
                 ):
                     agent_goal = str(agent_index)
                     if agent_goal in self.agent_goal_positions:
@@ -138,7 +142,7 @@ class Heuristic(metaclass=ABCMeta):
                             closest_box = min(boxes_not_in_goal,
                                               key=lambda b: self.initial_distances_from_box[b][agent_row][agent_col])
                             total_distance += self.initial_distances_from_box[closest_box][agent_row][agent_col]
-                            
+
                         # Distance of boxes to their goals
                         for other_box in [b for b in boxes_not_in_goal]:
                             box_position = state.boxes_dict[other_box]
@@ -149,13 +153,14 @@ class Heuristic(metaclass=ABCMeta):
                             if state.boxes[row][col] != box:
                                 total_distance += 1
 
-                        
-                        # COOPERATION COST                       
+                        # COOPERATION COST
                         if self.chokepoint_detection[agent_row][agent_col] != NO_CHOKEPOINT:
-                            for in_agent_index, (in_agent_row, in_agent_col) in enumerate(agents_zip[agent_index+1:]):
-                                if self.chokepoint_detection[agent_row][agent_col] == self.chokepoint_detection[in_agent_row][in_agent_col]:
+                            for in_agent_index, (in_agent_row, in_agent_col) in enumerate(agents_zip[agent_index + 1:]):
+                                if self.chokepoint_detection[agent_row][agent_col] == \
+                                        self.chokepoint_detection[in_agent_row][in_agent_col]:
                                     # total_distance += 1 # VERSION 1: CONSTANT COOPERATION COST
-                                    total_distance += calculate_manhattan_distance((agent_row, agent_col), (in_agent_row,in_agent_col)) # VERSION 2: VARIALBE COOPERATION COST
+                                    total_distance += calculate_manhattan_distance((agent_row, agent_col), (
+                                        in_agent_row, in_agent_col))  # VERSION 2: VARIALBE COOPERATION COST
 
                     else:
                         if agent in self.distances_from_agent_goals:
@@ -245,6 +250,15 @@ class HeuristicWeightedAStar(Heuristic):
     def __repr__(self):
         return 'WA*({}) evaluation'.format(self.w)
 
+class HeuristicSpaceTimeAStar(Heuristic):
+    def __init__(self, initial_state: "State"):
+        super().__init__(initial_state)
+
+    def f(self, state: 'State') -> 'int':
+        return state.g + self.h(state) + state.time_step
+
+    def __repr__(self):
+        return 'SpaceTimeA* evaluation'
 
 class HeuristicGreedy(Heuristic):
     def __init__(self, initial_state: "State"):
@@ -256,12 +270,11 @@ class HeuristicGreedy(Heuristic):
     def __repr__(self):
         return "greedy evaluation"
 
-
 def calculate_manhattan_distance(first_position, second_position):
     return abs(first_position[0] - second_position[0]) + abs(first_position[1] - second_position[1])
 
 
-def create_dijsktra_mapping(state:State, row, col, num_rows, num_cols, take_boxes_into_account = False):
+def create_dijsktra_mapping(state: State, row, col, num_rows, num_cols, take_boxes_into_account=False):
     '''Return a map of the shape [num_rows, num_cols] with every cell filled with the distance to the cell (row, col),
     calculated with the Dijkstra algorithm. If a cell (i,j) is a wall, which we know by State.walls[i][j] == true, then
      the distance will be math.inf '''
@@ -293,9 +306,9 @@ def create_dijsktra_mapping(state:State, row, col, num_rows, num_cols, take_boxe
 
             # Check boundaries and walls
             if (
-                0 <= next_row < num_rows
-                and 0 <= next_col < num_cols
-                and not my_is_free(next_row, next_col)
+                    0 <= next_row < num_rows
+                    and 0 <= next_col < num_cols
+                    and not my_is_free(next_row, next_col)
             ):
                 new_distance = current_distance + 1  # Distance to adjacent cells is always 1 more
                 if new_distance < distances[next_row][next_col]:

@@ -12,10 +12,10 @@ class State:
     agent_box_dict = {}
     goal_literals: list[Atom] = []
 
-    def __init__(self, literals):
+    def __init__(self, literals, time_step=0):
         self.literals: list[Atom] = literals
         self.agent_locations = {lit.agt: lit.loc for lit in self.literals if isinstance(lit, AgentAt)}
-
+        self.time_step = time_step
         self.parent = None
         self.joint_action = None
         self.g = 0
@@ -103,7 +103,7 @@ class State:
         for action in joint_action:
             copy_literals = action.apply_effects(copy_literals)
 
-        copy_state = State(copy_literals)
+        copy_state = State(copy_literals, self.time_step + 1)
         copy_state.parent = self
         copy_state.joint_action = joint_action[:]
         copy_state.g = self.g + 1
@@ -201,17 +201,16 @@ class State:
             _hash = _hash * prime + hash(tuple(State.agent_colors))
             _hash = _hash * prime + hash(tuple(State.box_colors))
             _hash = _hash * prime + hash(tuple(State.goal_literals))
+            _hash = _hash * prime + hash(self.time_step)
             self._hash = _hash
         return self._hash
 
     def __eq__(self, other):
         if self is other:
             return True
-        if not isinstance(other, State):
-            return False
-        if set(self.literals) != set(other.literals):
-            return False
-        return True
+        if isinstance(other, State):
+            return set(self.literals) == set(other.literals) and self.time_step == other.time_step
+        return False
 
     def __repr__(self):
         return f"||{'^'.join(str(lit) for lit in self.literals)}||"
