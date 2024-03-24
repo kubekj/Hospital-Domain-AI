@@ -1,8 +1,9 @@
 from atom import AgentAt, Atom, Neighbour, Free, Location
 from enum import Enum, unique
 
+
 class Action:
-    def __init__(self, agt:int):
+    def __init__(self, agt: int):
         self.agt = agt
 
     def check_preconditions(self, literals: list[Atom]):
@@ -10,16 +11,17 @@ class Action:
 
     def apply_effects(self, literals: list[Atom]):
         return literals
-    
+
     def get_name(self):
         return "NoOp"
 
+
 class Move(Action):
-    def __init__(self, agt:int, agtfrom:Location, agtto:Location):
+    def __init__(self, agt: int, agtfrom: Location, agtto: Location):
         super().__init__(agt)
         self.agtfrom = agtfrom
         self.agtto = agtto
-    
+
     def check_preconditions(self, literals: list[Atom]):
         """
         Check if the preconditions of the Move action are satisfied in the given state.
@@ -69,6 +71,7 @@ class Move(Action):
             return "Move(W)"
         return "NoOp"
 
+
 @unique
 class PossibleAction(Enum):
     NoOp = ("NoOp", Action, 0, 0, 0, 0)
@@ -77,4 +80,3 @@ class PossibleAction(Enum):
     MoveS = ("Move(S)", Move, 1, 0, 0, 0)
     MoveE = ("Move(E)", Move, 0, 1, 0, 0)
     MoveW = ("Move(W)", Move, 0, -1, 0, 0)
-

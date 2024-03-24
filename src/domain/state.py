@@ -1,7 +1,9 @@
 import random
-from atom import Atom, AgentAt, BoxAt, Free, Location
-from color import Color
-from action import Action, Move, PossibleAction
+
+from src.domain.atom import Atom, AgentAt, BoxAt, Free, Location
+from src.utils.color import Color
+from src.domain.action import Action, Move
+
 from typing import Self
 
 
@@ -21,9 +23,10 @@ class State:
         self.g = 0
         self._hash = None
 
+    @staticmethod
     def make_initial_state(server_messages):
         # Read colors.
-        server_messages.readline()  # #colors
+        server_messages.readline()  # colors
         agent_colors = [None for _ in range(10)]
         box_colors = [None for _ in range(26)]
         line = server_messages.readline()
@@ -102,11 +105,11 @@ class State:
         copy_literals = self.literals[:]
         for action in joint_action:
             copy_literals = action.apply_effects(copy_literals)
-
         copy_state = State(copy_literals, self.time_step + 1)
         copy_state.parent = self
         copy_state.joint_action = joint_action[:]
         copy_state.g = self.g + 1
+
         return copy_state
 
     def is_goal_state(self) -> bool:
@@ -152,17 +155,20 @@ class State:
         State._RNG.shuffle(expanded_states)
         return expanded_states
 
-    def is_applicable(self, action: Action, literals: list[Atom]) -> bool:
+    @staticmethod
+    def is_applicable(action: Action, literals: list[Atom]) -> bool:
         if isinstance(action, Move):
             return Move(action.agt, action.agtfrom, action.agtto).check_preconditions(literals)
         elif isinstance(action, Action):
             return Action(action.agt).check_preconditions(literals)
+
         return False
 
     def get_applicable_actions(self, agent: int) -> Action:
         agtfrom = self.agent_locations[agent]
         possibilities = []
         possible_actions = [Action, Move]
+
         for action in possible_actions:
             if action is Move:
                 for agtto in agtfrom.neighbours:
@@ -171,6 +177,7 @@ class State:
                         possibilities.append(Move(agent, agtfrom, agtto))
             elif action is Action:
                 possibilities.append(Action(agent))
+
         return possibilities
 
     def is_conflicting(self, joint_action: list[Action]) -> bool:
@@ -178,19 +185,23 @@ class State:
         # For all applicable actions ai and aj where the precondition of one is inconsistent with the 
         # effect of the other, either CellCon ict(ai aj) or BoxCon ict(ai aj) holds.
         literals = self.literals[:]
+
         for agt, action in enumerate(joint_action):
             if self.is_applicable(action, literals):
                 literals = action.apply_effects(literals)
             else:
                 return True
+
         return False
 
     def extract_plan(self) -> list[list[Action]]:
         plan = [None for _ in range(self.g)]
         state = self
+
         while state.joint_action is not None:
             plan[state.g - 1] = state.joint_action
             state = state.parent
+
         return plan
 
     def __hash__(self):
@@ -208,8 +219,10 @@ class State:
     def __eq__(self, other):
         if self is other:
             return True
+
         if isinstance(other, State):
             return set(self.literals) == set(other.literals) and self.time_step == other.time_step
+
         return False
 
     def __repr__(self):

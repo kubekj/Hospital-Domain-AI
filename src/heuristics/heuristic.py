@@ -2,9 +2,9 @@ import math
 import heapq
 
 from abc import ABCMeta, abstractmethod
-from info import Info
-from atom import AgentAt, BoxAt, Free, Location
-from state import State
+from src.utils.info import Info
+from src.domain.atom import AgentAt, BoxAt, Free, Location
+from src.domain.state import State
 from enum import Enum, unique
 
 @unique
@@ -33,6 +33,7 @@ class Heuristic(metaclass=ABCMeta):
 
         num_rows = len(Free.walls)
         num_cols = len(Free.walls[0])
+        # TODO: Move the logic to Dijkstra Heuristic class
         match Heuristic.strategy:
             case HeuristicType.SimpleDijkstra:
                 self.distances_from_agent_goals = {}
@@ -97,6 +98,7 @@ class Heuristic(metaclass=ABCMeta):
         total_distance = 0
         # if len(state.boxes_dict) != sum([len(v) for b,v in State.agent_box_dict.items()]):
         #     return math.inf
+        # TODO: Make the code modular so it's more readable
         match Heuristic.strategy:
             case HeuristicType.Simple:
                 for agent_index, (agent_row, agent_col) in enumerate(
@@ -226,49 +228,6 @@ class Heuristic(metaclass=ABCMeta):
             self.distances_from_box_goals[box] = create_dijsktra_mapping(state, loc.row, loc.col, num_rows, num_cols)
         for box, loc in state.boxes_dict.items():
             self.initial_distances_from_box[box] = create_dijsktra_mapping(state, loc.row, loc.col, num_rows, num_cols)
-
-
-class HeuristicAStar(Heuristic):
-    def __init__(self, initial_state: "State"):
-        super().__init__(initial_state)
-
-    def f(self, state: 'State') -> 'int':
-        return state.g + self.h(state)
-
-    def __repr__(self):
-        return 'A* evaluation'
-
-
-class HeuristicWeightedAStar(Heuristic):
-    def __init__(self, initial_state: "State", w: "int"):
-        super().__init__(initial_state)
-        self.w = w
-
-    def f(self, state: 'State') -> 'int':
-        return state.g + self.w * self.h(state)
-
-    def __repr__(self):
-        return 'WA*({}) evaluation'.format(self.w)
-
-class HeuristicSpaceTimeAStar(Heuristic):
-    def __init__(self, initial_state: "State"):
-        super().__init__(initial_state)
-
-    def f(self, state: 'State') -> 'int':
-        return state.g + self.h(state) + state.time_step
-
-    def __repr__(self):
-        return 'SpaceTimeA* evaluation'
-
-class HeuristicGreedy(Heuristic):
-    def __init__(self, initial_state: "State"):
-        super().__init__(initial_state)
-
-    def f(self, state: 'State') -> 'int':
-        return self.h(state)
-
-    def __repr__(self):
-        return "greedy evaluation"
 
 def calculate_manhattan_distance(first_position, second_position):
     return abs(first_position[0] - second_position[0]) + abs(first_position[1] - second_position[1])

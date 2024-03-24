@@ -1,13 +1,12 @@
-from state import State
+from src.domain.state import State
 
 
 class ConflictBasedSearch:
     def __init__(self):
         self.constraints = None
 
-
-def search(initial_state: State, agents: list, cost: int):
-    return None
+    def search(self, initial_state: State, agents: list, cost: int):
+        return None
 
 
 '''

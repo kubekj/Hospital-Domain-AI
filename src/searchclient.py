@@ -2,13 +2,23 @@ import argparse
 import sys
 import time
 import debugpy
-import memory
 
-from action import Action
-from frontier import Frontier, FrontierBFS, FrontierDFS, FrontierBestFirst, FrontierIW
-from graphsearch import Info, search
-from heuristic import Heuristic, HeuristicAStar, HeuristicWeightedAStar, HeuristicGreedy, HeuristicType
-from state import State
+from src.frontiers.frontier import Frontier
+from src.frontiers.best_first import FrontierBestFirst
+from src.frontiers.bfs import FrontierBFS
+from src.frontiers.dfs import FrontierDFS
+from src.frontiers.iw import FrontierIW
+
+from src.heuristics.heuristic import Heuristic, HeuristicType
+from src.heuristics.astar import HeuristicAStar
+from src.heuristics.greedy import HeuristicGreedy
+from src.heuristics.wastar import HeuristicWeightedAStar
+
+from src.utils import memory
+
+from src.domain.action import Action
+from src.searches.graphsearch import Info, search
+from src.domain.state import State
 
 
 class SearchClient:
@@ -25,7 +35,6 @@ class SearchClient:
 
         # Read initial state.
         # line is currently "#initial".
-
         return State.make_initial_state(server_messages)
 
     @staticmethod
@@ -92,7 +101,7 @@ class SearchClient:
             # Default to BFS search.
             frontier = FrontierBFS()
             print('Defaulting to BFS search. '
-                  'Use arguments -bfs, -dfs, -astar, -wastar, or -greedy to set the search strategy.',
+                  'Use arguments -bfs, -dfs, -astar, -wastar, -iw, or -greedy to set the search strategy.',
                   file=sys.stderr,
                   flush=True)
         # END: TO EDIT #
@@ -153,6 +162,7 @@ if __name__ == '__main__':
                         help='Name the file where the information will be stored.')
     parser.add_argument('--test-folder', metavar='<test_folder_path>', type=str, default='./tests',
                         help='Name the folder the files with the information will be stored.')
+
     strategy_group = parser.add_mutually_exclusive_group()
     strategy_group.add_argument('-bfs', action='store_true', dest='bfs', help='Use the BFS strategy.')
     strategy_group.add_argument('-dfs', action='store_true', dest='dfs', help='Use the DFS strategy.')
