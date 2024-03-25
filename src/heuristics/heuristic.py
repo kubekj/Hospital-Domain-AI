@@ -45,8 +45,8 @@ class Heuristic(metaclass=ABCMeta):
                     )
             case HeuristicType.ComplexDijkstra:
                 self.create_all_dijkstra_mappings(initial_state)
-                self.chokepoint_detection = [[None for _ in range(num_cols)] for _ in range(num_rows)]
-                self.chokepoint_count = {}
+                self.choke_point_detection = [[None for _ in range(num_cols)] for _ in range(num_rows)]
+                self.choke_point_count = {}
 
                 def name_chokepoints(row, col, id):
                     if State.walls[row][col]:
@@ -65,16 +65,16 @@ class Heuristic(metaclass=ABCMeta):
                     if 0 <= col - 1 and not State.walls[row][col - 1]:
                         possible_moves += [(row, col - 1)]
                     if len(possible_moves) > 2:
-                        self.chokepoint_detection[row][col] = NO_CHOKEPOINT
+                        self.choke_point_detection[row][col] = NO_CHOKEPOINT
                     else:
-                        self.chokepoint_detection[row][col] = id
-                        if not id in self.chokepoint_count:
-                            self.chokepoint_count[id] = 0
-                        self.chokepoint_count[id] += 1
+                        self.choke_point_detection[row][col] = id
+                        if not id in self.choke_point_count:
+                            self.choke_point_count[id] = 0
+                        self.choke_point_count[id] += 1
 
                     for move in possible_moves:
-                        if self.chokepoint_detection[move[0]][move[1]] is None:
-                            if self.chokepoint_detection[row][col] == NO_CHOKEPOINT:
+                        if self.choke_point_detection[move[0]][move[1]] is None:
+                            if self.choke_point_detection[row][col] == NO_CHOKEPOINT:
                                 id += 1
                             name_chokepoints(move[0], move[1], id)
 
@@ -98,7 +98,7 @@ class Heuristic(metaclass=ABCMeta):
         total_distance = 0
         # if len(state.boxes_dict) != sum([len(v) for b,v in State.agent_box_dict.items()]):
         #     return math.inf
-        # TODO: Make the code modular so it's more readable
+        # TODO: Modularize the code so it's more readable - move these to separate functions inside to specific classes
         match Heuristic.strategy:
             case HeuristicType.Simple:
                 for agent_index, (agent_row, agent_col) in enumerate(
@@ -156,10 +156,10 @@ class Heuristic(metaclass=ABCMeta):
                                 total_distance += 1
 
                         # COOPERATION COST
-                        if self.chokepoint_detection[agent_row][agent_col] != NO_CHOKEPOINT:
+                        if self.choke_point_detection[agent_row][agent_col] != NO_CHOKEPOINT:
                             for in_agent_index, (in_agent_row, in_agent_col) in enumerate(agents_zip[agent_index + 1:]):
-                                if self.chokepoint_detection[agent_row][agent_col] == \
-                                        self.chokepoint_detection[in_agent_row][in_agent_col]:
+                                if self.choke_point_detection[agent_row][agent_col] == \
+                                        self.choke_point_detection[in_agent_row][in_agent_col]:
                                     # total_distance += 1 # VERSION 1: CONSTANT COOPERATION COST
                                     total_distance += calculate_manhattan_distance((agent_row, agent_col), (
                                         in_agent_row, in_agent_col))  # VERSION 2: VARIALBE COOPERATION COST
@@ -229,10 +229,6 @@ class Heuristic(metaclass=ABCMeta):
         for box, loc in state.boxes_dict.items():
             self.initial_distances_from_box[box] = create_dijsktra_mapping(state, loc.row, loc.col, num_rows, num_cols)
 
-def calculate_manhattan_distance(first_position, second_position):
-    return abs(first_position[0] - second_position[0]) + abs(first_position[1] - second_position[1])
-
-
 def create_dijsktra_mapping(state: State, row, col, num_rows, num_cols, take_boxes_into_account=False):
     '''Return a map of the shape [num_rows, num_cols] with every cell filled with the distance to the cell (row, col),
     calculated with the Dijkstra algorithm. If a cell (i,j) is a wall, which we know by State.walls[i][j] == true, then
@@ -276,6 +272,8 @@ def create_dijsktra_mapping(state: State, row, col, num_rows, num_cols, take_box
 
     return distances
 
+def calculate_manhattan_distance(first_position, second_position):
+    return abs(first_position[0] - second_position[0]) + abs(first_position[1] - second_position[1])
 
 def get_close_boxes(row, col, agent_boxes, boxes_map):
     close_boxes = {}
