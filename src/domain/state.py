@@ -1,28 +1,32 @@
 import random
-from atom import Atom,AgentAt, BoxAt, Free, Location
-from color import Color
-from action import Action, Move, PossibleAction
+
+from src.domain.atom import Atom, AgentAt, BoxAt, Free, Location
+from src.utils.color import Color
+from src.domain.action import Action, Move
+
 from typing import Self
+
 
 class State:
     _RNG = random.Random(1)
     agent_colors = []
     box_colors = []
     agent_box_dict = {}
-    goal_literals:list[Atom] = []
+    goal_literals: list[Atom] = []
 
-    def __init__(self, literals):
+    def __init__(self, literals, time_step=0):
         self.literals: list[Atom] = literals
-        self.agent_locations = {lit.agt: lit.loc for lit in self.literals if isinstance(lit,AgentAt)}
-        
+        self.agent_locations = {lit.agt: lit.loc for lit in self.literals if isinstance(lit, AgentAt)}
+        self.time_step = time_step
         self.parent = None
         self.joint_action = None
         self.g = 0
         self._hash = None
 
+    @staticmethod
     def make_initial_state(server_messages):
         # Read colors.
-        server_messages.readline()  # #colors
+        server_messages.readline()  # colors
         agent_colors = [None for _ in range(10)]
         box_colors = [None for _ in range(26)]
         line = server_messages.readline()
@@ -36,7 +40,6 @@ class State:
                 elif 'A' <= e <= 'Z':
                     box_colors[ord(e) - ord('A')] = color
             line = server_messages.readline()
-
 
         literals = []
         num_rows = 0
@@ -56,11 +59,11 @@ class State:
             for col, c in enumerate(line):
                 if '0' <= c <= '9':
                     agent = ord(c) - ord('0')
-                    literals += [AgentAt(agent, Location(row,col))]
+                    literals += [AgentAt(agent, Location(row, col))]
                     num_agents += 1
                 elif 'A' <= c <= 'Z':
-                    literals += [BoxAt(agent, Location(row,col))]
-                elif c == '+' or c=='\n':
+                    literals += [BoxAt(agent, Location(row, col))]
+                elif c == '+' or c == '\n':
                     walls[row][col] = True
                 else:
                     # literals += [Free(Location(row,col))]
@@ -79,17 +82,16 @@ class State:
             for col, c in enumerate(line):
                 if '0' <= c <= '9':
                     agent = ord(c) - ord('0')
-                    goal_literals += [AgentAt(agent, Location(row,col))]
+                    goal_literals += [AgentAt(agent, Location(row, col))]
                     num_agents += 1
                 elif 'A' <= c <= 'Z':
-                    goal_literals += [BoxAt(agent, Location(row,col))]
+                    goal_literals += [BoxAt(agent, Location(row, col))]
 
             row += 1
             line = server_messages.readline()
 
         # End.
         # line is currently "#end".
-
 
         State.agent_colors = agent_colors
         State.box_colors = box_colors
@@ -103,11 +105,11 @@ class State:
         copy_literals = self.literals[:]
         for action in joint_action:
             copy_literals = action.apply_effects(copy_literals)
-        
-        copy_state = State(copy_literals)
+        copy_state = State(copy_literals, self.time_step + 1)
         copy_state.parent = self
         copy_state.joint_action = joint_action[:]
         copy_state.g = self.g + 1
+
         return copy_state
 
     def is_goal_state(self) -> bool:
@@ -115,7 +117,7 @@ class State:
             if goal not in self.literals:
                 return False
         return True
-    
+
     def get_expanded_states(self) -> list[Self]:
         num_agents = len(self.agent_locations)
 
@@ -153,17 +155,20 @@ class State:
         State._RNG.shuffle(expanded_states)
         return expanded_states
 
-    def is_applicable(self, action: Action, literals: list[Atom]) -> bool:
+    @staticmethod
+    def is_applicable(action: Action, literals: list[Atom]) -> bool:
         if isinstance(action, Move):
             return Move(action.agt, action.agtfrom, action.agtto).check_preconditions(literals)
         elif isinstance(action, Action):
             return Action(action.agt).check_preconditions(literals)
+
         return False
-    
+
     def get_applicable_actions(self, agent: int) -> Action:
         agtfrom = self.agent_locations[agent]
         possibilities = []
         possible_actions = [Action, Move]
+
         for action in possible_actions:
             if action is Move:
                 for agtto in agtfrom.neighbours:
@@ -172,6 +177,7 @@ class State:
                         possibilities.append(Move(agent, agtfrom, agtto))
             elif action is Action:
                 possibilities.append(Action(agent))
+
         return possibilities
 
     def is_conflicting(self, joint_action: list[Action]) -> bool:
@@ -179,19 +185,23 @@ class State:
         # For all applicable actions ai and aj where the precondition of one is inconsistent with the 
         # effect of the other, either CellCon ict(ai aj) or BoxCon ict(ai aj) holds.
         literals = self.literals[:]
+
         for agt, action in enumerate(joint_action):
             if self.is_applicable(action, literals):
                 literals = action.apply_effects(literals)
             else:
                 return True
+
         return False
 
     def extract_plan(self) -> list[list[Action]]:
         plan = [None for _ in range(self.g)]
         state = self
+
         while state.joint_action is not None:
             plan[state.g - 1] = state.joint_action
             state = state.parent
+
         return plan
 
     def __hash__(self):
@@ -202,17 +212,18 @@ class State:
             _hash = _hash * prime + hash(tuple(State.agent_colors))
             _hash = _hash * prime + hash(tuple(State.box_colors))
             _hash = _hash * prime + hash(tuple(State.goal_literals))
+            _hash = _hash * prime + hash(self.time_step)
             self._hash = _hash
         return self._hash
 
     def __eq__(self, other):
         if self is other:
             return True
-        if not isinstance(other, State):
-            return False
-        if set(self.literals) != set(other.literals):
-            return False
-        return True
+
+        if isinstance(other, State):
+            return set(self.literals) == set(other.literals) and self.time_step == other.time_step
+
+        return False
 
     def __repr__(self):
         return f"||{'^'.join(str(lit) for lit in self.literals)}||"
