@@ -7,7 +7,7 @@ class HeuristicSimple(Heuristic):
         super().__init__(initial_state)
 
     def f(self, state):
-        return state
+        return self.h(state)
 
     def __repr__(self):
         return "Simple heuristic"
