@@ -7,15 +7,14 @@ from src.domain.atom import AgentAt, BoxAt, Free, Location
 from src.domain.state import State
 from enum import Enum, unique
 
+NO_CHOKEPOINT = -1
+
 @unique
 class HeuristicType(Enum):
     Simple = 0,
     SimpleDijkstra = 1,
     ComplexDijkstra = 2
     Manhattan = 3
-
-
-NO_CHOKEPOINT = -1
 
 
 class Heuristic(metaclass=ABCMeta):
@@ -40,7 +39,7 @@ class Heuristic(metaclass=ABCMeta):
                 self.distances_from_box_goals = {}
                 self.initial_distances_from_box = {}
                 for agent, loc in self.agent_goal_positions.items():
-                    self.distances_from_agent_goals[agent] = create_dijsktra_mapping(
+                    self.distances_from_agent_goals[agent] = create_dijkstra_mapping(
                         initial_state, loc.row, loc.col, num_rows, num_cols
                     )
             case HeuristicType.ComplexDijkstra:
@@ -96,8 +95,6 @@ class Heuristic(metaclass=ABCMeta):
 
     def h(self, state: 'State') -> 'int':
         total_distance = 0
-        # if len(state.boxes_dict) != sum([len(v) for b,v in State.agent_box_dict.items()]):
-        #     return math.inf
         # TODO: Modularize the code so it's more readable - move these to separate functions inside to specific classes
         match Heuristic.strategy:
             case HeuristicType.Simple:
@@ -129,7 +126,7 @@ class Heuristic(metaclass=ABCMeta):
                 # In state.result if an agent moves away from a box that has been previously moved
                 if state.recalculateDistanceOfBox is not None:
                     (box_row, box_col) = state.boxes_dict[state.recalculateDistanceOfBox]
-                    self.initial_distances_from_box[state.recalculateDistanceOfBox] = create_dijsktra_mapping(state, box_row, box_col, len(State.walls), len(State.walls[0]))
+                    self.initial_distances_from_box[state.recalculateDistanceOfBox] = create_dijkstra_mapping(state, box_row, box_col, len(State.walls), len(State.walls[0]))
                     state.recalculateDistanceOfBox = None
                 agents_zip = list(zip(state.agent_rows, state.agent_cols))
                 for agent_index, (agent_row, agent_col) in enumerate(agents_zip):
@@ -223,16 +220,18 @@ class Heuristic(metaclass=ABCMeta):
         self.distances_from_box_goals = {}
         self.initial_distances_from_box = {}
         for agent, loc in self.agent_goal_positions.items():
-            self.distances_from_agent_goals[agent] = create_dijsktra_mapping(state, loc.row, loc.col, num_rows, num_cols)
+            self.distances_from_agent_goals[agent] = create_dijkstra_mapping(state, loc.row, loc.col, num_rows, num_cols)
         for box, loc in self.box_goal_positions.items():
-            self.distances_from_box_goals[box] = create_dijsktra_mapping(state, loc.row, loc.col, num_rows, num_cols)
+            self.distances_from_box_goals[box] = create_dijkstra_mapping(state, loc.row, loc.col, num_rows, num_cols)
         for box, loc in state.boxes_dict.items():
-            self.initial_distances_from_box[box] = create_dijsktra_mapping(state, loc.row, loc.col, num_rows, num_cols)
+            self.initial_distances_from_box[box] = create_dijkstra_mapping(state, loc.row, loc.col, num_rows, num_cols)
 
-def create_dijsktra_mapping(state: State, row, col, num_rows, num_cols, take_boxes_into_account=False):
-    '''Return a map of the shape [num_rows, num_cols] with every cell filled with the distance to the cell (row, col),
+def create_dijkstra_mapping(state: State, row, col, num_rows, num_cols, take_boxes_into_account=False):
+    """
+    Return a map of the shape [num_rows, num_cols] with every cell filled with the distance to the cell (row, col),
     calculated with the Dijkstra algorithm. If a cell (i,j) is a wall, which we know by State.walls[i][j] == true, then
-     the distance will be math.inf '''
+    the distance will be math.inf
+    """
     distances = [[math.inf for _ in range(num_cols)] for _ in range(num_rows)]
 
     def my_is_free(row, col):

@@ -4,6 +4,7 @@ import os.path
 import sys
 import time
 
+from src.frontiers.best_first import FrontierBestFirst
 from src.frontiers.frontier import Frontier
 from src.frontiers.iw import FrontierIW
 
@@ -17,7 +18,7 @@ start_time = time.perf_counter()
 saved_once = False
 
 
-def search(initial_state: State, frontier: Frontier):
+def graph_search(initial_state: State, frontier: Frontier):
     if not saved_once:
         save_run_information(None, None, None, {'Passed': False})
 
@@ -49,14 +50,12 @@ def search(initial_state: State, frontier: Frontier):
         # Assuming expanded_states is obtained from some state.get_expanded_states() method
         expanded_states = state.get_expanded_states()
 
-        # Assuming heuristics is a list of heuristic values for each state in expanded_states
-        heuristics = [frontier.heuristic.h(s) for s in expanded_states]
+        if isinstance(frontier, (FrontierIW, FrontierBestFirst)):
+            heuristics = [frontier.heuristic.h(s) for s in expanded_states]
+            sorted_states = sorted(zip(heuristics, expanded_states), key=lambda x: x[0])
+            expanded_states = [s for _, s in sorted_states]
 
-        # Combine expanded_states with their corresponding heuristics, sort by heuristic, and extract states
-        sorted_states = [(h, state) for h, state in sorted(zip(heuristics, expanded_states), key=lambda x: x[0])]
-
-        # Now sorted_states contains the states ordered by their heuristic values
-        for expanded_state in [s for (_, s) in sorted_states]:
+        for expanded_state in expanded_states:
             if not frontier.contains(expanded_state) and expanded_state not in explored:
                 frontier.add(expanded_state)
 

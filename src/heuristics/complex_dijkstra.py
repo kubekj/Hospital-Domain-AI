@@ -5,6 +5,7 @@ from src.heuristics.simple_dijkstra import HeuristicSimpleDijkstra
 
 NO_CHOKE_POINT = -1
 
+
 # TODO: Transform code so it utilizes this class
 class HeuristicComplexDijkstra(Heuristic):
     def __init__(self, initial_state: "State", num_rows, num_cols):
@@ -67,11 +68,11 @@ class HeuristicComplexDijkstra(Heuristic):
         self.distances_from_box_goals = {}
         self.initial_distances_from_box = {}
         for agent, loc in self.agent_goal_positions.items():
-            self.distances_from_agent_goals[agent] = HeuristicSimpleDijkstra.create_mapping(state, loc.row, loc.col, num_rows,
-                                                                             num_cols)
+            self.distances_from_agent_goals[agent] = HeuristicSimpleDijkstra.create_mapping(state, loc.row, loc.col,
+                                                                                            num_rows, num_cols)
         for box, loc in self.box_goal_positions.items():
-            self.distances_from_box_goals[box] = HeuristicSimpleDijkstra.create_mapping(state, loc.row, loc.col, num_rows,
-                                                                         num_cols)
+            self.distances_from_box_goals[box] = HeuristicSimpleDijkstra.create_mapping(state, loc.row, loc.col,
+                                                                                        num_rows, num_cols)
         for box, loc in state.boxes_dict.items():
-            self.initial_distances_from_box[box] = HeuristicSimpleDijkstra.create_mapping(state, loc.row, loc.col, num_rows,
-                                                                           num_cols)
+            self.initial_distances_from_box[box] = HeuristicSimpleDijkstra.create_mapping(state, loc.row, loc.col,
+                                                                                          num_rows, num_cols)

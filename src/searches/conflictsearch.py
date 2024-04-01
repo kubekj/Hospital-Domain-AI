@@ -5,7 +5,7 @@ class ConflictBasedSearch:
     def __init__(self):
         self.constraints = None
 
-    def search(self, initial_state: State, agents: list, cost: int):
+    def conflict_based_search(self, initial_state: State, agents: list, cost: int):
         return None
 
 

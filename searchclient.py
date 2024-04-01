@@ -3,22 +3,21 @@ import sys
 import time
 import debugpy
 
-from src.frontiers.frontier import Frontier
+from src.domain.state import State
+
 from src.frontiers.best_first import FrontierBestFirst
 from src.frontiers.bfs import FrontierBFS
 from src.frontiers.dfs import FrontierDFS
 from src.frontiers.iw import FrontierIW
 
-from src.heuristics.heuristic import Heuristic, HeuristicType
 from src.heuristics.astar import HeuristicAStar
 from src.heuristics.greedy import HeuristicGreedy
+from src.heuristics.heuristic import Heuristic, HeuristicType
 from src.heuristics.wastar import HeuristicWeightedAStar
 
-from src.utils import memory
+from src.searches.graphsearch import Info, graph_search
 
-from src.domain.action import Action
-from src.searches.graphsearch import Info, search
-from src.domain.state import State
+from src.utils import memory
 
 
 class SearchClient:
@@ -26,11 +25,11 @@ class SearchClient:
     def parse_level(server_messages) -> State:
         # We can assume that the level file is conforming to specification, since the server verifies this.
         # Read domain.
-        server_messages.readline()  # #domain
+        server_messages.readline()  # domain
         server_messages.readline()  # hospital
 
         # Read Level name.
-        server_messages.readline()  # #levelname
+        server_messages.readline()  # level name
         Info.level_name = server_messages.readline().strip()  # <name>
 
         # Read initial state.
@@ -38,41 +37,12 @@ class SearchClient:
         return State.make_initial_state(server_messages)
 
     @staticmethod
-    def print_search_status(start_time: int, explored: list[State], frontier: Frontier) -> None:
-        status_template = ('#Expanded: {:8,}, '
-                           '#Frontier: {:8,}, '
-                           '#Generated: {:8,}, '
-                           'Time: {:3.3f} s'
-                           '\n[Alloc: {:4.2f} MB, MaxAlloc: {:4.2f} MB]')
-        elapsed_time = time.perf_counter() - start_time
-        print(status_template.format(len(explored), frontier.size(), len(explored) + frontier.size(), elapsed_time,
-                                     memory.get_usage(), memory.max_usage), file=sys.stderr, flush=True)
+    def set_heuristic_strategy(args):
+        """
+        Sets the heuristic strategy based on the provided arguments.
 
-    @staticmethod
-    def main(args) -> None:
-        # Use stderr to print to the console.
-        print('SearchClient initializing. I am sending this using the error output stream.', file=sys.stderr,
-              flush=True)
-
-        # Send client name to server.
-        if hasattr(sys.stdout, "reconfigure"):
-            sys.stdout.reconfigure(encoding='ASCII')
-        print('SearchClient', flush=True)
-
-        # We can also print comments to stdout by prefixing with a #.
-        print('#This is a comment.', flush=True)
-
-        # Parse the level.
-        server_messages = sys.stdin
-        if hasattr(server_messages, "reconfigure"):
-            server_messages.reconfigure(encoding='ASCII')
-        initial_state = SearchClient.parse_level(server_messages)
-
-        Info.test_name = args.test_name
-        Info.test_folder = args.test_folder
-
-        # START: TO EDIT #
-
+        :param args: The command line arguments.
+        """
         if args.simple:
             Heuristic.strategy = HeuristicType.Simple
         elif args.s_dij:
@@ -84,66 +54,97 @@ class SearchClient:
         else:
             Heuristic.strategy = HeuristicType.Simple
 
-        # Select search strategy.
+    @staticmethod
+    def set_frontier_strategy(args, initial_state):
+        """
+        Sets the frontier strategy based on the provided arguments.
+
+        :param args: The command line arguments.
+        :param initial_state: The initial state of the search.
+        :return: The frontier object based on the selected strategy.
+        """
         if args.bfs:
-            frontier = FrontierBFS()
+            return FrontierBFS()
         elif args.dfs:
-            frontier = FrontierDFS()
+            return FrontierDFS()
         elif args.astar:
-            frontier = FrontierBestFirst(HeuristicAStar(initial_state))
+            return FrontierBestFirst(HeuristicAStar(initial_state))
         elif args.wastar is not False:
-            frontier = FrontierBestFirst(HeuristicWeightedAStar(initial_state, args.wastar))
+            return FrontierBestFirst(HeuristicWeightedAStar(initial_state, args.wastar))
         elif args.greedy:
-            frontier = FrontierBestFirst(HeuristicGreedy(initial_state))
+            return FrontierBestFirst(HeuristicGreedy(initial_state))
         elif args.iw:
-            frontier = FrontierIW(HeuristicGreedy(initial_state), 1)
+            return FrontierIW(HeuristicGreedy(initial_state), 1)
         else:
             # Default to BFS search.
-            frontier = FrontierBFS()
             print('Defaulting to BFS search. '
-                  'Use arguments -bfs, -dfs, -astar, -wastar, -iw, or -greedy to set the search strategy.',
+                  'Use arguments -bfs, -dfs, -astar, -wastar, or -greedy to set the search strategy.',
                   file=sys.stderr,
                   flush=True)
-        # END: TO EDIT #
+            return FrontierBFS()
 
-        # Search for a plan.
+    @staticmethod
+    def initialize_and_configure(args):
+        """
+        Initializes and configures the search client.
+
+        :param args: The command line arguments.
+        :return: The initial state and the frontier.
+        """
+        print('SearchClient initializing. I am sending this using the error output stream.',
+              file=sys.stderr,
+              flush=True)
+
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding='ASCII')
+
+        print('SearchClient', flush=True)
+        print('#This is a comment.', flush=True)
+
+        server_messages = sys.stdin
+        if hasattr(server_messages, "reconfigure"):
+            server_messages.reconfigure(encoding='ASCII')
+        initial_state = SearchClient.parse_level(server_messages)
+
+        Info.test_name = args.test_name
+        Info.test_folder = args.test_folder
+
+        SearchClient.set_heuristic_strategy(args)
+        frontier = SearchClient.set_frontier_strategy(args, initial_state)
+
+        return initial_state, frontier
+
+    @staticmethod
+    def execute_and_print_plan(initial_state, frontier, server_messages):
+        """
+        Executes the search plan and prints the results.
+
+        :param initial_state: The initial state of the search.
+        :param frontier: The frontier used by the search algorithm.
+        :param server_messages: The server messages.
+        """
         print('Starting {}.'.format(frontier.get_name()), file=sys.stderr, flush=True)
-        plan = search(initial_state, frontier)
-        # Print plan to server.
+        plan = graph_search(initial_state, frontier)
+
         if plan is None:
             print('Unable to solve level.', file=sys.stderr, flush=True)
             sys.exit(0)
         else:
             print('Found solution of length {}.'.format(len(plan)), file=sys.stderr, flush=True)
-            if True:
-                states = [None for _ in range(len(plan) + 1)]
-                states[0] = initial_state
+            states = [None for _ in range(len(plan) + 1)]
+            states[0] = initial_state
             for ip, joint_action in enumerate(plan):
                 states[ip + 1] = states[ip].result(joint_action)
-                if Heuristic.strategy == HeuristicType.ComplexDijkstra:
-                    my_message = str(frontier.heuristic.f(states[ip + 1]))
-                    action = Action.PullNE
-                    if states[ip].is_applicable(0, action):
-                        my_message += "-" + str(frontier.heuristic.f(states[ip].result([action])))
-                else:
-                    my_message = None
+                my_message = str(frontier.heuristic.f(
+                    states[ip + 1])) if Heuristic.strategy == HeuristicType.ComplexDijkstra else None
                 print("|".join(a.get_name() + '@' + (my_message if my_message is not None else a.get_name()) for a in
                                joint_action), flush=True)
-                # We must read the server's response to not fill up the stdin buffer and block the server.
-                response = server_messages.readline()
-                if fail_info:
-                    answers = response.split('|')
-                    failed = [a.strip() != 'true' for a in answers]
-                    if any(failed):
-                        print(
-                            f'''Failed move in step: {ip}. @@ {"|".join(f"#{a.get_name()}#" for a in joint_action)} @@ {response}''',
-                            flush=True)
+                server_messages.readline()
 
-                if True:
-                    states[ip + 1] = states[ip].result(joint_action)
-                    states[ip].is_conflicting(joint_action)
-                    # states[ip].is_applicable(0, joint_action[0])
-                    pass
+    @staticmethod
+    def main(args) -> None:
+        initial_state, frontier = SearchClient.initialize_and_configure(args)
+        SearchClient.execute_and_print_plan(initial_state, frontier, sys.stdin)
 
 
 debug = False
