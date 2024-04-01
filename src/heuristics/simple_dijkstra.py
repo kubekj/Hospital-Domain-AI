@@ -4,18 +4,34 @@ import math
 from src.domain.atom import Free, Location
 from src.heuristics.heuristic import Heuristic
 from src.domain.state import State
+from src.utils.info import Info
+
 
 # TODO: Transform code so it utilizes this class
 class HeuristicSimpleDijkstra(Heuristic):
-    def __init__(self, initial_state: "State", num_rows, num_cols):
+    def __init__(self, initial_state: "State"):
         super().__init__(initial_state)
         self.distances_from_agent_goals = {}
         self.distances_from_box_goals = {}
         self.initial_distances_from_box = {}
         for agent, loc in self.agent_goal_positions.items():
             self.distances_from_agent_goals[agent] = self.create_mapping(
-                initial_state, loc.row, loc.col, num_rows, num_cols
+                initial_state, loc.row, loc.col, self.num_rows, self.num_cols
             )
+
+    def h(self, state: 'State') -> 'int':
+        total_distance = 0
+        for agent_index, agent_loc in state.agent_locations.items():
+            agent = agent_index
+            try:
+                if agent in self.distances_from_agent_goals:
+                    total_distance += self.distances_from_agent_goals[agent][agent_loc.row][agent_loc.col]
+            except Exception as ex:
+                print(Info.level_name)
+                print(ex)
+                print(self.distances_from_agent_goals)
+                break
+        return total_distance
 
     def f(self, state: 'State') -> 'int':
         return self.h(state)

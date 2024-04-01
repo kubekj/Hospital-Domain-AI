@@ -22,13 +22,11 @@ def graph_search(initial_state: State, frontier: Frontier):
     if not saved_once:
         save_run_information(None, None, None, {'Passed': False})
 
-    iterations = 0
+    # iterations = 0
     frontier.add(initial_state)
     explored = set()
 
     while True:
-        # log_search_status(iterations, explored, frontier)
-
         if frontier.is_empty():
             if isinstance(frontier, FrontierIW):
                 frontier = FrontierIW(frontier.heuristic, frontier.width + 1)

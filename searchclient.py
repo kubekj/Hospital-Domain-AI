@@ -1,6 +1,6 @@
 import argparse
 import sys
-import time
+
 import debugpy
 
 from src.domain.state import State
@@ -11,8 +11,9 @@ from src.frontiers.dfs import FrontierDFS
 from src.frontiers.iw import FrontierIW
 
 from src.heuristics.astar import HeuristicAStar
-from src.heuristics.greedy import HeuristicGreedy
-from src.heuristics.heuristic import Heuristic, HeuristicType
+from src.heuristics.manhattan import HeuristicManhattan
+from src.heuristics.simple import HeuristicSimple
+from src.heuristics.simple_dijkstra import HeuristicSimpleDijkstra
 from src.heuristics.wastar import HeuristicWeightedAStar
 
 from src.searches.graphsearch import Info, graph_search
@@ -37,30 +38,32 @@ class SearchClient:
         return State.make_initial_state(server_messages)
 
     @staticmethod
-    def set_heuristic_strategy(args):
+    def set_heuristic_strategy(args, initial_state):
         """
         Sets the heuristic strategy based on the provided arguments.
 
         :param args: The command line arguments.
+        :param initial_state: The initial state of the search.
         """
         if args.simple:
-            Heuristic.strategy = HeuristicType.Simple
+            return HeuristicSimple(initial_state)
         elif args.s_dij:
-            Heuristic.strategy = HeuristicType.SimpleDijkstra
-        elif args.c_dij:
-            Heuristic.strategy = HeuristicType.ComplexDijkstra
+            return HeuristicSimpleDijkstra(initial_state)
+        # elif args.c_dij:
+        #     return HeuristicComplexDijkstra(initial_state)
         elif args.manhattan:
-            Heuristic.strategy = HeuristicType.Manhattan
+            return HeuristicManhattan(initial_state)
         else:
-            Heuristic.strategy = HeuristicType.Simple
+            return HeuristicSimple(initial_state)
 
     @staticmethod
-    def set_frontier_strategy(args, initial_state):
+    def set_frontier_strategy(args, initial_state, heuristic):
         """
         Sets the frontier strategy based on the provided arguments.
 
         :param args: The command line arguments.
         :param initial_state: The initial state of the search.
+        :param heuristic: The heuristic used by the greedy or IW search algorithm. (Other frontiers have default heuristics)
         :return: The frontier object based on the selected strategy.
         """
         if args.bfs:
@@ -72,9 +75,9 @@ class SearchClient:
         elif args.wastar is not False:
             return FrontierBestFirst(HeuristicWeightedAStar(initial_state, args.wastar))
         elif args.greedy:
-            return FrontierBestFirst(HeuristicGreedy(initial_state))
+            return FrontierBestFirst(heuristic)
         elif args.iw:
-            return FrontierIW(HeuristicGreedy(initial_state), 1)
+            return FrontierIW(heuristic, 1)
         else:
             # Default to BFS search.
             print('Defaulting to BFS search. '
@@ -109,18 +112,19 @@ class SearchClient:
         Info.test_name = args.test_name
         Info.test_folder = args.test_folder
 
-        SearchClient.set_heuristic_strategy(args)
-        frontier = SearchClient.set_frontier_strategy(args, initial_state)
+        heuristic = SearchClient.set_heuristic_strategy(args, initial_state)
+        frontier = SearchClient.set_frontier_strategy(args, initial_state, heuristic)
 
-        return initial_state, frontier
+        return initial_state, heuristic, frontier
 
     @staticmethod
-    def execute_and_print_plan(initial_state, frontier, server_messages):
+    def execute_and_print_plan(initial_state, frontier, heuristic, server_messages):
         """
         Executes the search plan and prints the results.
 
         :param initial_state: The initial state of the search.
         :param frontier: The frontier used by the search algorithm.
+        :param heuristic: The heuristic used by the search algorithm.
         :param server_messages: The server messages.
         """
         print('Starting {}.'.format(frontier.get_name()), file=sys.stderr, flush=True)
@@ -135,16 +139,18 @@ class SearchClient:
             states[0] = initial_state
             for ip, joint_action in enumerate(plan):
                 states[ip + 1] = states[ip].result(joint_action)
-                my_message = str(frontier.heuristic.f(
-                    states[ip + 1])) if Heuristic.strategy == HeuristicType.ComplexDijkstra else None
-                print("|".join(a.get_name() + '@' + (my_message if my_message is not None else a.get_name()) for a in
-                               joint_action), flush=True)
+                # TODO: Make ComplexDijkstra work with this
+                # my_message = str(frontier.heuristic.f(
+                #     states[ip + 1])) if isinstance(heuristic, HeuristicComplexDijkstra) else None
+                # print("|".join(a.get_name() + '@' + (my_message if my_message is not None else a.get_name()) for a in
+                #                joint_action), flush=True)
+                print("|".join(a.get_name() for a in joint_action), flush=True)
                 server_messages.readline()
 
     @staticmethod
     def main(args) -> None:
-        initial_state, frontier = SearchClient.initialize_and_configure(args)
-        SearchClient.execute_and_print_plan(initial_state, frontier, sys.stdin)
+        initial_state, heuristic, frontier = SearchClient.initialize_and_configure(args)
+        SearchClient.execute_and_print_plan(initial_state, frontier, heuristic, sys.stdin)
 
 
 debug = False
