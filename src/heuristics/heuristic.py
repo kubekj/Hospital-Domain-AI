@@ -1,11 +1,7 @@
-import math
-import heapq
-
 from abc import ABCMeta, abstractmethod
-from src.utils.info import Info
-from src.domain.atom import AgentAt, BoxAt, Free, Location
+
+from src.domain.atom import AgentAt, BoxAt, Free
 from src.domain.state import State
-from enum import Enum, unique
 
 NO_CHOKE_POINT = -1
 
@@ -25,19 +21,27 @@ class Heuristic(metaclass=ABCMeta):
         self.num_cols = len(Free.walls[0])
 
     def h(self, state: 'State') -> 'int':
-        total_distance = 0
-        for agent_index, (agent_row, agent_col) in enumerate(zip(state.agent_rows, state.agent_cols)):
-            agent_goal = str(agent_index)
-            if agent_goal in self.agent_goal_positions:
-                goal_row, goal_col = self.agent_goal_positions[agent_goal]
-                if agent_row != goal_row or agent_col != goal_col:
-                    total_distance += 1
+        goal_count = 0
 
-        for box, (row, col) in self.box_goal_positions.items():
-            if state.boxes[row][col] != box:
-                total_distance += 1
+        # Count agents not at their goal positions
+        for agent, goal_loc in self.agent_goal_positions.items():
+            agent_loc = None
+            for lit in state.literals:
+                if isinstance(lit, AgentAt) and lit.agt == agent:
+                    agent_loc = lit.loc
+            if agent_loc and agent_loc != goal_loc:
+                goal_count += 1
 
-        return total_distance
+        # Count boxes not at their goal positions
+        for box, goal_loc in self.box_goal_positions.items():
+            box_loc = None
+            for lit in state.literals:
+                if isinstance(lit, BoxAt) and lit.box == box:
+                    box_loc = lit.loc
+            if box_loc and box_loc != goal_loc:
+                goal_count += 1
+
+        return goal_count
 
     @abstractmethod
     def f(self, state: "State") -> "int":
