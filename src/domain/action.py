@@ -1,5 +1,5 @@
-from atom import AgentAt, Atom, Neighbour, Free, Location
 from enum import Enum, unique
+from src.domain.atom import Atom, Location, AgentAt, Neighbour, Free
 
 
 class Action:
