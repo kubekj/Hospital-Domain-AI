@@ -1,0 +1,117 @@
+#domain
+hospital
+#levelname
+TCPpp
+#colors
+blue: A, 1
+red: 0, B, G
+lightblue: 3, E, C
+purple: 2, F
+grey: 4, 5, 6, 7, 8, D, H
+green: I
+orange: 9
+#initial
+++++++++++++++++++++++++++++++++++++++++++++++++++
++II     1III                   5     A       F   +
++II IIIIIIIIDDDDDDDDDDDDDDDDDDDDDDDDDA F   F   F +
++II C    A IDDDDDDDDDDDDDDDDDDDDDDDDDA FFFFFFFFFF+
++ B    C IIIDDDDDDDDDDDDDDDDDDDDDDDDDA F         +
++IIIIIII IIIDDDDDDDDDDDDDDDDDDDDDDDDDA FFF FFFFF +
++III0    IIIDDDDDDDDDDDDDDDDDDDDDDDDDA   F F   F +
++IIIIIIIIIII                         A F   F F   +
++                                    AFFFFFF FFFF+
++DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDA     F     +
++DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDA F F F F F +
++DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDA FFF FFFFF +
++DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDA3FCC       +
++DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDAAAAAAAAAAAA+
++DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDA   A      F+
++                                    AFA    AAAAA+
++                                    AAAAAA2     +
++AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA   A   AAAA+
++CD    CCCCD D              C          A   A   F +
++C CC D    DD FFFFFFFFFFFFF CGGGGGGGGGGGGGGGGGGGG+
++C     D   C DC             C        H   H    H  +
++CCDC CCC  C CC FFFFFFFFFFFFC    H    H          +
++CC C      C  C             C      7             +
++CC CD   C C  FFFFFFFFFFFFF C   H  H    H        +
++C   C      D C             C           H   H    +
++C   C     D4 C FFFFFFFFFFFFC   H   H            +
++C D C  CCC   C             C  H    H      H   H +
++C D CCC D    FFFFFFFFFFFFF C     HH  HH         +
++C C D      D CDD           C                    +
++C CCCCCD     FFFFFFFFFFFFFFC        H   H    H  +
++FFFFFFFFFFFFFF             C H   H              +
++FFFFFFFFFFFFFFFFFFFFFFFFFFFFCC                  +
++C6     H           CCHCC     C  H   H           +
++C    CCHCC C CCCCC   H       C      H  H H H    +
++CCCCCCCCCCCCCCCCCCCCCCCCCCCC C                  +
++C    CCHCC CCCCC C   H       CH    H      H   H +
++C      H           CCHCC     C                  +
++C CCCCCCCCCCCCCCCCCCCCCCCCCCCC     H   H  H    H+
++C      H           CCHCC     C                  +
++C    CCHCC C CCCCC   H       C   H    H   H     +
++CCCCCCCCCCCCCCCCCCCCCCCCCCCC C                  +
++C    CCHCC CCCCC C   H       C  H   H    H   H  +
++C      H           CCHCC     C                  +
++CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC       H   +
++AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC           +
++HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHC  H        +
++                                    C           +
++                                    C    H  H   +
++                                   8C           +
++                                    C H   H    9+
+++++++++++++++++++++++++++++++++++++++++++++++++++
+#goal
+++++++++++++++++++++++++++++++++++++++++++++++++++
++II     1III                         A   CC  F   +
++II IIIIIIII                         A F   F   F3+
++II C     AI                         A FFFFFFFFFF+
++B     C III                         A F         +
++IIIIIII III                         A FFF FFFFF +
++III0    III                         A   F F   F +
++IIIIIIIIIII                         A F   F F   +
++                                    AFFFFFF FFFF+
++                                    A     F     +
++                                    A F F F F F +
++                                    A FFF FFFFF +
++                                    A F         +
++                                    AAAAAAAAAAAA+
++                                    A   A       +
++                                    A A    AAAAA+
++5                                   AAAAAA    FF+
++AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA   A   AAAA+
++C     CCCC                 C2 F       A   A     +
++C CC        DFFFFFFFFFFFFF CGGGGGGGGGGGGGGGGGGGG+
++C         C  C             C9                   +
++CC C CCC  C CC FFFFFFFFFFFFC                    +
++CC CDDDDDDC DC             C                    +
++CC C DDDC C  FFFFFFFFFFFFF C                    +
++CD  CDDDDD   C             C           7        +
++C   CDDD     C FFFFFFFFFFFFC                    +
++C   C  CCC   C             C                    +
++C   CCC      FFFFFFFFFFFFF C                    +
++C C          C             C                    +
++C CCCCC      FFFFFFFFFFFFFFC                    +
++FFFFFFFFFFFFFF             C                    +
++FFFFFFFFFFFFFFFFFFFFFFFFFFFFCC                  +
++C           H      CC CC  H  C                  +
++C    CC CC CHCCCCC        H  C                  +
++CCCCCCCCCCCCCCCCCCCCCCCCCCCC C                  +
++C H  CC CC CCCCCHC           C                  +
++C H             H  CC CC     C                  +
++C CCCCCCCCCCCCCCCCCCCCCCCCCCCC                  +
++C           H      CC CC  H  C                  +
++C    CC CC CHCCCCC        H  C                  +
++CCCCCCCCCCCCCCCCCCCCCCCCCCCC C                  +
++CH   CC CC CCCCCHC           C                  +
++CH     6        H  CC CC     C                  +
++CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCHH         +
++AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC           +
++                                    C  H        +
++                                    C           +
++8                                   C    H  H   +
++                                    C           +
++HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHC H   H     +
+++++++++++++++++++++++++++++++++++++++++++++++++++
+#end

@@ -1,0 +1,34 @@
+#domain
+hospital
+#levelname
+GThirty
+#colors
+red: 0, A
+green: 1, B
+purple: 2, C
+blue: 3, D
+orange: 4, E
+grey: 5, F
+#initial
+++++++++++++
++ 0   AB   +
++          +
++   F      +
++  E1C     +
++   D      +
++       5  +
++      + + +
++     4 2 3+
+++++++++++++
+#goal
+++++++++++++
++         A+
++         B+
++ C        +
++ D        +
++ E        +
++ F        +
++      +5+ +
++     01234+
+++++++++++++
+#end

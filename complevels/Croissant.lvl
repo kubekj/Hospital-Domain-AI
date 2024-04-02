@@ -1,0 +1,40 @@
+#domain
+hospital
+#levelname
+Croissant
+#colors
+red: 0, 2, A, E, I, O, U
+blue: 1, 3, C, D, J, N, P, R, S, T, W
+orange: 4, 5, 6, X, Y
+brown: 7, H
+#initial
++++++++++++++++++++
++S ++++0++++  +A+T+
++    U   PE D +C+E+
++  ++++N++++  +C+J+
++ C  R+O+     +E+E+
++   1 +W+ T I +P+C+
++YYHYHWHWHYHYY+T+R+
++WHYHW4 6WHYHW+   +
++     XXX     +23 +
++ XX  X X  XX +   +
++ XCROISSANTX + 7 +
++ XX  X X  XX +HYH+
++     XXX    5+   +
++++++++++++++++++++
+#goal
++++++++++++++++++++
++  ++++I++++  +A+R+
++ DON T SCREW +C+E+
++  ++++U++++  +C+J+
++     +P+     +E+E+
++     + +     +P+C+
++   YHW WHY   +T+T+
++WHY   5 WHY  +   +
++  XXXXXXX    +   +
++  X X X      +   +
++  CROISS  T  +   +
++  X XX  X    + Y +
++  XXX XXX    +H7H+
++++++++++++++++++++
+#end

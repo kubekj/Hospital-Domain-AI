@@ -1,0 +1,37 @@
+#domain
+hospital
+#levelname
+SelfConf
+#colors
+blue: 0,A
+orange: 1,B
+red: 2,C
+green: 3,D
+purple: 4,E,5,6, F
+orange: 7
+cyan: 8,G
+#initial
+++++++++++++++++++++++++
++       G   8EEEA      +
++7      AAAAAAAAA5 E   +
++AAAAAAAAEEEEEEEAF E   +
++AAAAAAAAEA0 1BEAF E   +
++EEEEEE AE     EAF E   +
++EEEEEEEAE     EAF E   +
++EEEEEEEAEC2 3DEAF E   +
++   EEEEAEEEEEEEAF E   +
++4  EEEEAAAAAAAAA6 E   +
+++++++++++++++++++++++++
+#goal
+++++++++++++++++++++++++
++          87          +
++                5    E+
++                 F   E+
++         D0 1C   F   E+
++      4          F   E+
++                 F   E+
++         B2 3A   F   E+
++                 F   E+
++                6    E+
+++++++++++++++++++++++++
+#end

@@ -1,0 +1,26 @@
+#domain
+hospital
+#levelname
+Colada
+#colors
+blue: 0, P
+red: 1, I
+green: 2, N
+purple: 3, A
+#initial
++++++++++
++0+1+2+3+
++       +
++A+I+P+N+
++       +
++       +
++++++++++
+#goal
++++++++++
++0+ +2+3+
++       +
++ + + + +
++1      +
++PINA   +
++++++++++
+#end

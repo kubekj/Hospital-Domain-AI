@@ -1,0 +1,66 @@
+#domain
+hospital
+#levelname
+SoftBoys
+#colors
+Blue: 0,Y
+Red: 3,M
+Cyan: 7, F,Q
+Purple: 4, G
+Green: 5, H,V
+Orange: 6,I,W
+Pink: 1, A, L , E , X , N, D, R, J, O , C
+Grey: 2, B
+Lightblue: 8,9,T
+Brown: Z
+#initial
++++++++++++++++++++++++++++++++++++
++0++++2++++++++H     +     GZIABCD+
++B++++M++++++++H     +  T  GZIABCD+
++            3+H     +     GZIABCD+
++             +H  5  +  4  GZIABCD+
++     T       +             ZYYYYY+
++YYY      BBB +             ZYYYYY+
++             +I     +     FZHEFGH+
++  T      T    I  6  +  7  FZHEFGH+
++             +I     +   T FZHEFGH+
++             +I     +     FZHEFGH+
++++++++++++ +++++ +++++++++++++++++
++MMM          +        T    ZXJQWV+
++             +          T  ZXJQWV+
++                           ZXJQWV+
++             +             ZXJQWV+
++             +             ZTTTTT+
++             +           ++ZTTTTT+
++             +   1         ZTTTTT+
++             +     T     ++ZABCDE+
++             +JOEL         ZABCDE+
++   89        +CARL       ++ZABCDE+
++             +ALEX         ZABCDE+
++++++++++++++++++++++++++++++++++++
+#goal
++++++++++++++++++++++++++++++++++++
++ ++++ ++++++++F     +     IZ     +
++B++++M++++++++F     +     IZ     +
++          MMM+F     +     IZ     +
++             +F     +     IZ     +
++             +             Z     +
++             +             Z     +
++             +G     +     HZ     +
++              G     +     HZ     +
++             +G     +     HZ     +
++ BBB   YYY   +G     +     HZ     +
++++++++++++ +++++ +++++++++++++++++
++             +   0123456789Z     +
++             +             Z     +
++                           Z     +
++             +             Z     +
++             +             Z     +
++             +           ++Z     +
++             +         ALEXZ     +
++             +           ++Z     +
++             +         CARLZ     +
++             +           ++Z     +
++TTTTTTTT     +         JOELZ     +
++++++++++++++++++++++++++++++++++++
+#end
