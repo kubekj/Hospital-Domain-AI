@@ -16,6 +16,7 @@ set "PYTHON_SCRIPT_PATH=python %STEPS_TO_ROOT%src\searches\graphsearch.py"
 set "NIRCMD_PATH=nircmd.exe"
 set "SCREENSHOT_SAVE_PATH=%STEPS_TO_ROOT%complevels\images"
 set "LEVELS_PATH=%STEPS_TO_ROOT%complevels"
+@REM set "LEVELS_PATH=%STEPS_TO_ROOT%levels\custom"
 
 for %%F in ("!LEVELS_PATH!\*.lvl") do (
     set "LEVEL=%%F"
