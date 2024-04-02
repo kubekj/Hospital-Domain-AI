@@ -1,0 +1,38 @@
+#domain
+hospital
+#levelname
+hashCrack
+#colors
+orange: 0, G
+blue: 1, B
+red: 2, F
+green: 3, D
+grey: 4, Y
+lightblue: 5, H, A, S, C, R, K, E
+#initial
+++++++++++++++++++++++++++
++  D3B420+          +  1++
++  BBB   +  DDDDDD  + + ++
++    B   +       D  +  B++
++BBB B      DDDDDD  ++++++
++B   BYGF+          ++++++
++BBBBB   +          ++++++
+++++++++++++++++++++++++++
++++++    +        ++++++++
++++++HASH CRACKERS++++++++
+++++++++5  +++++++++++++++
+++++++++++++++++++++++++++
+#goal
+++++++++++++++++++++++++++
++    B420+          +B  ++
++  BBB   +  DDDDDD  + + ++
++    B   +  Y  GFD  +   ++
++BBB B      DDDDDD  ++++++
++BD  B   +          ++++++
++BBBBB   +          ++++++
+++++++++++++++++++++++++++
++++++HASH+CRACKERS++++++++
++++++             ++++++++
+++++++++   +++++++++++++++
+++++++++++++++++++++++++++
+#end

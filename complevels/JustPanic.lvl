@@ -1,0 +1,65 @@
+#domain
+hospital
+#levelname
+JustPanic
+#colors
+lightblue: 0, O, D
+green: 2, U, X, Y, Z
+purple: 3, E, F
+red: 4, 5, A, B, J, R, H
+pink: 6, K, P
+cyan: 7, I, L, T
+brown: 1, 8, N, G, S, V
+grey: Q, M, W
+orange: 9, C
+#initial
+++++++++++++++++++++++++++++++++++++++++++
++5                                       +
++     CC                          CCA    +
++    CUC  CC                  CCHHC C    +
++   CZZC  C C                CECSSC C    +
++   CYYC  C C                CFCNGC  C   +
++   CXXXCCC C        C       C CCM   C   +
++   CN      C    CCCCCCCC    C  Q Q  C   +
++   CB      C   CC     NCC   C  Q9Q  C   +
++    C    CC   C          C  CC  M  C    +
++     C   CC  C            C  CC   C     +
++      CC2C  C  C0       C  C  C CC      +
++      ICJCCC   CC      CC   CCC CR      +
++      LC           CC         P C       +
++     TC  CV        G          C  C      +
++     C  C7WC               DC  C  C     +
++    C  C  CCC      V       CCC  C 3C    +
++     CC  C 6C    CCCCCC    C8 C  CC     +
++     C  C  CC  MC     KC   CC  C 1C     +
++       C  CC   C        C   CC  CC      +
++       I  CO  C          CS OC          +
++          CCCC            CCCCB         +
++                                       4+
+++++++++++++++++++++++++++++++++++++++++++
+#goal
+++++++++++++++++++++++++++++++++++++++++++
++                                        +
++     CC                          CC     +
++    C C  CC                  CC  CEC    +
++   C  C  CUC      T  S      C C  C C    +
++   C  C  C C    H L  S H    C C  C 3C   +
++   C   CCC C    KINGCRAB    C CC    C   +
++   C       C    CCCCCCCC    C   9   C   +
++   C       C   CC      CC   C       C   +
++    C    CC   C          C  CC     C    +
++     C   CC  C            C  CC   C     +
++      CC2C  C  CO      OC  C  C CC      +
++       C CCC   CC      CC   CCC C       +
++       C           CC           C       +
++      C  C                    C  C      +
++     C  C  C               DC  C  C     +
++    C1 C  CCC              CCC  C  C    +
++     CC  C  C    CCCCCC    C  C GCC     +
++     C  C  CC   C      C   CC  CSVC     +
++       C  CC   C        C   CC  CC      +
++          C   C          C   C          +
++          CCCC            CCCC          +
++                                        +
+++++++++++++++++++++++++++++++++++++++++++
+#end

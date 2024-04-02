@@ -1,0 +1,53 @@
+#domain
+hospital
+#levelname
+corridors
+#colors
+red: 0, 1, 8, A, B, C, D, E, F
+blue: 2, 7, 9, G, H, I, J, K, L
+green: 3, 5, M, N, O, P, Q, R, S
+pink: 4, 6, T, U, V, W, X, Y
+purple: Z
+#initial
+++++++++++++++++++++++++++++++++++++++++++++++++++ 
++67                 50+ 12                     34+
++ZZZZ  ZZZZZZZZZZZZZZZ+                          +
++                 ABCD+                          +
++  ZZZZZZZZZZZZZZZZZZZ+                      M   +
++                     + ZA   Z ZL      TZ Z ZN   +
++                  ZZZ+ ZB   Z ZK      UZ Z ZO   +
++                     + ZC   Z ZJ      VZ Z ZP   +
++                   GH+ ZD   Z ZI      WZ Z ZQ   +
++                   ZZ+ ZE   Z ZH      XZ Z ZR   +
++                     + ZF   Z ZG      YZ Z ZS   +
++   ZZZZZZZZZZZZZZZZZZ++++++++++++++++++++++++++++
++          T          +                         8+
++   ZZZZZZZZZZZZZZZZZZ+ZZZZZZZZZZZZZZ            +
++                     +GHIJ                      +
++   ZZZZZZZZZZZZZZZZZZ+                          +
++                    M+ABCD                      +
++   ZZZZZZZZZZZZZZZZZZ+ZZZZZZZZZZZZZZ            +
++                     +                         9+
+++++++++++++++++++++++++++++++++++++++++++++++++++
+#goal
+++++++++++++++++++++++++++++++++++++++++++++++++++ 
++                     +                          +
++                     +                          +
++                     +                          +
++                     +                    S     +
++                 DCBA+F      G          Y R     +
++                     +E      H          X Q     +
++                     +D      I          W P     +
++                     +C      J          V O     +
++                     +B      K          U N     +
++                   HG+A      L          T M     +
++                     ++++++++++++++++++++++++++++
++                    T+JIHG                      +
++                     +                          +
++                     +                          +
++                     +                          +
++                     +                          +
++                     +                          +
++                    M+DCBA                      +
+++++++++++++++++++++++++++++++++++++++++++++++++++
+#end

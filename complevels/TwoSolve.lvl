@@ -1,0 +1,23 @@
+#domain
+hospital
+#levelname
+TwoSolve
+#colors
+red: 0,1,A
+blue: 2,3
+cyan: 4,5
+#initial
++++++++++
++   +   +
++++14 + +
++ A25 + +
++ +3  +0+
++++++++++
+#goal
++++++++++
++2 3+ 5 +
++++1 4+A+
++ 0   + +
++ +   + +
++++++++++
+#end

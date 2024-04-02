@@ -1,0 +1,47 @@
+#domain
+hospital
+#levelname
+Wallies
+#colors
+green: 0, A
+blue: 1, 2, B, C, E
+red: 3, D
+cyan: 4, 5, 6, 7, 8, 9
+grey: G, H, I, J, K, L, M, N
+#initial
++++++++++++++++++++++++++++++++++
++JJHHHHHHHHHHHHHHHHHHHHHDHHHHHHH+
++JJJJJJJJJMMHHHHHHHHHHHH HHHHHHH+
++MMMMMMMMMMMMMMMMMMMMMMM   3 MMK+
++MMMMIIIIIII60         M     MMK+
++KKKKKKIIIIIIIIIII A   MJJJ JNNK+
++JJJJJJJJJJJJJJJJGMM MMMJJJ  NNK+
++5 JJJJJJJJJJ2   GM  MMMJJJ  NNK+
++        C       GM  MMJJJJ  NNK+
++J    LLLLLLLLLLLG  MMMMJNN JNNK+
++J    8LLLLLLLLLLG MMMMMJNN  NNK+
++J7              G  MMMMJNN  NNK+
++LLL         9ELLGM   MMJNN  NNK+
++                GMM  MMJNN  NNK+
++    LLLLLLLLLLLLG   MMJNN4  NNK+
++          B   1 G  MMMMJNN  NNK+
++++++++++++++++++++++++++++++++++
+#goal
++++++++++++++++++++++++++++++++++
++                               +
++                               +
++                               +
++                               +
++                               +
++                               +
++                               +
++  C                            +
++                               +
++                               +
++                               +
++                               +
++             E                 +
++B                              +
++                 A         D   +
++++++++++++++++++++++++++++++++++
+#end
