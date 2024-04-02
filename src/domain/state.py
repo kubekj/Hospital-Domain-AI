@@ -2,7 +2,7 @@ import random
 
 from src.domain.atom import Atom, AgentAt, BoxAt, Free, Location
 from src.utils.color import Color
-from src.domain.action import Action, Move
+from src.domain.action import Action, Move, Pull, Push
 
 from typing import Self
 
@@ -85,7 +85,8 @@ class State:
                     goal_literals += [AgentAt(agent, Location(row, col))]
                     num_agents += 1
                 elif 'A' <= c <= 'Z':
-                    goal_literals += [BoxAt(agent, Location(row, col))]
+                    box = ord(c) - ord('A')
+                    goal_literals += [BoxAt(box, Location(row, col))]
 
             row += 1
             line = server_messages.readline()
@@ -159,6 +160,10 @@ class State:
     def is_applicable(action: Action, literals: list[Atom]) -> bool:
         if isinstance(action, Move):
             return Move(action.agt, action.agtfrom, action.agtto).check_preconditions(literals)
+        elif isinstance(action, Push):
+            return Push(action.agt, action.agtfrom, action.box, action.boxfrom, action.boxto).check_preconditions(literals)
+        elif isinstance(action, Pull):
+            return Pull(action.agt, action.agtfrom, action.agtto, action.box, action.boxfrom).check_preconditions(literals)
         elif isinstance(action, Action):
             return Action(action.agt).check_preconditions(literals)
 
@@ -167,7 +172,7 @@ class State:
     def get_applicable_actions(self, agent: int) -> Action:
         agtfrom = self.agent_locations[agent]
         possibilities = []
-        possible_actions = [Action, Move]
+        possible_actions = [Action, Move, Push, Pull]
 
         for action in possible_actions:
             if action is Move:
@@ -175,6 +180,22 @@ class State:
                     action = Move(agent, agtfrom, agtto)
                     if self.is_applicable(action, self.literals[:]):
                         possibilities.append(Move(agent, agtfrom, agtto))
+            elif action is Push:
+                for boxfrom in agtfrom.neighbours:
+                    boxes = [ord(c) - ord('A') for c in State.agent_box_dict[agent] if BoxAt(ord(c) - ord('A'),boxfrom) in self.literals]
+                    for box in boxes:
+                        for boxto in boxfrom.neighbours:
+                            action = Push(agent, agtfrom, box, boxfrom, boxto)
+                            if self.is_applicable(action, self.literals[:]):
+                                possibilities.append(Push(agent, agtfrom, box, boxfrom, boxto))
+            elif action is Pull:
+                for boxfrom in agtfrom.neighbours:
+                    boxes = [ord(c) - ord('A') for c in State.agent_box_dict[agent] if BoxAt(ord(c) - ord('A'),boxfrom) in self.literals]
+                    for box in boxes:
+                        for agtto in boxfrom.neighbours:
+                            action = Pull(agent, agtfrom, agtto, box, boxfrom)
+                            if self.is_applicable(action, self.literals[:]):
+                                possibilities.append(Pull(agent, agtfrom, agtto, box, boxfrom))
             elif action is Action:
                 possibilities.append(Action(agent))
 
