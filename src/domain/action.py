@@ -30,11 +30,12 @@ class Move(Action):
         - Neighbour(agtfrom, agtto)
         - Free(agtto)
         """
-        return (AgentAt(self.agt, self.agtfrom) in literals and
-                Neighbour(self.agtfrom, self.agtto).eval()
-                and Free(self.agtto).eval(literals)
-                # and Free(self.agtto) in literals
-                )
+        return (
+            AgentAt(self.agt, self.agtfrom) in literals
+            and Neighbour(self.agtfrom, self.agtto).eval()
+            and Free(self.agtto).eval(literals)
+            # and Free(self.agtto) in literals
+        )
 
     def apply_effects(self, literals: list[Atom]):
         """
@@ -71,8 +72,11 @@ class Move(Action):
             return "Move(W)"
         return "NoOp"
 
+
 class Push(Action):
-    def __init__(self, agt: int, agtfrom: Location, box: int, boxfrom: Location, boxto: Location):
+    def __init__(
+        self, agt: int, agtfrom: Location, box: int, boxfrom: Location, boxto: Location
+    ):
         super().__init__(agt)
         self.agtfrom = agtfrom
         self.box = box
@@ -89,11 +93,13 @@ class Push(Action):
         - BoxAt(box, boxfrom)
         - Free(agtto)
         """
-        return (AgentAt(self.agt, self.agtfrom) in literals
-                and Neighbour(self.agtfrom, self.boxfrom).eval()
-                and Neighbour(self.boxfrom, self.boxto).eval()
-                and BoxAt(self.box, self.boxfrom) in literals
-                and Free(self.boxto).eval(literals))
+        return (
+            AgentAt(self.agt, self.agtfrom) in literals
+            and Neighbour(self.agtfrom, self.boxfrom).eval()
+            and Neighbour(self.boxfrom, self.boxto).eval()
+            and BoxAt(self.box, self.boxfrom) in literals
+            and Free(self.boxto).eval(literals)
+        )
 
     def apply_effects(self, literals: list[Atom]):
         """
@@ -118,7 +124,10 @@ class Push(Action):
             raise Exception("Preconditions not satisfied for the Move action.")
 
     def get_name(self):
-        if self.agtfrom.row != self.agtto.row and self.agtfrom.col != self.agtto.col:
+        if (
+            self.agtfrom.row != self.boxfrom.row
+            and self.agtfrom.col != self.boxfrom.col
+        ):
             raise Exception("Move action is not possible")
         agentMove = None
         if self.agtfrom.row < self.boxfrom.row:
@@ -129,7 +138,7 @@ class Push(Action):
             agentMove = "E"
         elif self.agtfrom.col > self.boxfrom.col:
             agentMove = "W"
-        
+
         boxMove = None
         if self.boxfrom.row < self.boxto.row:
             boxMove = "S"
@@ -139,13 +148,18 @@ class Push(Action):
             boxMove = "E"
         elif self.boxfrom.col > self.boxto.col:
             boxMove = "W"
+
         if agentMove is None or boxMove is None:
             return "NoOp"
         else:
+            print(agentMove, boxMove)
             return f"Push({agentMove},{boxMove})"
 
+
 class Pull(Action):
-    def __init__(self, agt: int, agtfrom: Location, agtto: Location, box: int, boxfrom: Location):
+    def __init__(
+        self, agt: int, agtfrom: Location, agtto: Location, box: int, boxfrom: Location
+    ):
         super().__init__(agt)
         self.agtfrom = agtfrom
         self.agtto = agtto
@@ -162,11 +176,13 @@ class Pull(Action):
         - BoxAt(box, boxfrom)
         - Free(agtto)
         """
-        return (AgentAt(self.agt, self.agtfrom) in literals
-                and Neighbour(self.agtfrom, self.agtto).eval()
-                and Neighbour(self.agtfrom, self.boxfrom).eval()
-                and BoxAt(self.box, self.boxfrom) in literals
-                and Free(self.agtto).eval(literals))
+        return (
+            AgentAt(self.agt, self.agtfrom) in literals
+            and Neighbour(self.agtfrom, self.agtto).eval()
+            and Neighbour(self.agtfrom, self.boxfrom).eval()
+            and BoxAt(self.box, self.boxfrom) in literals
+            and Free(self.agtto).eval(literals)
+        )
 
     def apply_effects(self, literals: list[Atom]):
         """
@@ -197,14 +213,14 @@ class Pull(Action):
             raise Exception("Move action is not possible")
         agentMove = None
         if self.agtfrom.row < self.boxfrom.row:
-            agentMove = "S"
-        elif self.agtfrom.row > self.boxfrom.row:
             agentMove = "N"
+        elif self.agtfrom.row > self.boxfrom.row:
+            agentMove = "S"
         elif self.agtfrom.col < self.boxfrom.col:
-            agentMove = "E"
-        elif self.agtfrom.col > self.boxfrom.col:
             agentMove = "W"
-        
+        elif self.agtfrom.col > self.boxfrom.col:
+            agentMove = "E"
+
         boxMove = None
         if self.boxfrom.row < self.agtfrom.row:
             boxMove = "S"
@@ -218,6 +234,7 @@ class Pull(Action):
             return "NoOp"
         else:
             return f"Pull({agentMove},{boxMove})"
+
 
 @unique
 class PossibleAction(Enum):
