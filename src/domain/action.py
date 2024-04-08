@@ -223,13 +223,13 @@ class Pull(Action):
 
         boxMove = None
         if self.boxfrom.row < self.agtfrom.row:
-            boxMove = "S"
-        elif self.boxfrom.row > self.agtfrom.row:
             boxMove = "N"
+        elif self.boxfrom.row > self.agtfrom.row:
+            boxMove = "S"
         elif self.boxfrom.col < self.agtfrom.col:
-            boxMove = "E"
-        elif self.boxfrom.col > self.agtfrom.col:
             boxMove = "W"
+        elif self.boxfrom.col > self.agtfrom.col:
+            boxMove = "E"
         if agentMove is None or boxMove is None:
             return "NoOp"
         else:
