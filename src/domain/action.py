@@ -100,10 +100,11 @@ class Push(Action):
         """
         return (
             AgentAt(self.agt, self.agtfrom) in literals
+            and BoxAt(self.box, self.boxfrom) in literals
             and Neighbour(self.agtfrom, self.boxfrom).eval()
             and Neighbour(self.boxfrom, self.boxto).eval()
-            and BoxAt(self.box, self.boxfrom) in literals
             and Free(self.boxto).eval(literals)
+            and self.agtfrom != self.boxto
         )
 
     def apply_effects(self, literals: list[Atom]):
@@ -187,6 +188,7 @@ class Pull(Action):
             and Neighbour(self.agtfrom, self.boxfrom).eval()
             and BoxAt(self.box, self.boxfrom) in literals
             and Free(self.agtto).eval(literals)
+            and self.agtto != self.boxfrom
         )
 
     def apply_effects(self, literals: list[Atom]):
@@ -228,13 +230,13 @@ class Pull(Action):
 
         boxMove = None
         if self.boxfrom.row < self.agtfrom.row:
-            boxMove = "N"
-        elif self.boxfrom.row > self.agtfrom.row:
             boxMove = "S"
+        elif self.boxfrom.row > self.agtfrom.row:
+            boxMove = "N"
         elif self.boxfrom.col < self.agtfrom.col:
-            boxMove = "W"
-        elif self.boxfrom.col > self.agtfrom.col:
             boxMove = "E"
+        elif self.boxfrom.col > self.agtfrom.col:
+            boxMove = "W"
         if agentMove is None or boxMove is None:
             return "NoOp"
         else:
