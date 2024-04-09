@@ -62,15 +62,20 @@ class Move(Action):
     def get_name(self):
         if self.agtfrom.row != self.agtto.row and self.agtfrom.col != self.agtto.col:
             raise Exception("Move action is not possible")
+        agentMove = None
         if self.agtfrom.row < self.agtto.row:
-            return "Move(S)"
+            agentMove = "S"
         elif self.agtfrom.row > self.agtto.row:
-            return "Move(N)"
+            agentMove = "N"
         elif self.agtfrom.col < self.agtto.col:
-            return "Move(E)"
+            agentMove = "E"
         elif self.agtfrom.col > self.agtto.col:
-            return "Move(W)"
-        return "NoOp"
+            agentMove = "W"
+
+        if agentMove is None:
+            return "NoOp"
+        else:
+            return f"Move({agentMove})"
 
 
 class Push(Action):
@@ -106,14 +111,14 @@ class Push(Action):
         Apply the effects of the Move action to the given state.
         Effects:
         - Remove AgentAt(agt, agtfrom)
-        - Add AgentAt(agt, agtto)
+        - Add AgentAt(agt, boxfrom)
         - Free(agtfrom)
-        - Not Free(agtto)
+        - Not Free(boxfrom)
         """
         if self.check_preconditions(literals):
             # ~AgentAt(agt,agtfrom)
             literals.remove(AgentAt(self.agt, self.agtfrom))
-            # AgentAt(agt,agtto)
+            # AgentAt(agt,boxfrom)
             literals.append(AgentAt(self.agt, self.boxfrom))
             # ~BoxAt(box,boxfrom)
             literals.remove(BoxAt(self.box, self.boxfrom))
@@ -212,14 +217,14 @@ class Pull(Action):
         if self.agtfrom.row != self.agtto.row and self.agtfrom.col != self.agtto.col:
             raise Exception("Move action is not possible")
         agentMove = None
-        if self.agtfrom.row < self.boxfrom.row:
-            agentMove = "N"
-        elif self.agtfrom.row > self.boxfrom.row:
+        if self.agtfrom.row < self.agtto.row:
             agentMove = "S"
-        elif self.agtfrom.col < self.boxfrom.col:
-            agentMove = "W"
-        elif self.agtfrom.col > self.boxfrom.col:
+        elif self.agtfrom.row > self.agtto.row:
+            agentMove = "N"
+        elif self.agtfrom.col < self.agtto.col:
             agentMove = "E"
+        elif self.agtfrom.col > self.agtto.col:
+            agentMove = "W"
 
         boxMove = None
         if self.boxfrom.row < self.agtfrom.row:

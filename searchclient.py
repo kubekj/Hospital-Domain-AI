@@ -139,12 +139,11 @@ class SearchClient:
             states[0] = initial_state
             for ip, joint_action in enumerate(plan):
                 states[ip + 1] = states[ip].result(joint_action)
+                my_message = None
                 # TODO: Make ComplexDijkstra work with this
-                # my_message = str(frontier.heuristic.f(
-                #     states[ip + 1])) if isinstance(heuristic, HeuristicComplexDijkstra) else None
-                # print("|".join(a.get_name() + '@' + (my_message if my_message is not None else a.get_name()) for a in
-                #                joint_action), flush=True)
-                print("|".join(a.get_name() for a in joint_action), flush=True)
+                # my_message = str(frontier.heuristic.f(states[ip + 1])) if isinstance(heuristic, HeuristicComplexDijkstra) else None
+                print("|".join(a.get_name() + '@' + (my_message if my_message is not None else a.get_name()) for a in
+                               joint_action), flush=True)
                 server_messages.readline()
 
     @staticmethod

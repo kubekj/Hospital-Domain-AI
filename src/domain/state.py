@@ -220,7 +220,7 @@ class State:
                         if BoxAt(ord(c) - ord("A"), boxfrom) in self.literals
                     ]
                     for box in boxes:
-                        for agtto in boxfrom.neighbours:
+                        for agtto in agtfrom.neighbours:
                             action = Pull(agent, agtfrom, agtto, box, boxfrom)
                             if self.is_applicable(action, self.literals[:]):
                                 possibilities.append(

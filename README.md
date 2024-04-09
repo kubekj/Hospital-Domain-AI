@@ -36,5 +36,10 @@ java -jar ./server.jar -l ./levels/MAPF01.lvl -c "python searchclient.py -greedy
 java -jar ./server.jar -l ./levels/MAPF02C.lvl -c "python searchclient.py -iw -s_dij --test-name iw --test-folder ../benchmarks" -g      
 java -jar ./server.jar -l ./levels/MAPF03.lvl -c "python searchclient.py -iw -s_dij --test-name iw --test-folder ../benchmarks" -g
 java -jar ./server.jar -l ./levels/MAPF03C.lvl -c "python searchclient.py -iw -s_dij --test-name iw --test-folder ../benchmarks" -g
+
+java -jar ./server.jar -l ./levels/test_push.lvl -c "python searchclient.py -iw -c_dij --test-name iw --test-folder ../benchmarks" -g
+java -jar ./server.jar -l ./levels/test.lvl -c "python searchclient.py -iw -c_dij --test-name iw --test-folder ../benchmarks" -g
+
+java -jar ./server.jar -l ./levels/SACrunch.lvl -c "python searchclient.py -iw -s_dij --test-name iw --test-folder ../benchmarks" -g
 ```
 

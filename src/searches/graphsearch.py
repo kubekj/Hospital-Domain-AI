@@ -137,7 +137,7 @@ def serialize_to_json_file(data, file_path: str):
     try:
         with open(file_path, 'w') as json_file:
             json.dump(data, json_file, indent=4)  # Pretty printing with 4 spaces indentation
-        print(f"Data successfully serialized to {file_path}")
+        # print(f"Data successfully serialized to {file_path}")
     except Exception as e:
         print(f"An error occurred during serialization: {e}")
         pass
@@ -153,7 +153,7 @@ def deserialize_from_json_file(file_path: str):
     try:
         with open(file_path, 'r') as json_file:
             data = json.load(json_file)
-        print(f"Data successfully deserialized from {file_path}")
+        # print(f"Data successfully deserialized from {file_path}")
         return dict(data)
     except FileNotFoundError:
         print(f"File not found: {file_path}")
