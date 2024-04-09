@@ -40,6 +40,6 @@ java -jar ./server.jar -l ./levels/MAPF03C.lvl -c "python searchclient.py -iw -s
 java -jar ./server.jar -l ./levels/test_push.lvl -c "python searchclient.py -iw -c_dij --test-name iw --test-folder ../benchmarks" -g
 java -jar ./server.jar -l ./levels/test.lvl -c "python searchclient.py -iw -c_dij --test-name iw --test-folder ../benchmarks" -g
 
-java -jar ./server.jar -l ./levels/SACrunch.lvl -c "python searchclient.py -iw -s_dij --test-name iw --test-folder ../benchmarks" -g
+java -jar ./server.jar -l ./levels/SAFirefly.lvl -c "python searchclient.py -iw -s_dij --test-name iw --test-folder ../benchmarks" -g
 ```
 
