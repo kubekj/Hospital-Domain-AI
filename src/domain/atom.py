@@ -93,5 +93,7 @@ class Free(Atom):
 
     def eval(self, literals: list[Atom]):
         agent_at_literals = [lit for lit in literals if isinstance(lit, AgentAt)]
+        box_at_literals = [lit for lit in literals if isinstance(lit, BoxAt)]
         return (not self.walls[self.loc.row][self.loc.col]
-                and not any([lit.loc == self.loc for lit in agent_at_literals]))
+                and not any([lit.loc == self.loc for lit in agent_at_literals])
+                and not any([lit.loc == self.loc for lit in box_at_literals]))
