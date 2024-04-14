@@ -12,34 +12,34 @@ The project supports various search strategies to tackle the MAPF/APF problems. 
 #### Breadth-First Search (BFS)
 
 ```bash
-java -jar ./server.jar -l ./levels/MAPF01.lvl -c "python searchclient.py -bfs --test-name bfs --test-folder ../benchmarks" -g
+java -jar ./server.jar -l ./levels/MAPF01.lvl -c "python searchclient.py -bfs --test-name bfs --test-folder ./benchmarks" -g
 ```
 
 #### Depth-First Search (DFS)
 ```bash
-java -jar ./server.jar -l ./levels/MAPF01.lvl -c "python searchclient.py -dfs --test-name dfs --test-folder ../benchmarks" -g
+java -jar ./server.jar -l ./levels/MAPF01.lvl -c "python searchclient.py -dfs --test-name dfs --test-folder ./benchmarks" -g
 
 ```
 
 #### Uniform-cost search (also known as Dijkstra)
 ```bash
-java -jar ./server.jar -l ./levels/MAPF01.lvl -c "python searchclient.py -greedy -s_dij --test-name greedy --test-folder ../benchmarks" -g
+java -jar ./server.jar -l ./levels/MAPF01.lvl -c "python searchclient.py -greedy -s_dij --test-name greedy --test-folder ./benchmarks" -g
 ```
 
 #### Greedy Best-First Search with Customized UCF (Currently Not Working)
 ```bash
-java -jar ./server.jar -l ./levels/MAPF01.lvl -c "python searchclient.py -greedy -c_dij --test-name greedy --test-folder ../benchmarks" -g
+java -jar ./server.jar -l ./levels/MAPF01.lvl -c "python searchclient.py -greedy -c_dij --test-name greedy --test-folder ./benchmarks" -g
 ```
 
 #### Iterated Width Search
 ```bash
-java -jar ./server.jar -l ./levels/MAPF02C.lvl -c "python searchclient.py -iw -s_dij --test-name iw --test-folder ../benchmarks" -g      
-java -jar ./server.jar -l ./levels/MAPF03.lvl -c "python searchclient.py -iw -s_dij --test-name iw --test-folder ../benchmarks" -g
-java -jar ./server.jar -l ./levels/MAPF03C.lvl -c "python searchclient.py -iw -s_dij --test-name iw --test-folder ../benchmarks" -g
+java -jar ./server.jar -l ./levels/MAPF02C.lvl -c "python searchclient.py -iw -s_dij --test-name iw --test-folder ./benchmarks" -g      
+java -jar ./server.jar -l ./levels/MAPF03.lvl -c "python searchclient.py -iw -s_dij --test-name iw --test-folder ./benchmarks" -g
+java -jar ./server.jar -l ./levels/MAPF03C.lvl -c "python searchclient.py -iw -s_dij --test-name iw --test-folder ./benchmarks" -g
 
-java -jar ./server.jar -l ./levels/test_push.lvl -c "python searchclient.py -iw -c_dij --test-name iw --test-folder ../benchmarks" -g
-java -jar ./server.jar -l ./levels/test.lvl -c "python searchclient.py -iw -c_dij --test-name iw --test-folder ../benchmarks" -g
+java -jar ./server.jar -l ./levels/test_push.lvl -c "python searchclient.py -iw -c_dij --test-name iw --test-folder ./benchmarks" -g
+java -jar ./server.jar -l ./levels/test.lvl -c "python searchclient.py -iw -c_dij --test-name iw --test-folder ./benchmarks" -g
 
-java -jar ./server.jar -l ./levels/SAFirefly.lvl -c "python searchclient.py -iw -s_dij --test-name iw --test-folder ../benchmarks" -g
+java -jar ./server.jar -l ./levels/SACrunch.lvl -c "python searchclient.py -iw -c_dij --test-name iw --test-folder ./benchmarks" -g
 ```
 

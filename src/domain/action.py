@@ -158,7 +158,6 @@ class Push(Action):
         if agentMove is None or boxMove is None:
             return "NoOp"
         else:
-            print(agentMove, boxMove)
             return f"Push({agentMove},{boxMove})"
 
 

@@ -64,7 +64,7 @@ class State:
                     literals += [AgentAt(agent, Location(row, col))]
                     num_agents += 1
                 elif "A" <= c <= "Z":
-                    box = ord(c) - ord("A")
+                    box = c
                     literals += [BoxAt(box, Location(row, col))]
                 elif c == "+" or c == "\n":
                     walls[row][col] = True
@@ -88,7 +88,7 @@ class State:
                     goal_literals += [AgentAt(agent, Location(row, col))]
                     num_agents += 1
                 elif "A" <= c <= "Z":
-                    box = ord(c) - ord("A")
+                    box = c
                     goal_literals += [BoxAt(box, Location(row, col))]
 
             row += 1
@@ -201,9 +201,9 @@ class State:
             elif action is Push:
                 for boxfrom in agtfrom.neighbours:
                     boxes = [
-                        ord(c) - ord("A")
+                        c
                         for c in State.agent_box_dict[agent]
-                        if BoxAt(ord(c) - ord("A"), boxfrom) in self.literals
+                        if BoxAt(c, boxfrom) in self.literals
                     ]
                     for box in boxes:
                         for boxto in boxfrom.neighbours:
@@ -215,9 +215,9 @@ class State:
             elif action is Pull:
                 for boxfrom in agtfrom.neighbours:
                     boxes = [
-                        ord(c) - ord("A")
+                        c
                         for c in State.agent_box_dict[agent]
-                        if BoxAt(ord(c) - ord("A"), boxfrom) in self.literals
+                        if BoxAt(c, boxfrom) in self.literals
                     ]
                     for box in boxes:
                         for agtto in agtfrom.neighbours:
