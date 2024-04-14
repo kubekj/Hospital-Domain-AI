@@ -29,7 +29,7 @@ class HeuristicSimpleDijkstra(Heuristic):
             except Exception as ex:
                 print(Info.level_name)
                 print(ex)
-                print(self.distances_from_agent_goals)
+                # print(self.distances_from_agent_goals)
                 break
         return total_distance
 

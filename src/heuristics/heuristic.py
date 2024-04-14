@@ -4,7 +4,7 @@ from src.domain.atom import AgentAt, BoxAt, Free
 from src.domain.state import State
 
 # Goal count as a default heuristic
-def extract_goal_positions(atom_type, initial_state, item_attr):
+def extract_goal_positions(atom_type, initial_state: State, item_attr):
     return {getattr(lit, item_attr): lit.loc for lit in initial_state.goal_literals if isinstance(lit, atom_type)}
 
 

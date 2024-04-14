@@ -1,9 +1,11 @@
 from abc import ABCMeta, abstractmethod
 
 from src.domain.state import State
+from src.heuristics.heuristic import Heuristic
 
 
 class Frontier(metaclass=ABCMeta):
+    heuristic: Heuristic = None
     @abstractmethod
     def add(self, state: 'State'): raise NotImplementedError
 
