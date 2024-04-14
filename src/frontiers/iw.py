@@ -12,24 +12,24 @@ class FrontierIW(FrontierBestFirst):
         self.known_combinations = set()
         print(f"Initialized frontier with width {self.width}")
 
-    def add(self, state: 'State'):
+    def add(self, state: "State"):
         if self.is_novel_combination(state.literals):
             super().add(state)
 
-    def pop(self) -> 'State':
+    def pop(self) -> "State":
         return super().pop()
 
-    def is_empty(self) -> 'bool':
+    def is_empty(self) -> "bool":
         return super().is_empty()
 
-    def size(self) -> 'int':
+    def size(self) -> "int":
         return super().size()
 
-    def contains(self, state: 'State') -> 'bool':
+    def contains(self, state: "State") -> "bool":
         return super().contains(state)
 
     def get_name(self):
-        return 'Iterated-width search'
+        return "Iterated-width search"
 
     def is_novel_combination(self, elements):
         """

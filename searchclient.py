@@ -2,6 +2,7 @@ import argparse
 import sys
 
 import debugpy
+from src.searches.graphsearch import print_search_status
 
 from src.domain.state import State
 
@@ -77,13 +78,15 @@ class SearchClient:
         elif args.greedy:
             return FrontierBestFirst(heuristic)
         elif args.iw:
-            return FrontierIW(heuristic, 1)
+            return FrontierIW(heuristic, 2)
         else:
             # Default to BFS search.
-            print('Defaulting to BFS search. '
-                  'Use arguments -bfs, -dfs, -astar, -wastar, or -greedy to set the search strategy.',
-                  file=sys.stderr,
-                  flush=True)
+            print(
+                "Defaulting to BFS search. "
+                "Use arguments -bfs, -dfs, -astar, -wastar, or -greedy to set the search strategy.",
+                file=sys.stderr,
+                flush=True,
+            )
             return FrontierBFS()
 
     @staticmethod
@@ -94,19 +97,21 @@ class SearchClient:
         :param args: The command line arguments.
         :return: The initial state and the frontier.
         """
-        print('SearchClient initializing. I am sending this using the error output stream.',
-              file=sys.stderr,
-              flush=True)
+        print(
+            "SearchClient initializing. I am sending this using the error output stream.",
+            file=sys.stderr,
+            flush=True,
+        )
 
         if hasattr(sys.stdout, "reconfigure"):
-            sys.stdout.reconfigure(encoding='ASCII')
+            sys.stdout.reconfigure(encoding="ASCII")
 
-        print('SearchClient', flush=True)
-        print('#This is a comment.', flush=True)
+        print("SearchClient", flush=True)
+        print("#This is a comment.", flush=True)
 
         server_messages = sys.stdin
         if hasattr(server_messages, "reconfigure"):
-            server_messages.reconfigure(encoding='ASCII')
+            server_messages.reconfigure(encoding="ASCII")
         initial_state = SearchClient.parse_level(server_messages)
 
         Info.test_name = args.test_name
@@ -127,14 +132,18 @@ class SearchClient:
         :param heuristic: The heuristic used by the search algorithm.
         :param server_messages: The server messages.
         """
-        print('Starting {}.'.format(frontier.get_name()), file=sys.stderr, flush=True)
+        print("Starting {}.".format(frontier.get_name()), file=sys.stderr, flush=True)
         plan = graph_search(initial_state, frontier)
 
         if plan is None:
-            print('Unable to solve level.', file=sys.stderr, flush=True)
+            print("Unable to solve level.", file=sys.stderr, flush=True)
             sys.exit(0)
         else:
-            print('Found solution of length {}.'.format(len(plan)), file=sys.stderr, flush=True)
+            print(
+                "Found solution of length {}.".format(len(plan)),
+                file=sys.stderr,
+                flush=True,
+            )
             states = [None for _ in range(len(plan) + 1)]
             states[0] = initial_state
             for ip, joint_action in enumerate(plan):
@@ -142,49 +151,108 @@ class SearchClient:
                 my_message = None
                 # TODO: Make ComplexDijkstra work with this
                 # my_message = str(frontier.heuristic.f(states[ip + 1])) if isinstance(heuristic, HeuristicComplexDijkstra) else None
-                print("|".join(a.get_name() + '@' + (my_message if my_message is not None else a.get_name()) for a in
-                               joint_action), flush=True)
+                print(
+                    "|".join(
+                        a.get_name()
+                        + "@"
+                        + (my_message if my_message is not None else a.get_name())
+                        for a in joint_action
+                    ),
+                    flush=True,
+                )
                 server_messages.readline()
 
     @staticmethod
     def main(args) -> None:
         initial_state, heuristic, frontier = SearchClient.initialize_and_configure(args)
-        SearchClient.execute_and_print_plan(initial_state, frontier, heuristic, sys.stdin)
+        SearchClient.execute_and_print_plan(
+            initial_state, frontier, heuristic, sys.stdin
+        )
 
 
 debug = False
 fail_info = True
-if __name__ == '__main__':
+if __name__ == "__main__":
     if debug:
         debugpy.listen(("localhost", 1234))  # Open a debugging server at localhost:1234
         debugpy.wait_for_client()  # Wait for the debugger to connect
         debugpy.breakpoint()  # Ensure the program starts paused
 
     # Program arguments.
-    parser = argparse.ArgumentParser(description='Simple client based on state-space graph search.')
-    parser.add_argument('--max-memory', metavar='<MB>', type=float, default=2048.0,
-                        help='The maximum memory usage allowed in MB (soft limit, default 2048).')
-    parser.add_argument('--test-name', metavar='<test_name>', type=str, default='default',
-                        help='Name the file where the information will be stored.')
-    parser.add_argument('--test-folder', metavar='<test_folder_path>', type=str, default='./tests',
-                        help='Name the folder the files with the information will be stored.')
+    parser = argparse.ArgumentParser(
+        description="Simple client based on state-space graph search."
+    )
+    parser.add_argument(
+        "--max-memory",
+        metavar="<MB>",
+        type=float,
+        default=2048.0,
+        help="The maximum memory usage allowed in MB (soft limit, default 2048).",
+    )
+    parser.add_argument(
+        "--test-name",
+        metavar="<test_name>",
+        type=str,
+        default="default",
+        help="Name the file where the information will be stored.",
+    )
+    parser.add_argument(
+        "--test-folder",
+        metavar="<test_folder_path>",
+        type=str,
+        default="./tests",
+        help="Name the folder the files with the information will be stored.",
+    )
 
     strategy_group = parser.add_mutually_exclusive_group()
-    strategy_group.add_argument('-bfs', action='store_true', dest='bfs', help='Use the BFS strategy.')
-    strategy_group.add_argument('-dfs', action='store_true', dest='dfs', help='Use the DFS strategy.')
-    strategy_group.add_argument('-iw', action='store_true', dest='iw', help='Use the IW strategy.')
-    strategy_group.add_argument('-astar', action='store_true', dest='astar', help='Use the A* strategy.')
-    strategy_group.add_argument('-wastar', action='store', dest='wastar', nargs='?', type=int, default=False, const=5,
-                                help='Use the WA* strategy.')
-    strategy_group.add_argument('-greedy', action='store_true', dest='greedy', help='Use the Greedy strategy.')
+    strategy_group.add_argument(
+        "-bfs", action="store_true", dest="bfs", help="Use the BFS strategy."
+    )
+    strategy_group.add_argument(
+        "-dfs", action="store_true", dest="dfs", help="Use the DFS strategy."
+    )
+    strategy_group.add_argument(
+        "-iw", action="store_true", dest="iw", help="Use the IW strategy."
+    )
+    strategy_group.add_argument(
+        "-astar", action="store_true", dest="astar", help="Use the A* strategy."
+    )
+    strategy_group.add_argument(
+        "-wastar",
+        action="store",
+        dest="wastar",
+        nargs="?",
+        type=int,
+        default=False,
+        const=5,
+        help="Use the WA* strategy.",
+    )
+    strategy_group.add_argument(
+        "-greedy", action="store_true", dest="greedy", help="Use the Greedy strategy."
+    )
 
     strategy_group2 = parser.add_mutually_exclusive_group()
-    strategy_group2.add_argument('-simple', action='store_true', dest='simple', help='Use the Simple Heuristic.')
-    strategy_group2.add_argument('-s_dij', action='store_true', dest='s_dij', help='Use the Simple Dijkstra Heuristic.')
-    strategy_group2.add_argument('-c_dij', action='store_true', dest='c_dij',
-                                 help='Use the Complex Dijkstra Heuristic.')
-    strategy_group2.add_argument('-manhattan', action='store_true', dest='manhattan',
-                                 help='Use the Manhattan Heuristic.')
+    strategy_group2.add_argument(
+        "-simple", action="store_true", dest="simple", help="Use the Simple Heuristic."
+    )
+    strategy_group2.add_argument(
+        "-s_dij",
+        action="store_true",
+        dest="s_dij",
+        help="Use the Simple Dijkstra Heuristic.",
+    )
+    strategy_group2.add_argument(
+        "-c_dij",
+        action="store_true",
+        dest="c_dij",
+        help="Use the Complex Dijkstra Heuristic.",
+    )
+    strategy_group2.add_argument(
+        "-manhattan",
+        action="store_true",
+        dest="manhattan",
+        help="Use the Manhattan Heuristic.",
+    )
 
     args = parser.parse_args()
 
