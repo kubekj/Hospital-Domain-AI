@@ -20,7 +20,7 @@ saved_once = False
 
 def graph_search(initial_state: State, frontier: Frontier):
     if not saved_once:
-        save_run_information(None, None, None, {'Passed': False})
+        save_run_information(None, None, None, {"Passed": False})
 
     # iterations = 0
     frontier.add(initial_state)
@@ -65,22 +65,36 @@ def log_search_status(iterations, explored: set[State], frontier):
 
     if memory.get_usage() > memory.max_usage:
         print_search_status(explored, frontier)
-        print('Maximum memory usage exceeded.', file=sys.stderr, flush=True)
+        print("Maximum memory usage exceeded.", file=sys.stderr, flush=True)
         return None
 
 
 def print_search_status(explored: set[State], frontier):
-    status_template = ('#Expanded: {:8,}, '
-                       '#Frontier: {:8,}, '
-                       '#Generated: {:8,}, '
-                       'Time: {:3.3f} s'
-                       '\n[Alloc: {:4.2f} MB, MaxAlloc: {:4.2f} MB]')
+    status_template = (
+        "#Expanded: {:8,}, "
+        "#Frontier: {:8,}, "
+        "#Generated: {:8,}, "
+        "Time: {:3.3f} s"
+        "\n[Alloc: {:4.2f} MB, MaxAlloc: {:4.2f} MB]"
+    )
     elapsed_time = time.perf_counter() - start_time
-    print(status_template.format(len(explored), frontier.size(), len(explored) + frontier.size(), elapsed_time,
-                                 memory.get_usage(), memory.max_usage), file=sys.stderr, flush=True)
+    print(
+        status_template.format(
+            len(explored),
+            frontier.size(),
+            len(explored) + frontier.size(),
+            elapsed_time,
+            memory.get_usage(),
+            memory.max_usage,
+        ),
+        file=sys.stderr,
+        flush=True,
+    )
 
 
-def save_run_information(explored: set[State], frontier, plan: list[list[Action]], information=None):
+def save_run_information(
+    explored: set[State], frontier, plan: list[list[Action]], information=None
+):
     """
     This function saves the information about the current run of the search algorithm.
 
@@ -104,7 +118,7 @@ def save_run_information(explored: set[State], frontier, plan: list[list[Action]
         print(f"Folder '{folder_path}' created.")
 
     # The file path for saving the run information.
-    file_path = os.path.join(folder_path, Info.test_name + '.json')
+    file_path = os.path.join(folder_path, Info.test_name + ".json")
 
     # Deserialize the existing data from the file.
     all_data = deserialize_from_json_file(file_path)
@@ -112,12 +126,12 @@ def save_run_information(explored: set[State], frontier, plan: list[list[Action]
     # If no additional information is provided, create a default dictionary.
     if information is None:
         information = {
-            'Passed': True,
-            'Expanded': len(explored),
-            'Frontier': frontier.size(),
-            'Generated': len(explored) + frontier.size(),
-            'Solution length': len(plan),
-            'Time': elapsed_time
+            "Passed": True,
+            "Expanded": len(explored),
+            "Frontier": frontier.size(),
+            "Generated": len(explored) + frontier.size(),
+            "Solution length": len(plan),
+            "Time": elapsed_time,
         }
 
     # Add the information about the current run to the existing data.
@@ -135,8 +149,10 @@ def serialize_to_json_file(data, file_path: str):
     :param file_path: The path of the file where to save the JSON data.
     """
     try:
-        with open(file_path, 'w') as json_file:
-            json.dump(data, json_file, indent=4)  # Pretty printing with 4 spaces indentation
+        with open(file_path, "w") as json_file:
+            json.dump(
+                data, json_file, indent=4
+            )  # Pretty printing with 4 spaces indentation
         # print(f"Data successfully serialized to {file_path}")
     except Exception as e:
         print(f"An error occurred during serialization: {e}")
@@ -151,7 +167,7 @@ def deserialize_from_json_file(file_path: str):
     :return: The deserialized Python object.
     """
     try:
-        with open(file_path, 'r') as json_file:
+        with open(file_path, "r") as json_file:
             data = json.load(json_file)
         # print(f"Data successfully deserialized from {file_path}")
         return dict(data)

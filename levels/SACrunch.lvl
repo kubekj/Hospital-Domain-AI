@@ -3,20 +3,20 @@ hospital
 #levelname
 SACrunch
 #colors
-blue: 0, A, B, C, D
+blue: 0, A, B, C
 #initial
 ++++++++
-+0+    +
++0+ C  +
 + A+   +
-+ +B+  +
-+  DC+ +
++ + +  +
++   B+ +
 + ++++ +
 +      +
 ++++++++
 #goal
 ++++++++
-+ +  CB+
-+  + AD+
++ +C   +
++  + AB+
 + + +  +
 +    + +
 + ++++ +
