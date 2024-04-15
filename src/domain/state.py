@@ -171,9 +171,7 @@ class State:
     @staticmethod
     def is_applicable(action: Action, literals: list[Atom]) -> bool:
         if isinstance(action, Move):
-            return Move(action.agt, action.agtfrom, action.agtto).check_preconditions(
-                literals
-            )
+            return Move(action.agt, action.agtfrom, action.agtto).check_preconditions(literals)
         elif isinstance(action, Push):
             return Push(
                 action.agt, action.agtfrom, action.box, action.boxfrom, action.boxto
