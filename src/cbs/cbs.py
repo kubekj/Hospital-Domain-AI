@@ -46,10 +46,4 @@ def detect_conflicts(solutions):
 
 def resolve_conflicts(node, conflict):
     agent1, agent2, position, time = conflict
-    # Implement logic to check if these agents should be merged based on conflict history or other criteria
-    # For now, let's assume we always create new constraints
-    new_node1 = CBSNode(node.constraints + [(agent1, position, time)], node.solutions, node.cost, node.merged_agents.copy())
-    new_node1.solutions[agent1] = a_star_search(agent1, new_node1.constraints)  # Re-plan for agent1
-    new_node2 = CBSNode(node.constraints + [(agent2, position, time)], node.solutions, node.cost, node.merged_agents.copy())
-    new_node2.solutions[agent2] = a_star_search(agent2, new_node2.constraints)  # Re-plan for agent2
-    return new_node1, new_node2
+
