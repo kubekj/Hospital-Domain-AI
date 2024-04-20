@@ -12,6 +12,7 @@ from src.frontiers.dfs import FrontierDFS
 from src.frontiers.iw import FrontierIW
 
 from src.heuristics.astar import HeuristicAStar
+from src.heuristics.complex_dijkstra import HeuristicComplexDijkstra
 from src.heuristics.manhattan import HeuristicManhattan
 from src.heuristics.simple import HeuristicSimple
 from src.heuristics.simple_dijkstra import HeuristicSimpleDijkstra
@@ -50,8 +51,8 @@ class SearchClient:
             return HeuristicSimple(initial_state)
         elif args.s_dij:
             return HeuristicSimpleDijkstra(initial_state)
-        # elif args.c_dij:
-        #     return HeuristicComplexDijkstra(initial_state)
+        elif args.c_dij:
+            return HeuristicComplexDijkstra(initial_state)
         elif args.manhattan:
             return HeuristicManhattan(initial_state)
         else:
@@ -150,16 +151,9 @@ class SearchClient:
                 states[ip + 1] = states[ip].result(joint_action)
                 my_message = None
                 # TODO: Make ComplexDijkstra work with this
-                # my_message = str(frontier.heuristic.f(states[ip + 1])) if isinstance(heuristic, HeuristicComplexDijkstra) else None
-                print(
-                    "|".join(
-                        a.get_name()
-                        + "@"
-                        + (my_message if my_message is not None else a.get_name())
-                        for a in joint_action
-                    ),
-                    flush=True,
-                )
+                my_message = str(heuristic.f(states[ip + 1])) if isinstance(heuristic, HeuristicComplexDijkstra) else None
+                print("|".join(a.get_name() + '@' + (my_message if my_message is not None else a.get_name()) for a in
+                               joint_action), flush=True)
                 server_messages.readline()
 
     @staticmethod
