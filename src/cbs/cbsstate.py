@@ -4,17 +4,20 @@ import random
 import numpy as np
 
 from src.cbs.cbsaction import CBSActionType, CBSAction
-from src.domain.state import State
+from src.cbs.cbsagent import CBSAgent
+from src.cbs.cbsbox import CBSBox
 
 
 class CBSState:
     _RNG = random.Random(1)
-    goals = []
-    walls = []
-    agent_colors = []
-    box_colors = []
+    agent_colors = list()
+    box_colors = list()
+    walls = list()
+    goals = list()
+    goals_coords = list()
+    agent_box_dict = dict()
 
-    def __init__(self, agent_rows, agent_cols, boxes):
+    def __init__(self, agents, boxes):
         """
         Constructs an initial state.
         Arguments are not copied, and therefore should not be modified after being passed in.
@@ -34,72 +37,27 @@ class CBSState:
 
         Note: The state should be considered immutable after it has been hashed, e.g. added to a dictionary or set.
         """
-        self.agent_rows = np.array(agent_rows, dtype=int)
-        self.agent_cols = np.array(agent_cols, dtype=int)
-        self.boxes = np.array(boxes, dtype=object)
-
-        self.boxes_map = {}
-        for (row, col), value in np.ndenumerate(self.boxes):
-            if 'A' <= value <= 'Z':  # Check if the current cell contains a box
-                self.boxes_map[value] = (row, col)
-
+        self.agents = agents
+        self.boxes = boxes
         self.parent = None
         self.joint_action = None
         self.g = 0
         self._hash = None
 
-    @staticmethod
-    def make_initial_state(server_messages):
-        agent_colors, box_colors = State.read_colors(server_messages)
-        _, num_rows, num_cols, walls = State.read_level(server_messages)
+    def result(self, joint_action):
+        new_agents = np.copy(self.agents)
+        new_boxes = np.copy(self.boxes)
 
-        State.agent_colors = agent_colors
-        State.box_colors = box_colors
-        State.walls = walls
+        for agent, action in zip(new_agents, joint_action):
+            if action.action_type == CBSActionType.Push:
+                box = new_boxes[action.box_label]
+                box.move(action.box_row_delta, action.box_col_delta)
+            elif action.action_type == CBSActionType.Pull:
+                box = new_boxes[action.box_label]
+                box.move(-action.box_row_delta, -action.box_col_delta)
+            agent.move(action.agent_row_delta, action.agent_col_delta)
 
-    def result(self, joint_action: "[NPAction, ...]") -> "CBSState":
-        """
-        Returns the state resulting from applying joint_action in this state.
-        Precondition: Joint action must be applicable and non-conflicting in this state.
-        """
-        # Copy this state.
-        copy_agent_rows = np.copy(self.agent_rows)
-        copy_agent_cols = np.copy(self.agent_cols)
-        copy_boxes = np.copy(self.boxes)
-
-        for agent, action in enumerate(joint_action):
-            delta_row, delta_col = action.agent_row_delta, action.agent_col_delta
-
-            if action.action_type == CBSActionType.NoOp:
-                continue
-
-            if action.action_type in [CBSActionType.Move, CBSActionType.Push, CBSActionType.Pull]:
-                copy_agent_rows[agent] += delta_row
-                copy_agent_cols[agent] += delta_col
-
-            if action.action_type in [CBSActionType.Push, CBSActionType.Pull]:
-                if action.type == CBSActionType.Push:
-                    box_row, box_col = copy_agent_rows[agent], copy_agent_cols[agent]
-                else:  # Pull
-                    box_row, box_col = copy_agent_rows[agent] - delta_row, copy_agent_cols[agent] - delta_col
-
-                # Calculate new box position
-                new_box_row = box_row + action.box_row_delta
-                new_box_col = box_col + action.box_col_delta
-
-                # Move the box
-                box = copy_boxes[box_row, box_col]
-                copy_boxes[box_row, box_col] = ''
-                copy_boxes[new_box_row, new_box_col] = box
-
-                self.boxes_map[box] = (new_box_row, new_box_col)
-
-        copy_state = CBSState(copy_agent_rows, copy_agent_cols, copy_boxes)
-        copy_state.parent = self
-        copy_state.joint_action = joint_action[:]
-        copy_state.g = self.g + 1
-
-        return copy_state
+        return CBSState(new_agents, new_boxes)
 
     def is_goal_state(self) -> bool:
         """
@@ -108,15 +66,12 @@ class CBSState:
         - Each box must match the character in the goals array (A-Z for boxes).
         - Each agent must match the numeric position specified in the goals array (0-9 for agents).
         """
-        for (row, col), goal in np.ndenumerate(CBSState.goals):
-            if 'A' <= goal <= 'Z':
-                if self.boxes[row, col] != goal:
-                    return False
-            elif '0' <= goal <= '9':
-                agent_index = int(goal)
-                if not (self.agent_rows[agent_index] == row and self.agent_cols[agent_index] == col):
-                    return False
-
+        for agent in self.agents:
+            if not agent.is_at_goal(self.goals[agent.id]):
+                return False
+        for box in self.boxes.values():
+            if not box.is_at_goal(self.goals[box.label]):
+                return False
         return True
 
     def get_expanded_states(self) -> "[NPState, ...]":
