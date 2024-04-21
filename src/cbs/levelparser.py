@@ -17,7 +17,7 @@ def parse_initial_state(server_messages) -> CBSState:
     CBSState.goals_coords = goals_coords
 
     boxes = [CBSBox(label=chr(col + ord('A')), position=(row, col), color=box_colors[col])
-                for row, cols in enumerate(boxes) for col, label in enumerate(cols) if label]
+             for row, cols in enumerate(boxes) for col, label in enumerate(cols) if label]
 
     agents = []
     for agent_id, (row, col) in enumerate(zip(agent_rows, agent_cols)):
