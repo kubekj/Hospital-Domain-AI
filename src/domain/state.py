@@ -25,6 +25,9 @@ class State:
         self.g = 0
         self._hash = None
 
+        self.lastMovedBox = [None for _ in range(len(self.agent_locations))]
+        self.recalculateDistanceOfBox = [None for _ in range(len(self.agent_locations))]
+
     @staticmethod
     def make_initial_state(server_messages):
         # Read colors.
@@ -114,12 +117,22 @@ class State:
 
     def result(self, joint_action: list[Action]) -> Self:
         copy_literals = self.literals[:]
-        for action in joint_action:
+        copy_recalculateDistanceOfBox = self.recalculateDistanceOfBox[:]
+        copy_lastMovedBox = self.lastMovedBox[:]
+        for agent, action in enumerate(joint_action):
             copy_literals = action.apply_effects(copy_literals)
+            if isinstance(action, Move) and copy_lastMovedBox[agent] is not None:
+                copy_recalculateDistanceOfBox[agent] = copy_lastMovedBox[agent]
+                copy_lastMovedBox[agent] = None
+            if (isinstance(action, Push) or isinstance(action, Pull)):
+                copy_lastMovedBox[agent] = action.box
+            
         copy_state = State(copy_literals, self.time_step + 1)
         copy_state.parent = self
         copy_state.joint_action = joint_action[:]
         copy_state.g = self.g + 1
+        copy_state.recalculateDistanceOfBox = copy_recalculateDistanceOfBox
+        copy_state.lastMovedBox = copy_lastMovedBox
 
         return copy_state
 

@@ -1,0 +1,9 @@
+java -jar ./server.jar -l ./complevels/Sixty.lvl -c "python searchclient.py -iw -c_dij --test-name tests_cdij --test-folder ./benchmarks" -t 180
+java -jar ./server.jar -l ./complevels/RoboMatic.lvl -c "python searchclient.py -iw -c_dij --test-name tests_cdij --test-folder ./benchmarks" -t 180
+java -jar ./server.jar -l ./complevels/NHL.lvl -c "python searchclient.py -iw -c_dij --test-name tests_cdij --test-folder ./benchmarks" -t 180
+java -jar ./server.jar -l ./complevels/AgentWayz.lvl -c "python searchclient.py -iw -c_dij --test-name tests_cdij --test-folder ./benchmarks" -t 180
+java -jar ./server.jar -l ./complevels/Tryhard.lvl -c "python searchclient.py -iw -c_dij --test-name tests_cdij --test-folder ./benchmarks" -t 180
+java -jar ./server.jar -l ./complevels/FastCipka.lvl -c "python searchclient.py -iw -c_dij --test-name tests_cdij --test-folder ./benchmarks" -t 180
+java -jar ./server.jar -l ./complevels/cbsSolve.lvl -c "python searchclient.py -iw -c_dij --test-name tests_cdij --test-folder ./benchmarks" -t 180
+java -jar ./server.jar -l ./complevels/Wallies.lvl -c "python searchclient.py -iw -c_dij --test-name tests_cdij --test-folder ./benchmarks" -t 180
+java -jar ./server.jar -l ./complevels/brAln.lvl -c "python searchclient.py -iw -c_dij --test-name tests_cdij --test-folder ./benchmarks" -t 180

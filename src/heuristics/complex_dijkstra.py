@@ -28,20 +28,30 @@ class HeuristicComplexDijkstra(Heuristic):
 
     def h(self, state: State) -> int:
         total_distance = 0
-        # if state.recalculateDistanceOfBox is not None:
-        #     (box_row, box_col) = state.boxes_dict[state.recalculateDistanceOfBox]
-        #     self.initial_distances_from_box[state.recalculateDistanceOfBox] = (
-        #         HeuristicSimpleDijkstra.create_mapping(state,
-        #                                                box_row,
-        #                                                box_col,
-        #                                                len(Free.walls),
-        #                                                len(Free.walls[0])))
-        #     state.recalculateDistanceOfBox = None
         agents = {lit.agt: lit.loc for lit in state.literals if isinstance(lit, AgentAt)}
         boxes = {lit.box: lit.loc for lit in state.literals if isinstance(lit, BoxAt)}
+
+        for agt, box in enumerate(state.recalculateDistanceOfBox):
+            if box != None:
+                # print(f"Recalculating box {box} last moved by agent {agt}")
+                self.initial_distances_from_box[box] = (
+                    HeuristicSimpleDijkstra.create_mapping(state,
+                                                        boxes[box].row,
+                                                        boxes[box].col,
+                                                        len(Free.walls),
+                                                        len(Free.walls[0])))
+
         for agent, agent_loc in agents.items():
-            boxes_not_in_goal = [b for b in State.agent_box_dict[agent] if
-                                 self.box_goal_positions[b] != boxes[b]]
+            try:
+                boxes_not_in_goal = [b for b in State.agent_box_dict[agent] if
+                                     b in self.box_goal_positions and
+                                        self.box_goal_positions[b] != boxes[b]]
+            except Exception as exc:
+                print(State.agent_box_dict)
+                print(self.box_goal_positions)
+                print('H' in self.box_goal_positions)
+                raise Exception(exc)
+
             if len(boxes_not_in_goal):
                 close_boxes = get_close_boxes(agent_loc, {b: boxes[b] for b in boxes if b in State.agent_box_dict[agent]})
                 if len(close_boxes) == 0:
