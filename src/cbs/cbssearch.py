@@ -4,6 +4,7 @@ from queue import PriorityQueue
 from src.cbs.cbsconstraints import CBSConstraints
 from src.cbs.ctnode import CTNode
 from src.frontiers.best_first import FrontierBestFirst
+from src.frontiers.bfs import FrontierBFS
 from src.heuristics.astar import HeuristicAStar
 from src.searches.graphsearch import graph_search
 
@@ -12,7 +13,7 @@ def conflict_based_search(problem):
     agents = problem.agents
     root = CTNode(CBSConstraints(), {}, 0)
     root.solution = {
-        agent: graph_search(problem, FrontierBestFirst(HeuristicAStar(problem))) for agent in agents
+        agent: graph_search(problem, FrontierBFS()) for agent in agents
     }
     root.total_cost = CTNode.sic(root.solution)
     frontier = PriorityQueue()

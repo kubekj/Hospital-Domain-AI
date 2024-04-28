@@ -7,27 +7,48 @@ from src.utils.color import Color
 def parse_initial_state(server_messages) -> CBSState:
     parse_domain(server_messages)
     agent_colors, box_colors = parse_colors(server_messages)
-    walls, boxes, agent_rows, agent_cols, num_cols, num_rows = parse_level(server_messages)
+    walls, raw_boxes, agent_rows, agent_cols, num_cols, num_rows = parse_level(server_messages)
     goals, goals_coords = parse_goals(server_messages, num_cols, num_rows)
 
-    CBSState.agent_colors = agent_colors
-    CBSState.box_colors = box_colors
     CBSState.walls = walls
     CBSState.goals = goals
     CBSState.goals_coords = goals_coords
 
-    boxes = [CBSBox(label=chr(col + ord('A')), position=(row, col), color=box_colors[col])
-             for row, cols in enumerate(boxes) for col, label in enumerate(cols) if label]
+    boxes = []
+    for row, col, box_label in [(row, col, box_label) for row, boxes_row in enumerate(raw_boxes)
+                                for col, box_label in enumerate(boxes_row) if box_label]:
+        color = box_colors[box_label]
+        boxes.append(CBSBox(label=box_label, color=color, position=(row, col)))
 
     agents = []
     for agent_id, (row, col) in enumerate(zip(agent_rows, agent_cols)):
-        agent_boxes = {box for box in boxes if box.color == agent_colors[agent_id]}
+        color = agent_colors[agent_id]
+        agent_boxes = {box for box in boxes if box.color == color}
         agents.append(CBSAgent(agent_id=agent_id,
                                start=(row, col),
                                goal=goals_coords[agent_id],
-                               boxes=agent_boxes))
+                               boxes=agent_boxes,
+                               color=color))
 
     return CBSState(agents, boxes)
+
+
+def parse_colors(server_messages):
+    server_messages.readline()  # colors   
+    agent_colors = dict()
+    box_colors = dict()
+    line = server_messages.readline()
+    while not line.startswith("#"):
+        split = line.split(":")
+        color = Color.from_string(split[0].strip())
+        entities = [e.strip() for e in split[1].split(",")]
+        for e in entities:
+            if "0" <= e <= "9":
+                agent_colors[int(e)] = color
+            elif "A" <= e <= "Z":
+                box_colors[str(e)] = color
+        line = server_messages.readline()
+    return agent_colors, box_colors
 
 
 def parse_domain(server_messages) -> None:
@@ -38,24 +59,6 @@ def parse_domain(server_messages) -> None:
     # Read Level name.
     server_messages.readline()  # level name
     server_messages.readline().strip()  # <name>
-
-
-def parse_colors(server_messages):
-    server_messages.readline()  # colors
-    agent_colors = [None for _ in range(10)]
-    box_colors = [None for _ in range(26)]
-    line = server_messages.readline()
-    while not line.startswith("#"):
-        split = line.split(":")
-        color = Color.from_string(split[0].strip())
-        entities = [e.strip() for e in split[1].split(",")]
-        for e in entities:
-            if "0" <= e <= "9":
-                agent_colors[ord(e) - ord("0")] = color
-            elif "A" <= e <= "Z":
-                box_colors[ord(e) - ord("A")] = color
-        line = server_messages.readline()
-    return agent_colors, box_colors
 
 
 def parse_level(server_messages):

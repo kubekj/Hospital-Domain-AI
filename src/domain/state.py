@@ -119,7 +119,7 @@ class State:
         copy_literals = self.literals[:]
         for action in joint_action:
             copy_literals = action.apply_effects(copy_literals)
-        copy_state = State(copy_literals, self.time_step + 1)
+        copy_state = State(copy_literals)
         copy_state.parent = self
         copy_state.joint_action = joint_action[:]
         copy_state.g = self.g + 1

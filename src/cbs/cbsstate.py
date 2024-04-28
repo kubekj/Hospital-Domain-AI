@@ -1,3 +1,4 @@
+import copy
 import itertools
 import random
 
@@ -45,19 +46,65 @@ class CBSState:
         self._hash = None
 
     def result(self, joint_action):
-        new_agents = np.copy(self.agents)
-        new_boxes = np.copy(self.boxes)
+        # Create a deep copy of the current agents and boxes
+        new_agents = copy.deepcopy(self.agents)
+        new_boxes = copy.deepcopy(self.boxes)
 
+        # Iterate over each agent and the corresponding action
         for agent, action in zip(new_agents, joint_action):
-            if action.action_type == CBSActionType.Push:
-                box = new_boxes[action.box_label]
-                box.move(action.box_row_delta, action.box_col_delta)
-            elif action.action_type == CBSActionType.Pull:
-                box = new_boxes[action.box_label]
-                box.move(-action.box_row_delta, -action.box_col_delta)
+            # If the action is a push or pull, check if the box is in the agent's list of boxes
+            if action.action_type in [CBSActionType.Push, CBSActionType.Pull]:
+                for box in agent.boxes:
+                    box_row, box_col = box.position
+                    # Check if the box is in the direction of the action
+                    if (box_row - agent.position[0] == action.box_row_delta and
+                            box_col - agent.position[1] == action.box_col_delta):
+                        # Move the box in the direction of the action for a push
+                        # and in the opposite direction for a pull
+                        direction = 1 if action.action_type == CBSActionType.Push else -1
+                        box.move(direction * action.box_row_delta, direction * action.box_col_delta)
+                        break
+            # Move the agent in the direction of the action
             agent.move(action.agent_row_delta, action.agent_col_delta)
 
-        return CBSState(new_agents, new_boxes)
+        copy_state = CBSState(new_agents, new_boxes)
+        copy_state.parent = self
+        copy_state.joint_action = joint_action[:]
+        copy_state.g = self.g + 1
+        self._hash = self.__hash__()
+
+        return copy_state
+
+    # def result(self, joint_action):
+    #     """
+    #     This method applies a joint action to the current state and returns a new state.
+    #
+    #     Parameters:
+    #     joint_action (list): A list of actions, one for each agent.
+    #
+    #     Returns:
+    #     CBSState: A new state after applying the joint action.
+    #
+    #     """
+    #
+    #     # Create a copy of the current agents and boxes
+    #     new_agents = copy.deepcopy(self.agents)
+    #     new_boxes = copy.deepcopy(self.boxes)
+    #
+    #     # Iterate over each agent and the corresponding action
+    #     for agent, action in zip(new_agents, joint_action):
+    #         # If the action is a push, move the box in the direction of the action
+    #         if action.action_type == CBSActionType.Push:
+    #             box = new_boxes[action.box_label]
+    #             box.move(action.box_row_delta, action.box_col_delta)
+    #         # If the action is a pull, move the box in the opposite direction of the action
+    #         elif action.action_type == CBSActionType.Pull:
+    #             box = new_boxes[action.box_label]
+    #             box.move(-action.box_row_delta, -action.box_col_delta)
+    #         # Move the agent in the direction of the action
+    #         agent.move(action.agent_row_delta, action.agent_col_delta)
+    #
+    #     return CBSState(new_agents, new_boxes)
 
     def is_goal_state(self) -> bool:
         """
@@ -67,19 +114,18 @@ class CBSState:
         - Each agent must match the numeric position specified in the goals array (0-9 for agents).
         """
         for agent in self.agents:
-            if not agent.is_at_goal(self.goals[agent.id]):
+            if not agent.is_at_goal():
                 return False
-        for box in self.boxes.values():
-            if not box.is_at_goal(self.goals[box.label]):
-                return False
+        for box in self.boxes:
+            for goal_coord in self.goals_coords:
+                if not box.is_at_goal(goal_coord):
+                    return False
         return True
 
-    def get_expanded_states(self) -> "[NPState, ...]":
-        num_agents = len(self.agent_rows)
-
+    def get_expanded_states(self) -> "[CBSState, ...]":
         # Determine list of applicable action for each individual agent.
         applicable_actions = [
-            [action for action in CBSAction if self.is_applicable(agent, action)] for agent in range(num_agents)
+            [action for action in CBSAction if self.is_applicable(agent, action)] for agent in self.agents
         ]
 
         product_of_actions = itertools.product(*applicable_actions)
@@ -95,9 +141,9 @@ class CBSState:
 
         return expanded_states
 
-    def is_applicable(self, agent: int, action: "CBSAction") -> bool:
-        agent_row = self.agent_rows[agent]
-        agent_col = self.agent_cols[agent]
+    def is_applicable(self, agent: CBSAgent, action: "CBSAction") -> bool:
+        agent_row = agent.position[0]
+        agent_col = agent.position[1]
 
         if action.action_type == CBSActionType.NoOp:
             return True
@@ -105,35 +151,35 @@ class CBSState:
         destination_row = agent_row + action.agent_row_delta
         destination_col = agent_col + action.agent_col_delta
 
+        box: CBSBox = None
+
         if action.action_type == CBSActionType.Move:
             return self.is_free(destination_row, destination_col)
 
         elif action.action_type == CBSActionType.Push:
-            if not self.is_within_bounds(destination_row, destination_col):
-                return False
-            box = self.boxes[destination_row, destination_col]
+            for b in self.boxes:
+                if tuple(b.position) == (destination_row, destination_col):                    
+                    box = b
+                    break
             if box:  # Check if box exists at the location
                 next_row = destination_row + action.box_row_delta
                 next_col = destination_col + action.box_col_delta
-                return (CBSState.box_colors[ord(box) - ord('A')] == CBSState.agent_colors[agent] and
-                        self.is_free(next_row, next_col))
+                return agent.color == box.color and self.is_free(next_row, next_col)
 
         elif action.action_type == CBSActionType.Pull:
             source_row = agent_row - action.box_row_delta
             source_col = agent_col - action.box_col_delta
-            if not self.is_within_bounds(source_row, source_col):
-                return False
-            box = self.boxes[source_row, source_col]
+            for b in self.boxes:
+                if tuple(b.position) == (agent_row - action.box_row_delta, agent_col - action.box_col_delta):
+                    box = b
+                    break
             if box and self.is_free(destination_row, destination_col):  # Check if box exists and destination is free
-                return CBSState.box_colors[ord(box) - ord('A')] == CBSState.agent_colors[agent]
+                return agent.color == box.color
 
         return False
 
-    def is_within_bounds(self, row, col):
-        return 0 <= row < self.boxes.shape[0] and 0 <= col < self.boxes.shape[1]
-
-    def is_conflicting(self, joint_action: "[NPAction, ...]") -> "bool":
-        num_agents = len(self.agent_rows)
+    def is_conflicting(self, joint_action: "[CBSAction, ...]") -> "bool":
+        num_agents = len(self.agents)
         destination_rows = [
             None for _ in range(num_agents)
         ]  # row of new cell to become occupied by action
@@ -148,29 +194,30 @@ class CBSState:
         ]  # current column of box moved by action
 
         # Collect cells to be occupied and boxes to be moved.
-        for agent in range(num_agents):
-            action = joint_action[agent]
-            agent_row = self.agent_rows[agent]
-            agent_col = self.agent_cols[agent]
+        for agent in self.agents:
+            agent_row = agent.position[0]
+            agent_col = agent.position[1]
+            agent_id = agent.id
+            action = joint_action[agent_id]
 
             if action.action_type == CBSActionType.NoOp:
                 pass
 
             elif action.action_type == CBSActionType.Move:
-                destination_rows[agent] = agent_row + action.agent_row_delta
-                destination_cols[agent] = agent_col + action.agent_col_delta
+                destination_rows[agent_id] = agent_row + action.agent_row_delta
+                destination_cols[agent_id] = agent_col + action.agent_col_delta
 
             elif action.action_type == CBSActionType.Push:
-                destination_rows[agent] = agent_row + action.agent_row_delta
-                destination_cols[agent] = agent_col + action.agent_col_delta
-                box_rows[agent] = agent_row + joint_action[agent].agent_row_delta
-                box_cols[agent] = agent_col + joint_action[agent].agent_col_delta
+                destination_rows[agent_id] = agent_row + action.agent_row_delta
+                destination_cols[agent_id] = agent_col + action.agent_col_delta
+                box_rows[agent_id] = agent_row + joint_action[agent_id].agent_row_delta
+                box_cols[agent_id] = agent_col + joint_action[agent_id].agent_col_delta
 
             elif action.action_type == CBSActionType.Pull:
-                destination_rows[agent] = agent_row + action.agent_row_delta
-                destination_cols[agent] = agent_col + action.agent_col_delta
-                box_rows[agent] = agent_row - joint_action[agent].box_row_delta
-                box_cols[agent] = agent_row - joint_action[agent].box_col_delta
+                destination_rows[agent_id] = agent_row + action.agent_row_delta
+                destination_cols[agent_id] = agent_col + action.agent_col_delta
+                box_rows[agent_id] = agent_row - joint_action[agent_id].box_row_delta
+                box_cols[agent_id] = agent_row - joint_action[agent_id].box_col_delta
 
         for a1 in range(num_agents):
             if joint_action[a1] is CBSAction.NoOp:
@@ -201,18 +248,27 @@ class CBSState:
         """
         Returns True if the cell is free (not a wall, box, or agent), False otherwise.
         """
-        return not CBSState.walls[row][col] and self.boxes[row][col] == "" and self.agent_at(row, col) is None
+        return not CBSState.walls[row][col] and self.box_at(row, col) == '' and self.agent_at(row, col) == -1
 
-    def agent_at(self, row: "int", col: "int") -> "chr":
+    def box_at(self, row: "int", col: "int") -> chr:
         """
-        Returns the agent number (0-indexed) at the given row and column, or None if no agent is there.
+        Returns the box character at the given row and column, or None if no box is there.
         """
-        for agent in range(len(self.agent_rows)):
-            if self.agent_rows[agent] == row and self.agent_cols[agent] == col:
-                return chr(agent + ord("0"))
+        for box in self.boxes:
+            if box.position[0] == row and box.position[1] == col:
+                return box.label
         return None
 
-    def extract_plan(self) -> "[NPAction, ...]":
+    def agent_at(self, row: "int", col: "int") -> int:
+        """
+        Returns the agent id (0-indexed) at the given row and column, or None if no agent is there.
+        """
+        for agent in self.agents:
+            if agent.position[0] == row and agent.position[1] == col:
+                return agent.id
+        return None
+
+    def extract_plan(self) -> "[CBSAction, ...]":
         """
         Extract a plan from the current state.
         """
@@ -227,10 +283,9 @@ class CBSState:
         if self._hash is None:
             prime = 31
             _hash = 1
-            _hash = _hash * prime + hash(tuple(self.agent_rows))
-            _hash = _hash * prime + hash(tuple(self.agent_cols))
+            _hash = _hash * prime + hash(tuple(self.agents))
+            _hash = _hash * prime + hash(tuple(self.boxes))
             _hash = _hash * prime + hash(tuple(CBSState.agent_colors))
-            _hash = _hash * prime + hash(tuple(tuple(row) for row in self.boxes))
             _hash = _hash * prime + hash(tuple(CBSState.box_colors))
             _hash = _hash * prime + hash(tuple(tuple(row) for row in CBSState.goals))
             _hash = _hash * prime + hash(tuple(tuple(row) for row in CBSState.walls))
@@ -242,9 +297,7 @@ class CBSState:
             return True
         if not isinstance(other, CBSState):
             return False
-        if self.agent_rows != other.agent_rows:
-            return False
-        if self.agent_cols != other.agent_cols:
+        if self.agents != other.agents:
             return False
         if CBSState.agent_colors != other.agent_colors:
             return False

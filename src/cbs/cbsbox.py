@@ -26,4 +26,7 @@ class CBSBox:
         return hash((self.label, tuple(self.position)))
 
     def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
         return f"Box {self.label} at {self.position.tolist()}"

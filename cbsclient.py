@@ -4,6 +4,8 @@ import argparse
 from src.cbs.cbssearch import conflict_based_search
 from src.cbs.cbsstate import CBSState
 from src.cbs.levelparser import parse_initial_state
+from src.frontiers.bfs import FrontierBFS
+from src.searches.graphsearch import graph_search
 from src.utils import memory
 from src.utils.info import handle_debug
 
@@ -34,7 +36,7 @@ class CBSSearchClient:
     @staticmethod
     def execute_and_print_plan(initial_state, server_messages):
         print("Starting {}.".format("CBS with Meta Agent approach"), file=sys.stderr, flush=True)
-        plan = conflict_based_search(initial_state)
+        plan = graph_search(initial_state, FrontierBFS())
 
         if plan is None:
             print("Unable to solve level.", file=sys.stderr, flush=True)
