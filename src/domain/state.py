@@ -272,7 +272,7 @@ class State:
             return True
 
         if isinstance(other, State):
-            return set(self.literals) == set(other.literals) and self.time_step == other.time_step
+            return set(self.literals) == set(other.literals)
 
         return False
 

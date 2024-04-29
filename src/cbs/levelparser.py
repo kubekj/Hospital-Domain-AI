@@ -13,6 +13,8 @@ def parse_initial_state(server_messages) -> CBSState:
     CBSState.walls = walls
     CBSState.goals = goals
     CBSState.goals_coords = goals_coords
+    CBSState.num_cols = num_cols
+    CBSState.num_rows = num_rows
 
     boxes = []
     for row, col, box_label in [(row, col, box_label) for row, boxes_row in enumerate(raw_boxes)

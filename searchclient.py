@@ -138,7 +138,7 @@ class SearchClient:
                 file=sys.stderr,
                 flush=True,
             )
-            states = [State(None) for _ in range(len(plan) + 1)]
+            states = [None for _ in range(len(plan) + 1)]
             states[0] = initial_state
             for ip, joint_action in enumerate(plan):
                 states[ip + 1] = states[ip].result(joint_action)
@@ -156,7 +156,7 @@ class SearchClient:
         SearchClient.execute_and_print_plan(initial_state, frontier, heuristic, sys.stdin)
 
 
-debug = True
+debug = False
 fail_info = True
 if __name__ == "__main__":
     handle_debug(debug)

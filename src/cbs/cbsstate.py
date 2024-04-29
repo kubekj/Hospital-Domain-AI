@@ -11,12 +11,11 @@ from src.cbs.cbsbox import CBSBox
 
 class CBSState:
     _RNG = random.Random(1)
-    agent_colors = list()
-    box_colors = list()
     walls = list()
     goals = list()
     goals_coords = list()
-    agent_box_dict = dict()
+    num_cols = 0
+    num_rows = 0
 
     def __init__(self, agents, boxes):
         """
@@ -250,7 +249,7 @@ class CBSState:
         """
         return not CBSState.walls[row][col] and self.box_at(row, col) == '' and self.agent_at(row, col) == -1
 
-    def box_at(self, row: "int", col: "int") -> chr:
+    def box_at(self, row: "int", col: "int") -> str:
         """
         Returns the box character at the given row and column, or None if no box is there.
         """
@@ -259,13 +258,13 @@ class CBSState:
                 return box.label
         return None
 
-    def agent_at(self, row: "int", col: "int") -> int:
+    def agent_at(self, row: "int", col: "int") -> str:
         """
         Returns the agent id (0-indexed) at the given row and column, or None if no agent is there.
         """
         for agent in self.agents:
             if agent.position[0] == row and agent.position[1] == col:
-                return agent.id
+                return str(agent.id)
         return None
 
     def extract_plan(self) -> "[CBSAction, ...]":
@@ -285,8 +284,6 @@ class CBSState:
             _hash = 1
             _hash = _hash * prime + hash(tuple(self.agents))
             _hash = _hash * prime + hash(tuple(self.boxes))
-            _hash = _hash * prime + hash(tuple(CBSState.agent_colors))
-            _hash = _hash * prime + hash(tuple(CBSState.box_colors))
             _hash = _hash * prime + hash(tuple(tuple(row) for row in CBSState.goals))
             _hash = _hash * prime + hash(tuple(tuple(row) for row in CBSState.walls))
             self._hash = _hash
@@ -299,13 +296,9 @@ class CBSState:
             return False
         if self.agents != other.agents:
             return False
-        if CBSState.agent_colors != other.agent_colors:
-            return False
         if CBSState.walls != other.walls:
             return False
         if self.boxes != other.boxes:
-            return False
-        if CBSState.box_colors != other.box_colors:
             return False
         if CBSState.goals != other.goals:
             return False
@@ -313,12 +306,12 @@ class CBSState:
 
     def __repr__(self):
         lines = []
-        for row in range(len(self.boxes)):
+        for row in range(self.num_rows):
             line = []
-            for col in range(len(self.boxes[row])):
-                if self.boxes[row][col] != "":
-                    line.append(self.boxes[row][col])
-                elif CBSState.walls[row][col] is not None:
+            for col in range(self.num_cols):
+                if self.box_at(row, col) is not None:
+                    line.append(self.box_at(row, col))
+                elif CBSState.walls[row][col] is not False:
                     line.append("+")
                 elif self.agent_at(row, col) is not None:
                     line.append(self.agent_at(row, col))

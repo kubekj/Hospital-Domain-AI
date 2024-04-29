@@ -47,6 +47,7 @@ def graph_search(initial_state, frontier: Frontier):
 
         # Assuming expanded_states is obtained from some state.get_expanded_states() method
         expanded_states = state.get_expanded_states()
+        # print("#Expanded states:", expanded_states)
 
         if isinstance(frontier, (FrontierIW, FrontierBestFirst)):
             heuristics = [frontier.heuristic.h(s) for s in expanded_states]
@@ -55,7 +56,6 @@ def graph_search(initial_state, frontier: Frontier):
 
         for expanded_state in expanded_states:
             if not frontier.contains(expanded_state) and expanded_state not in explored:
-                print("e")
                 frontier.add(expanded_state)
 
 
