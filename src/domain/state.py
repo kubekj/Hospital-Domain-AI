@@ -14,12 +14,11 @@ class State:
     agent_box_dict = {}
     goal_literals: list[Atom] = []
 
-    def __init__(self, literals, time_step=0):
+    def __init__(self, literals):
         self.literals: list[Atom] = literals
         self.agent_locations = {
             lit.agt: lit.loc for lit in self.literals if isinstance(lit, AgentAt)
         }
-        self.time_step = time_step
         self.parent = None
         self.joint_action = None
         self.g = 0
@@ -30,7 +29,19 @@ class State:
 
     @staticmethod
     def make_initial_state(server_messages):
-        # Read colors.
+        agent_colors, box_colors = State.read_colors(server_messages)
+        literals, num_rows, num_cols, walls = State.read_level(server_messages)
+        goal_literals = State.read_goal_state(server_messages, num_rows)
+
+        State.agent_colors = agent_colors
+        State.box_colors = box_colors
+        State.agent_box_dict = State.create_agent_box_dict(agent_colors, box_colors)
+        State.goal_literals = goal_literals
+
+        return State(literals)
+
+    @staticmethod
+    def read_colors(server_messages):
         server_messages.readline()  # colors
         agent_colors = [None for _ in range(10)]
         box_colors = [None for _ in range(26)]
@@ -45,7 +56,10 @@ class State:
                 elif "A" <= e <= "Z":
                     box_colors[ord(e) - ord("A")] = color
             line = server_messages.readline()
+        return agent_colors, box_colors
 
+    @staticmethod
+    def read_level(server_messages):
         literals = []
         num_rows = 0
         num_cols = 0
@@ -58,29 +72,25 @@ class State:
             line = server_messages.readline()
 
         walls = [[False for _ in range(num_cols)] for _ in range(num_rows)]
-        num_agents = 0
         row = 0
         for line in level_lines:
             for col, c in enumerate(line):
                 if "0" <= c <= "9":
                     agent = ord(c) - ord("0")
                     literals += [AgentAt(agent, Location(row, col))]
-                    num_agents += 1
                 elif "A" <= c <= "Z":
                     box = c
                     literals += [BoxAt(box, Location(row, col))]
                 elif c == "+" or c == "\n":
                     walls[row][col] = True
-                else:
-                    # literals += [Free(Location(row,col))]
-                    pass
             row += 1
 
-        # Create all rigid literals relating to Locations
         Location.calculate_all_neighbours(walls)
         Free.walls = walls
-        # Read goal state.
-        # line is currently "#goal".
+        return literals, num_rows, num_cols, walls
+
+    @staticmethod
+    def read_goal_state(server_messages, num_rows):
         goal_literals = []
         line = server_messages.readline()
         row = 0
@@ -89,20 +99,16 @@ class State:
                 if "0" <= c <= "9":
                     agent = ord(c) - ord("0")
                     goal_literals += [AgentAt(agent, Location(row, col))]
-                    num_agents += 1
                 elif "A" <= c <= "Z":
                     box = c
                     goal_literals += [BoxAt(box, Location(row, col))]
-
             row += 1
             line = server_messages.readline()
+        return goal_literals
 
-        # End.
-        # line is currently "#end".
-
-        State.agent_colors = agent_colors
-        State.box_colors = box_colors
-        State.agent_box_dict = {
+    @staticmethod
+    def create_agent_box_dict(agent_colors, box_colors):
+        return {
             i: [
                 chr(j + ord("A"))
                 for j, b in enumerate(box_colors)
@@ -111,9 +117,6 @@ class State:
             for i, a in enumerate(agent_colors)
             if a is not None
         }
-        State.goal_literals = goal_literals
-        # print(literals)
-        return State(literals)
 
     def result(self, joint_action: list[Action]) -> Self:
         copy_literals = self.literals[:]
@@ -127,7 +130,7 @@ class State:
             if (isinstance(action, Push) or isinstance(action, Pull)):
                 copy_lastMovedBox[agent] = action.box
             
-        copy_state = State(copy_literals, self.time_step + 1)
+        copy_state = State(copy_literals)
         copy_state.parent = self
         copy_state.joint_action = joint_action[:]
         copy_state.g = self.g + 1
@@ -146,12 +149,10 @@ class State:
         num_agents = len(self.agent_locations)
 
         # Determine list of applicable action for each individual agent.
-        applicable_actions = [
-            self.get_applicable_actions(agent) for agent in range(num_agents)
-        ]
+        applicable_actions = [self.get_applicable_actions(agent) for agent in range(num_agents)]
 
         # Iterate over joint actions, check conflict and generate child states.
-        joint_action = [None for _ in range(num_agents)]
+        joint_action: list[Action] = [Action(0) for _ in range(num_agents)]
         actions_permutation = [0 for _ in range(num_agents)]
         expanded_states = []
         while True:
@@ -184,9 +185,9 @@ class State:
     @staticmethod
     def is_applicable(action: Action, literals: list[Atom]) -> bool:
         if isinstance(action, Move):
-            return Move(action.agt, action.agtfrom, action.agtto).check_preconditions(
-                literals
-            )
+            return Move(
+                action.agt, action.agtfrom, action.agtto
+            ).check_preconditions(literals)
         elif isinstance(action, Push):
             return Push(
                 action.agt, action.agtfrom, action.box, action.boxfrom, action.boxto
@@ -270,13 +271,12 @@ class State:
 
     def __hash__(self):
         if self._hash is None:
-            prime = 31
-            _hash = 1
+            prime: int = 31
+            _hash: int = 1
             _hash = _hash * prime + hash(tuple(self.literals))
             _hash = _hash * prime + hash(tuple(State.agent_colors))
             _hash = _hash * prime + hash(tuple(State.box_colors))
             _hash = _hash * prime + hash(tuple(State.goal_literals))
-            _hash = _hash * prime + hash(self.time_step)
             self._hash = _hash
         return self._hash
 
@@ -285,10 +285,7 @@ class State:
             return True
 
         if isinstance(other, State):
-            return (
-                set(self.literals) == set(other.literals)
-                and self.time_step == other.time_step
-            )
+            return set(self.literals) == set(other.literals)
 
         return False
 
