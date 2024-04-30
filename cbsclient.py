@@ -47,7 +47,7 @@ class CBSSearchClient:
                 file=sys.stderr,
                 flush=True,
             )
-            states = [CBSState(None) for _ in range(len(plan) + 1)]
+            states = [CBSState(None)] * (len(plan) + 1)
             states[0] = initial_state
             for ip, joint_action in enumerate(plan):
                 states[ip + 1] = states[ip].result(joint_action)

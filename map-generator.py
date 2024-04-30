@@ -237,7 +237,7 @@ class Analysis:
 
     @staticmethod
     def largest_open_area(map_, width, height):
-        visited = [[False for _ in range(width)] for _ in range(height)]
+        visited = [[False] * width] * height
         largest_area = 0
         for y in range(height):
             for x in range(width):
@@ -248,7 +248,7 @@ class Analysis:
 
     @staticmethod
     def count_accessible_areas(map_, width, height):
-        visited = [[False for _ in range(width)] for _ in range(height)]
+        visited = [[False] * width] * height
         areas = 0
         for y in range(height):
             for x in range(width):

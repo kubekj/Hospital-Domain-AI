@@ -6,10 +6,10 @@ class Action:
     def __init__(self, agt: int):
         self.agt = agt
 
-    def check_preconditions(self, literals: list[Atom]):
+    def check_preconditions(self, literals: set[Atom]):
         return True
 
-    def apply_effects(self, literals: list[Atom]):
+    def apply_effects(self, literals: set[Atom]):
         return literals
 
     def get_name(self):
@@ -22,7 +22,7 @@ class Move(Action):
         self.agtfrom = agtfrom
         self.agtto = agtto
 
-    def check_preconditions(self, literals: list[Atom]):
+    def check_preconditions(self, literals: set[Atom]):
         """
         Check if the preconditions of the Move action are satisfied in the given state.
         Preconditions:
@@ -37,7 +37,7 @@ class Move(Action):
             # and Free(self.agtto) in literals
         )
 
-    def apply_effects(self, literals: list[Atom]):
+    def apply_effects(self, literals: set[Atom]):
         """
         Apply the effects of the Move action to the given state.
         Effects:
@@ -50,11 +50,11 @@ class Move(Action):
             # ~AgentAt(agt,agtfrom)
             literals.remove(AgentAt(self.agt, self.agtfrom))
             # AgentAt(agt,agtto)
-            literals.append(AgentAt(self.agt, self.agtto))
+            literals.add(AgentAt(self.agt, self.agtto))
             # ~Free(agtto)
             # literals.remove(Free(self.agtto))
             # Free(agtfrom)
-            # literals.append(Free(self.agtfrom))
+            # literals.add(Free(self.agtfrom))
             return literals
         else:
             raise Exception("Preconditions not satisfied for the Move action.")
@@ -88,7 +88,7 @@ class Push(Action):
         self.boxfrom = boxfrom
         self.boxto = boxto
 
-    def check_preconditions(self, literals: list[Atom]):
+    def check_preconditions(self, literals: set[Atom]):
         """
         Check if the preconditions of the Move action are satisfied in the given state.
         Preconditions:
@@ -107,7 +107,7 @@ class Push(Action):
             and self.agtfrom != self.boxto
         )
 
-    def apply_effects(self, literals: list[Atom]):
+    def apply_effects(self, literals: set[Atom]):
         """
         Apply the effects of the Move action to the given state.
         Effects:
@@ -120,11 +120,11 @@ class Push(Action):
             # ~AgentAt(agt,agtfrom)
             literals.remove(AgentAt(self.agt, self.agtfrom))
             # AgentAt(agt,boxfrom)
-            literals.append(AgentAt(self.agt, self.boxfrom))
+            literals.add(AgentAt(self.agt, self.boxfrom))
             # ~BoxAt(box,boxfrom)
             literals.remove(BoxAt(self.box, self.boxfrom))
             # BoxAt(box,boxto)
-            literals.append(BoxAt(self.box, self.boxto))
+            literals.add(BoxAt(self.box, self.boxto))
             return literals
         else:
             raise Exception("Preconditions not satisfied for the Move action.")
@@ -171,7 +171,7 @@ class Pull(Action):
         self.box = box
         self.boxfrom = boxfrom
 
-    def check_preconditions(self, literals: list[Atom]):
+    def check_preconditions(self, literals: set[Atom]):
         """
         Check if the preconditions of the Move action are satisfied in the given state.
         Preconditions:
@@ -190,7 +190,7 @@ class Pull(Action):
             and self.agtto != self.boxfrom
         )
 
-    def apply_effects(self, literals: list[Atom]):
+    def apply_effects(self, literals: set[Atom]):
         """
         Apply the effects of the Move action to the given state.
         Effects:
@@ -205,11 +205,11 @@ class Pull(Action):
             # ~AgentAt(agt,agtfrom)
             literals.remove(AgentAt(self.agt, self.agtfrom))
             # AgentAt(agt,agtto)
-            literals.append(AgentAt(self.agt, self.agtto))
+            literals.add(AgentAt(self.agt, self.agtto))
             # ~BoxAt(box,boxfrom)
             literals.remove(BoxAt(self.box, self.boxfrom))
             # BoxAt(box,boxto)
-            literals.append(BoxAt(self.box, self.agtfrom))
+            literals.add(BoxAt(self.box, self.agtfrom))
             return literals
         else:
             raise Exception("Preconditions not satisfied for the Move action.")

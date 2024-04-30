@@ -91,7 +91,7 @@ class Free(Atom):
         super().__init__("Free", (loc))
         self.loc = loc
 
-    def eval(self, literals: list[Atom]):
+    def eval(self, literals: set[Atom]):
         agent_at_literals = [lit for lit in literals if isinstance(lit, AgentAt)]
         box_at_literals = [lit for lit in literals if isinstance(lit, BoxAt)]
         return (not self.walls[self.loc.row][self.loc.col]

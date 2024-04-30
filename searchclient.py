@@ -138,7 +138,7 @@ class SearchClient:
                 file=sys.stderr,
                 flush=True,
             )
-            states = [None for _ in range(len(plan) + 1)]
+            states = [None] * (len(plan) + 1)
             states[0] = initial_state
             for ip, joint_action in enumerate(plan):
                 states[ip + 1] = states[ip].result(joint_action)

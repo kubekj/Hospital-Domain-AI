@@ -12,7 +12,7 @@ class HeuristicComplexDijkstra(Heuristic):
     def __init__(self, initial_state: State):
         super().__init__(initial_state)
         self.create_all_dijkstra_mappings(initial_state)
-        self.choke_point_detection = [[None for _ in range(self.num_cols)] for _ in range(self.num_rows)]
+        self.choke_point_detection = [[None] * self.num_cols for _ in range(self.num_rows)]
         self.choke_point_count = {}
 
         break_outer_loop = False

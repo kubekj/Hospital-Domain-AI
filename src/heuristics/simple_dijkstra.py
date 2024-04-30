@@ -46,7 +46,7 @@ class HeuristicSimpleDijkstra(Heuristic):
         calculated with the Dijkstra algorithm. If a cell (i,j) is a wall, which we know by State.walls[i][j] == true, then
         the distance will be math.inf
         """
-        distances = [[math.inf for _ in range(num_cols)] for _ in range(num_rows)]
+        distances = [[math.inf] * num_cols for _ in range(num_rows)]
 
         def my_is_free(row, col):
             if take_boxes_into_account:

@@ -179,18 +179,10 @@ class CBSState:
 
     def is_conflicting(self, joint_action: "[CBSAction, ...]") -> "bool":
         num_agents = len(self.agents)
-        destination_rows = [
-            None for _ in range(num_agents)
-        ]  # row of new cell to become occupied by action
-        destination_cols = [
-            None for _ in range(num_agents)
-        ]  # column of new cell to become occupied by action
-        box_rows = [
-            None for _ in range(num_agents)
-        ]  # current row of box moved by action
-        box_cols = [
-            None for _ in range(num_agents)
-        ]  # current column of box moved by action
+        destination_rows = [None] * num_agents  # row of new cell to become occupied by action
+        destination_cols = [None] * num_agents  # column of new cell to become occupied by action
+        box_rows = [None] * num_agents  # current row of box moved by action
+        box_cols = [None] * num_agents  # current column of box moved by action
 
         # Collect cells to be occupied and boxes to be moved.
         for agent in self.agents:
@@ -271,7 +263,7 @@ class CBSState:
         """
         Extract a plan from the current state.
         """
-        plan = [None for _ in range(self.g)]
+        plan = [None] * self.g
         state = self
         while state.joint_action is not None:
             plan[state.g - 1] = state.joint_action

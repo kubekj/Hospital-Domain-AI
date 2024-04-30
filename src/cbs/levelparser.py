@@ -75,10 +75,10 @@ def parse_level(server_messages):
         line = server_messages.readline()
 
     num_agents = 0
-    agent_rows = [0 for _ in range(10)]
-    agent_cols = [0 for _ in range(10)]
-    walls = [[False for _ in range(num_cols)] for _ in range(num_rows)]
-    boxes = [['' for _ in range(num_cols)] for _ in range(num_rows)]
+    agent_rows = [0] * 10
+    agent_cols = [0] * 10
+    walls = [[False] * num_cols for _ in range(num_rows)]
+    boxes = [[''] * num_cols for _ in range(num_rows)]
     row = 0
     for line in level_lines:
         for col, c in enumerate(line):
@@ -99,7 +99,7 @@ def parse_level(server_messages):
 
 
 def parse_goals(server_messages, num_cols, num_rows):
-    goals = [['' for _ in range(num_cols)] for _ in range(num_rows)]
+    goals = [[''] * num_cols for _ in range(num_rows)]
     goals_coords = []
     line = server_messages.readline()
     row = 0
