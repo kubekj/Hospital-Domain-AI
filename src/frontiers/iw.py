@@ -1,4 +1,5 @@
 from itertools import combinations
+import sys
 
 from src.frontiers.best_first import FrontierBestFirst
 from src.heuristics.heuristic import Heuristic
@@ -39,9 +40,12 @@ class FrontierIW(FrontierBestFirst):
         :param i: The size of the combinations to check.
         :return: True if there's a novel combination, False otherwise.
         """
+        def sorted_tuple(comb):
+            # Sort by a consistent attribute or representation to fix duplicate issue
+            return tuple(sorted(comb, key=lambda x: repr(x)))
 
         # Generate all combinations of size i from the elements
-        new_combinations = set(combinations(elements, self.width))
+        new_combinations = set(sorted_tuple(comb) for comb in combinations(elements, self.width))
 
         # Check if there's any combination that we have not seen before
         novel = not new_combinations.issubset(self.known_combinations)
