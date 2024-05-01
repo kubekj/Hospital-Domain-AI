@@ -10,36 +10,52 @@ The goal of the Hospital-Domain-AI project is to create an efficient client for 
 The project supports various search strategies to tackle the MAPF/APF problems. Below are the commands to execute each strategy:
 
 #### Breadth-First Search (BFS)
-
+With saving the tests in the benchmarks folder:
 ```bash
 java -jar ./server.jar -l ./levels/MAPF01.lvl -c "python searchclient.py -bfs --test-name bfs --test-folder ./benchmarks" -g
 ```
+Without saving the tests:
+```bash
+java -jar ./server.jar -l ./levels/MAPF01.lvl -c "python searchclient.py -bfs" -g
+```
 
 #### Depth-First Search (DFS)
+With saving the tests in the benchmarks folder:
 ```bash
 java -jar ./server.jar -l ./levels/MAPF01.lvl -c "python searchclient.py -dfs --test-name dfs --test-folder ./benchmarks" -g
-
+```
+Without saving the tests:
+```bash
+java -jar ./server.jar -l ./levels/MAPF01.lvl -c "python searchclient.py -dfs" -g
 ```
 
 #### Uniform-cost search (also known as Dijkstra)
+With saving the tests in the benchmarks folder:
 ```bash
 java -jar ./server.jar -l ./levels/MAPF01.lvl -c "python searchclient.py -greedy -s_dij --test-name greedy --test-folder ./benchmarks" -g
 ```
+Without saving the tests:
+```bash
+java -jar ./server.jar -l ./levels/MAPF01.lvl -c "python searchclient.py -greedy -s_dij" -g
+```
 
 #### Greedy Best-First Search with Customized UCF (Currently Not Working)
+With saving the tests in the benchmarks folder:
 ```bash
 java -jar ./server.jar -l ./levels/MAPF01.lvl -c "python searchclient.py -greedy -c_dij --test-name greedy --test-folder ./benchmarks" -g
+```
+Without saving the tests:
+```bash
+java -jar ./server.jar -l ./levels/MAPF01.lvl -c "python searchclient.py -greedy -c_dij" -g
 ```
 
 #### Iterated Width Search
 ```bash
-java -jar ./server.jar -l ./levels/MAPF02C.lvl -c "python searchclient.py -iw -s_dij --test-name iw --test-folder ./benchmarks" -g      
-java -jar ./server.jar -l ./levels/MAPF03.lvl -c "python searchclient.py -iw -s_dij --test-name iw --test-folder ./benchmarks" -g
-java -jar ./server.jar -l ./levels/MAPF03C.lvl -c "python searchclient.py -iw -s_dij --test-name iw --test-folder ./benchmarks" -g
-
-java -jar ./server.jar -l ./levels/test_push.lvl -c "python searchclient.py -iw -c_dij --test-name iw --test-folder ./benchmarks" -g
-java -jar ./server.jar -l ./levels/test.lvl -c "python searchclient.py -iw -c_dij --test-name iw --test-folder ./benchmarks" -g
-
 java -jar ./server.jar -l ./levels/SACrunch.lvl -c "python searchclient.py -iw -c_dij --test-name iw --test-folder ./benchmarks" -g
+```
+
+Without saving the tests:
+```bash
+java -jar ./server.jar -l ./levels/SACrunch.lvl -c "python searchclient.py -iw -c_dij" -g
 ```
 
