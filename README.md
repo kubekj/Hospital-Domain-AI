@@ -61,3 +61,8 @@ java -jar ./server.jar -l ./complevels/AgentWayz.lvl -c "python searchclient.py 
 java -jar ./server.jar -l ./complevels/Tryhard.lvl -c "python searchclient.py -iw -c_dij --test-name tests_cdij --test-folder ./benchmarks" -g
 ```
 
+Without saving the tests:
+```bash
+java -jar ./server.jar -l ./levels/SACrunch.lvl -c "python searchclient.py -iw -c_dij" -g
+```
+
