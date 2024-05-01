@@ -188,6 +188,12 @@ if __name__ == "__main__":
         help="Name the folder the files with the information will be stored.",
         required=False
     )
+    parser.add_argument(
+        "--profile",
+        action="store_true",
+        default=False,
+        help="Enable profiling with cProfile."
+    )
 
     strategy_group = parser.add_mutually_exclusive_group()
     strategy_group.add_argument(
@@ -244,5 +250,16 @@ if __name__ == "__main__":
     # Set max memory usage allowed (soft limit).
     memory.max_usage = args.max_memory
 
+    if args.profile:
+        import cProfile
+        import pstats
+        profiler = cProfile.Profile()
+        profiler.enable()
+
     # Run client.
     SearchClient.main(args)
+
+    if args.profile:
+        profiler.disable()
+        stats = pstats.Stats(profiler).sort_stats('cumulative')
+        stats.dump_stats('profile.prof')
