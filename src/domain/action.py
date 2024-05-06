@@ -88,9 +88,9 @@ class Push(Action):
     ):
         super().__init__(agt)
         self.box = box
-        self.agtfrom = encode_atom_pos(AtomType.AGENT_AT, agtfrom, agt)
-        self.boxfrom = encode_atom_pos(AtomType.BOX_AT, boxfrom, box)
-        self.boxto = encode_atom_pos(AtomType.BOX_AT, boxto, box)
+        self.agtfrom = agtfrom
+        self.boxfrom = boxfrom
+        self.boxto = boxto
 
     def check_preconditions(self, literals: set[Atom]):
         """
@@ -103,8 +103,8 @@ class Push(Action):
         - Free(agtto)
         """
         return (
-            self.agtfrom in literals #Agent_at
-            and self.boxfrom in literals #Box_at
+            encode_atom_pos(AtomType.AGENT_AT, self.agtfrom, self.agt) in literals #Agent_at
+            and encode_atom_pos(AtomType.BOX_AT, self.boxfrom, self.agt) in literals #Box_at
             and eval_neighbour(self.agtfrom, self.boxfrom)
             and eval_neighbour(self.boxfrom, self.boxto)
             and eval_free(self.boxto, literals)
@@ -121,22 +121,27 @@ class Push(Action):
         - Not Free(boxfrom)
         """
         if skip_check or self.check_preconditions(literals):
+            agtgfrom = encode_atom_pos(AtomType.AGENT_AT, self.agtfrom, self.agt)
+            agtgto = encode_atom_pos(AtomType.AGENT_AT, self.boxfrom, self.agt)
+            boxfrom = encode_atom_pos(AtomType.BOX_AT, self.boxfrom, self.box)
+            boxto = encode_atom_pos(AtomType.BOX_AT, self.boxto, self.box)
+
             # ~AgentAt(agt,agtfrom)
-            literals.remove(self.agtfrom)
+            literals.remove(agtgfrom)
             # AgentAt(agt,boxfrom)
-            literals.add(self.boxfrom)
+            literals.add(agtgto)
             # ~BoxAt(box,boxfrom)
-            literals.remove(self.boxfrom)
+            literals.remove(boxfrom)
             # BoxAt(box,boxto)
-            literals.add(self.boxto)
+            literals.add(boxto)
             return literals
         else:
             raise Exception("Preconditions not satisfied for the Move action.")
 
     def get_name(self):
-        agtfrom_row, agtfrom_col = get_atom_location(self.agtfrom)
-        boxfrom_row, boxfrom_col = get_atom_location(self.boxfrom)
-        boxto_row, boxto_col = get_atom_location(self.boxto)
+        agtfrom_row, agtfrom_col = self.agtfrom
+        boxfrom_row, boxfrom_col = self.boxfrom
+        boxto_row, boxto_col = self.boxto
 
         if agtfrom_row == boxfrom_row and agtfrom_col == boxfrom_col:
             raise Exception("Move action is not possible")
@@ -174,9 +179,9 @@ class Pull(Action):
     ):
         super().__init__(agt)
         self.box = box
-        self.agtto = encode_atom_pos(AtomType.AGENT_AT, agtto, agt)
-        self.agtfrom = encode_atom_pos(AtomType.AGENT_AT, agtfrom, agt)
-        self.boxfrom = encode_atom_pos(AtomType.BOX_AT, boxfrom, box)
+        self.agtto = agtto
+        self.agtfrom = agtfrom
+        self.boxfrom = boxfrom
 
     def check_preconditions(self, literals: set[Atom]):
         """
@@ -189,10 +194,10 @@ class Pull(Action):
         - Free(agtto)
         """
         return (
-            self.agtfrom in literals #Agent_at
+            encode_atom_pos(AtomType.AGENT_AT, self.agtfrom, self.agt) in literals #Agent_at
             and eval_neighbour(self.agtfrom, self.agtto)
             and eval_neighbour(self.agtfrom, self.boxfrom)
-            and self.boxfrom in literals #Box_at
+            and encode_atom_pos(AtomType.BOX_AT, self.boxfrom, self.box) in literals #Box_at
             and eval_free(self.agtto, literals)
             and self.agtto != self.agtfrom
         )
@@ -209,22 +214,27 @@ class Pull(Action):
         - Not Free(agtto)
         """
         if skip_check or self.check_preconditions(literals):
+            agtto = encode_atom_pos(AtomType.AGENT_AT, self.agtto, self.agt)
+            agtfrom = encode_atom_pos(AtomType.AGENT_AT, self.agtfrom, self.agt)
+            boxfrom = encode_atom_pos(AtomType.BOX_AT, self.boxfrom, self.box)
+            boxto = encode_atom_pos(AtomType.BOX_AT, self.agtfrom, self.box)
+
             # ~AgentAt(agt,agtfrom)
-            literals.remove(self.agtfrom)
+            literals.remove(agtfrom)
             # AgentAt(agt,agtto)
-            literals.add(self.agtto)
+            literals.add(agtto)
             # ~BoxAt(box,boxfrom)
-            literals.remove(self.boxfrom)
+            literals.remove(boxfrom)
             # BoxAt(box,boxto)
-            literals.add(self.agtfrom)
+            literals.add(boxto)
             return literals
         else:
             raise Exception("Preconditions not satisfied for the Move action.")
 
     def get_name(self):
-        agtto_row, agtto_col = get_atom_location(self.agtto)
-        agtfrom_row, agtfrom_col = get_atom_location(self.agtfrom)
-        boxfrom_row, boxfrom_col = get_atom_location(self.boxfrom)
+        agtto_row, agtto_col = self.agtto
+        agtfrom_row, agtfrom_col = self.agtfrom
+        boxfrom_row, boxfrom_col = self.boxfrom
 
         if agtfrom_row != agtto_row and agtfrom_col != agtto_col:
             raise Exception("Move action is not possible")

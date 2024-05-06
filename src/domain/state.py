@@ -107,7 +107,7 @@ class State:
     def create_agent_box_dict(agent_colors, box_colors):
         return {
             i: [
-                chr(j + ord("A"))
+                j
                 for j, b in enumerate(box_colors)
                 if b is not None and b == a
             ]
@@ -125,7 +125,7 @@ class State:
         copy_lastMovedBox = self.lastMovedBox[:]
         for agent, action in enumerate(joint_action):
             if calc_results: 
-                copy_literals = action.apply_effects(copy_literals, True)
+                copy_literals = action.apply_effects(copy_literals)
             if isinstance(action, Move) and copy_lastMovedBox[agent] is not None:
                 copy_recalculateDistanceOfBox[agent] = copy_lastMovedBox[agent]
                 copy_lastMovedBox[agent] = None
@@ -204,9 +204,9 @@ class State:
             elif action is Push:
                 for boxfrom in agtfrom_neighbours:
                     boxes = [
-                        ord(c)-ord("A")
+                        c
                         for c in State.agent_box_dict[agent]
-                        if encode_atom_pos(AtomType.BOX_AT, boxfrom, ord(c)-ord("A")) in self.literals
+                        if encode_atom_pos(AtomType.BOX_AT, boxfrom, c) in self.literals
                     ]
                     boxfrom_neighbours = Location.get_neighbours(boxfrom)
                     for box in boxes:
@@ -217,9 +217,9 @@ class State:
             elif action is Pull:
                 for boxfrom in agtfrom_neighbours:
                     boxes = [
-                        ord(c)-ord("A")
+                        c
                         for c in State.agent_box_dict[agent]
-                        if encode_atom_pos(AtomType.BOX_AT, boxfrom, ord(c)-ord("A")) in self.literals
+                        if encode_atom_pos(AtomType.BOX_AT, boxfrom, c) in self.literals
                     ]
                     for box in boxes:
                         for agtto in agtfrom_neighbours:

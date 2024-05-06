@@ -28,7 +28,7 @@ class HeuristicComplexDijkstra(Heuristic):
 
     def h(self, state: State) -> int:
         total_distance = 0
-        agents = atoms_by_type(state.literals, AtomType.AGENT_AT)
+        agents = state.agent_locations
         boxes = atoms_by_type(state.literals, AtomType.BOX_AT)
 
         for agt, box in enumerate(state.recalculateDistanceOfBox):
@@ -143,7 +143,7 @@ class HeuristicComplexDijkstra(Heuristic):
 def get_close_boxes(loc: Location, boxes: dict):
     close_boxes = {}
 
-    for neig in loc.neighbours:
+    for neig in Location.get_neighbours(loc):
         for box, box_loc in boxes.items():
             if box_loc == neig:
                 close_boxes[box] = neig

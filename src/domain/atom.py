@@ -70,7 +70,8 @@ def encode_atom(atom_type: AtomType, row: int, col: int, atom_id: int = 0, extra
     :param extra: int, extra data to encode, representing location list index or other metadata.
     :return: int, encoded 64-bit integer representing the atom.
     """
-    return (extra << 38) | (atom_id << 34) | (col << 18) | (row << 2) | atom_type.value
+    # (extra << 38) |
+    return (atom_id << 34) | (col << 18) | (row << 2) | atom_type.value
 
 def get_atom_type(encoded: int) -> int:
     return encoded & 0x3
@@ -87,8 +88,8 @@ def decode_atom(encoded: Atom) -> Tuple[AtomType, int, int, int]:
     atom_type = get_atom_type(encoded)
     row, col = get_atom_location(encoded)
     atom_id = get_atom_id(encoded)
-    extra = (encoded >> 38) & 0x3FFFFFF
-    return atom_type, row, col, atom_id, extra
+    # extra = (encoded >> 38) & 0x3FFFFFF
+    return atom_type, row, col, atom_id#, extra
 
 def atom_repr(encoded: Atom) -> str:
     atom_type, row, col, atom_id, extra = decode_atom(encoded)
