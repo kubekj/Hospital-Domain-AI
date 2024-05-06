@@ -22,24 +22,18 @@ class Location:
                 Location.all_neighbours[loc].append(new_loc)
 
     @staticmethod
-    def calculate_all_neighbours(walls: list[list[bool]]):
+    def calculate_all_neighbours(walls: list[list[bool]], lit: list[Atom] = None):
         """ Recalculate neighbours for all known locations. """
+        Location.walls = walls
+        for atom in lit:
+            loc = get_atom_location(atom)
+            Location.all_locations += [loc]
         for loc in Location.all_locations:
             Location.calculate_neighbours(loc, walls)
 
     @staticmethod
     def get_neighbours(loc: Pos) -> list[Pos]:
         return Location.all_neighbours.get(loc, [])
-    
-    @staticmethod
-    def add_locations(lit: list[Atom]):
-        for atom in lit:
-            loc = get_atom_location(atom)
-            Location.all_locations += [loc]
-
-    @staticmethod
-    def add_location(loc: Pos):
-        Location.all_locations += [loc]
 
 class AtomType(Enum):
     FREE = 0 # unused

@@ -87,9 +87,7 @@ class State:
             State.populate_literals(literals, line, row, walls)
             row += 1
 
-        Location.add_locations(literals)
-        Location.calculate_all_neighbours(walls)
-        Location.walls = walls
+        Location.calculate_all_neighbours(walls, literals)
         return literals, num_rows, num_cols, walls
 
     @staticmethod
