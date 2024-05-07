@@ -51,7 +51,14 @@ java -jar ./server.jar -l ./levels/MAPF01.lvl -c "python searchclient.py -greedy
 
 #### Iterated Width Search
 ```bash
+java -jar ./server.jar -l ./levels/MAPF02C.lvl -c "python searchclient.py -iw -s_dij --test-name iw --test-folder ./benchmarks" -g      
+java -jar ./server.jar -l ./levels/MAPF03.lvl -c "python searchclient.py -iw -s_dij --test-name iw --test-folder ./benchmarks" -g
+java -jar ./server.jar -l ./levels/MAPF03C.lvl -c "python searchclient.py -iw -s_dij --test-name iw --test-folder ./benchmarks" -g
 java -jar ./server.jar -l ./levels/SACrunch.lvl -c "python searchclient.py -iw -c_dij --test-name iw --test-folder ./benchmarks" -g
+
+java -jar ./server.jar -l ./levels/generated/level_2.lvl -c "python searchclient.py -iw -c_dij --test-name test_level_2_cdij --test-folder ./benchmarks" -g
+java -jar ./server.jar -l ./complevels/AgentWayz.lvl -c "python searchclient.py -iw -c_dij --test-name tests_cdij --test-folder ./benchmarks" -g
+java -jar ./server.jar -l ./complevels/Tryhard.lvl -c "python searchclient.py -iw -c_dij --test-name tests_cdij --test-folder ./benchmarks" -g
 ```
 
 Without saving the tests:

@@ -1,10 +1,10 @@
 import random
 
-from src.domain.atom import Atom, AgentAt, BoxAt, Free, Location
+from src.domain.atom import Atom, Location, AtomType, atoms_by_type, encode_atom, encode_atom_pos
 from src.utils.color import Color
 from src.domain.action import Action, Move, Pull, Push
 
-from typing import Self
+from typing import Optional, Self
 
 
 class State:
@@ -12,25 +12,37 @@ class State:
     agent_colors = []
     box_colors = []
     agent_box_dict = {}
-    goal_literals: list[Atom] = []
+    goal_literals: set[Atom] = set()
 
-    def __init__(self, literals, time_step=0):
-        self.literals: list[Atom] = literals
-        self.agent_locations = {
-            lit.agt: lit.loc for lit in self.literals if isinstance(lit, AgentAt)
-        }
-        self.time_step = time_step
+    def __init__(self, literals):
+        self.literals: set[Atom] = literals
+        self.agent_locations = atoms_by_type(self.literals, AtomType.AGENT_AT)
         self.parent = None
         self.joint_action = None
         self.g = 0
         self._hash = None
 
+        self.lastMovedBox = [None] * len(self.agent_locations)
+        self.recalculateDistanceOfBox = [None] * len(self.agent_locations)
+
     @staticmethod
     def make_initial_state(server_messages):
-        # Read colors.
+        agent_colors, box_colors = State.read_colors(server_messages)
+        literals, num_rows, num_cols, walls = State.read_level(server_messages)
+        goal_literals = State.read_goal_state(server_messages, num_rows)
+
+        State.agent_colors = agent_colors
+        State.box_colors = box_colors
+        State.agent_box_dict = State.create_agent_box_dict(agent_colors, box_colors)
+        State.goal_literals = goal_literals
+
+        return State(literals)
+
+    @staticmethod
+    def read_colors(server_messages):
         server_messages.readline()  # colors
-        agent_colors = [None for _ in range(10)]
-        box_colors = [None for _ in range(26)]
+        agent_colors = [None] * 10
+        box_colors = [None] * 26
         line = server_messages.readline()
         while not line.startswith("#"):
             split = line.split(":")
@@ -42,7 +54,22 @@ class State:
                 elif "A" <= e <= "Z":
                     box_colors[ord(e) - ord("A")] = color
             line = server_messages.readline()
+        return agent_colors, box_colors
 
+    @staticmethod
+    def populate_literals(literals: list[Atom], line, row: int, walls: list[list[bool]] = None):
+        for col, c in enumerate(line):
+            if "0" <= c <= "9":
+                agent = ord(c) - ord("0")
+                literals += [encode_atom(AtomType.AGENT_AT, row, col, agent)]
+            elif "A" <= c <= "Z":
+                box = ord(c) - ord("A")
+                literals += [encode_atom(AtomType.BOX_AT, row, col, box)]
+            elif walls != None and (c == "+" or c == "\n"):
+                walls[row][col] = True
+
+    @staticmethod
+    def read_level(server_messages):
         literals = []
         num_rows = 0
         num_cols = 0
@@ -54,72 +81,61 @@ class State:
             num_rows += 1
             line = server_messages.readline()
 
-        walls = [[False for _ in range(num_cols)] for _ in range(num_rows)]
-        num_agents = 0
+        walls = [[False] * num_cols for _ in range(num_rows)]
         row = 0
         for line in level_lines:
-            for col, c in enumerate(line):
-                if "0" <= c <= "9":
-                    agent = ord(c) - ord("0")
-                    literals += [AgentAt(agent, Location(row, col))]
-                    num_agents += 1
-                elif "A" <= c <= "Z":
-                    box = c
-                    literals += [BoxAt(box, Location(row, col))]
-                elif c == "+" or c == "\n":
-                    walls[row][col] = True
-                else:
-                    # literals += [Free(Location(row,col))]
-                    pass
+            State.populate_literals(literals, line, row, walls)
             row += 1
 
-        # Create all rigid literals relating to Locations
-        Location.calculate_all_neighbours(walls)
-        Free.walls = walls
-        # Read goal state.
-        # line is currently "#goal".
+        Location.calculate_all_neighbours(walls, literals)
+        return literals, num_rows, num_cols, walls
+
+    @staticmethod
+    def read_goal_state(server_messages, num_rows):
         goal_literals = []
         line = server_messages.readline()
         row = 0
         while not line.startswith("#"):
-            for col, c in enumerate(line):
-                if "0" <= c <= "9":
-                    agent = ord(c) - ord("0")
-                    goal_literals += [AgentAt(agent, Location(row, col))]
-                    num_agents += 1
-                elif "A" <= c <= "Z":
-                    box = c
-                    goal_literals += [BoxAt(box, Location(row, col))]
-
+            State.populate_literals(goal_literals, line, row)
             row += 1
             line = server_messages.readline()
+        return goal_literals
 
-        # End.
-        # line is currently "#end".
-
-        State.agent_colors = agent_colors
-        State.box_colors = box_colors
-        State.agent_box_dict = {
+    @staticmethod
+    def create_agent_box_dict(agent_colors, box_colors):
+        return {
             i: [
-                chr(j + ord("A"))
+                j
                 for j, b in enumerate(box_colors)
                 if b is not None and b == a
             ]
             for i, a in enumerate(agent_colors)
             if a is not None
         }
-        State.goal_literals = goal_literals
-        # print(literals)
-        return State(literals)
 
-    def result(self, joint_action: list[Action]) -> Self:
-        copy_literals = self.literals[:]
-        for action in joint_action:
-            copy_literals = action.apply_effects(copy_literals)
-        copy_state = State(copy_literals, self.time_step + 1)
+    def result(self, joint_action: list[Action], copy_literals: Optional[set[Atom]] = None) -> Self:
+        calc_results = False
+        if copy_literals is None:
+            calc_results = True
+            copy_literals = set(self.literals)
+
+        copy_recalculateDistanceOfBox = self.recalculateDistanceOfBox[:]
+        copy_lastMovedBox = self.lastMovedBox[:]
+        for agent, action in enumerate(joint_action):
+            if calc_results: 
+                copy_literals = action.apply_effects(copy_literals)
+            if isinstance(action, Move) and copy_lastMovedBox[agent] is not None:
+                copy_recalculateDistanceOfBox[agent] = copy_lastMovedBox[agent]
+                copy_lastMovedBox[agent] = None
+            if (isinstance(action, Push) or isinstance(action, Pull)):
+                copy_lastMovedBox[agent] = action.box
+            
+        copy_state = State(copy_literals)
         copy_state.parent = self
         copy_state.joint_action = joint_action[:]
         copy_state.g = self.g + 1
+        copy_state.recalculateDistanceOfBox = copy_recalculateDistanceOfBox
+        copy_state.lastMovedBox = copy_lastMovedBox
 
         return copy_state
 
@@ -133,13 +149,11 @@ class State:
         num_agents = len(self.agent_locations)
 
         # Determine list of applicable action for each individual agent.
-        applicable_actions = [
-            self.get_applicable_actions(agent) for agent in range(num_agents)
-        ]
+        applicable_actions = [self.get_applicable_actions(agent) for agent in range(num_agents)]
 
         # Iterate over joint actions, check conflict and generate child states.
-        joint_action = [None for _ in range(num_agents)]
-        actions_permutation = [0 for _ in range(num_agents)]
+        joint_action: list[Action] = [Action(0) for _ in range(num_agents)]
+        actions_permutation = [0] * num_agents
         expanded_states = []
         while True:
             for agent in range(num_agents):
@@ -147,8 +161,9 @@ class State:
                     actions_permutation[agent]
                 ]
 
-            if not self.is_conflicting(joint_action):
-                expanded_states.append(self.result(joint_action))
+            (check, result) = self.is_conflicting(joint_action)
+            if not check:
+                expanded_states.append(self.result(joint_action, result))
 
             # Advance permutation.
             done = False
@@ -169,84 +184,67 @@ class State:
         return expanded_states
 
     @staticmethod
-    def is_applicable(action: Action, literals: list[Atom]) -> bool:
-        if isinstance(action, Move):
-            return Move(action.agt, action.agtfrom, action.agtto).check_preconditions(
-                literals
-            )
-        elif isinstance(action, Push):
-            return Push(
-                action.agt, action.agtfrom, action.box, action.boxfrom, action.boxto
-            ).check_preconditions(literals)
-        elif isinstance(action, Pull):
-            return Pull(
-                action.agt, action.agtfrom, action.agtto, action.box, action.boxfrom
-            ).check_preconditions(literals)
-        elif isinstance(action, Action):
-            return Action(action.agt).check_preconditions(literals)
-
-        return False
+    def is_applicable(action: Action, literals: set[Atom]) -> bool:
+        return action.check_preconditions(literals)
 
     def get_applicable_actions(self, agent: int) -> Action:
         agtfrom = self.agent_locations[agent]
         possibilities = []
         possible_actions = [Action, Move, Push, Pull]
 
+        agtfrom_neighbours = Location.get_neighbours(agtfrom)
         for action in possible_actions:
             if action is Move:
-                for agtto in agtfrom.neighbours:
+                for agtto in agtfrom_neighbours:
                     action = Move(agent, agtfrom, agtto)
-                    if self.is_applicable(action, self.literals[:]):
-                        possibilities.append(Move(agent, agtfrom, agtto))
+                    if self.is_applicable(action, self.literals):
+                        possibilities.append(action)
             elif action is Push:
-                for boxfrom in agtfrom.neighbours:
+                for boxfrom in agtfrom_neighbours:
                     boxes = [
                         c
                         for c in State.agent_box_dict[agent]
-                        if BoxAt(c, boxfrom) in self.literals
+                        if encode_atom_pos(AtomType.BOX_AT, boxfrom, c) in self.literals
                     ]
+                    boxfrom_neighbours = Location.get_neighbours(boxfrom)
                     for box in boxes:
-                        for boxto in boxfrom.neighbours:
+                        for boxto in boxfrom_neighbours:
                             action = Push(agent, agtfrom, box, boxfrom, boxto)
-                            if self.is_applicable(action, self.literals[:]):
-                                possibilities.append(
-                                    Push(agent, agtfrom, box, boxfrom, boxto)
-                                )
+                            if self.is_applicable(action, self.literals):
+                                possibilities.append(action)
             elif action is Pull:
-                for boxfrom in agtfrom.neighbours:
+                for boxfrom in agtfrom_neighbours:
                     boxes = [
                         c
                         for c in State.agent_box_dict[agent]
-                        if BoxAt(c, boxfrom) in self.literals
+                        if encode_atom_pos(AtomType.BOX_AT, boxfrom, c) in self.literals
                     ]
                     for box in boxes:
-                        for agtto in agtfrom.neighbours:
+                        for agtto in agtfrom_neighbours:
                             action = Pull(agent, agtfrom, agtto, box, boxfrom)
-                            if self.is_applicable(action, self.literals[:]):
-                                possibilities.append(
-                                    Pull(agent, agtfrom, agtto, box, boxfrom)
-                                )
+                            if self.is_applicable(action, self.literals):
+                                possibilities.append(action)
             elif action is Action:
                 possibilities.append(Action(agent))
 
         return possibilities
 
-    def is_conflicting(self, joint_action: list[Action]) -> bool:
+    def is_conflicting(self, joint_action: list[Action]) -> tuple[bool, set[Atom]]:
         # This follows the following logic:
         # For all applicable actions ai and aj where the precondition of one is inconsistent with the
         # effect of the other, either CellCon ict(ai aj) or BoxCon ict(ai aj) holds.
-        literals = self.literals[:]
+        literals = set(self.literals)
 
         for agt, action in enumerate(joint_action):
             if self.is_applicable(action, literals):
-                literals = action.apply_effects(literals)
+                literals = action.apply_effects(literals, True)
             else:
-                return True
+                return (True, None)
 
-        return False
+        return (False, literals)
 
     def extract_plan(self) -> list[list[Action]]:
-        plan = [None for _ in range(self.g)]
+        plan = [None] * self.g
         state = self
 
         while state.joint_action is not None:
@@ -257,13 +255,12 @@ class State:
 
     def __hash__(self):
         if self._hash is None:
-            prime = 31
-            _hash = 1
+            prime: int = 31
+            _hash: int = 1
             _hash = _hash * prime + hash(tuple(self.literals))
             _hash = _hash * prime + hash(tuple(State.agent_colors))
             _hash = _hash * prime + hash(tuple(State.box_colors))
             _hash = _hash * prime + hash(tuple(State.goal_literals))
-            _hash = _hash * prime + hash(self.time_step)
             self._hash = _hash
         return self._hash
 
@@ -272,10 +269,7 @@ class State:
             return True
 
         if isinstance(other, State):
-            return (
-                set(self.literals) == set(other.literals)
-                and self.time_step == other.time_step
-            )
+            return set(self.literals) == set(other.literals)
 
         return False
 

@@ -1,0 +1,50 @@
+{
+    "SACrunch": {
+        "Passed": true,
+        "Expanded": 10113,
+        "Frontier": 2966,
+        "Generated": 13079,
+        "Solution length": 117,
+        "Time": 9.458306699991226
+    },
+    "test": {
+        "Passed": true,
+        "Expanded": 1,
+        "Frontier": 0,
+        "Generated": 1,
+        "Solution length": 0,
+        "Time": 0.01106609997805208
+    },
+    "MAPF02C": {
+        "Passed": true,
+        "Expanded": 15,
+        "Frontier": 335,
+        "Generated": 350,
+        "Solution length": 14,
+        "Time": 0.13488859997596592
+    },
+    "MAPFreorder_Fixed": {
+        "Passed": true,
+        "Expanded": 142,
+        "Frontier": 159,
+        "Generated": 301,
+        "Solution length": 18,
+        "Time": 1.5913083999184892
+    },
+    "MAPFreorder_Old": {
+        "Passed": true,
+        "Expanded": 325,
+        "Frontier": 332,
+        "Generated": 657,
+        "Solution length": 25,
+        "Time": 2.3338588000042364
+    },
+    "MAPFreorder": {
+        "Passed": true,
+        "Expanded": 142,
+        "Frontier": 159,
+        "Generated": 301,
+        "Solution length": 18,
+        "Time": 1.0859747000504285
+    }
+}

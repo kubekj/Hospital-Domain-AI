@@ -1,26 +1,20 @@
 import argparse
 import sys
 
-import debugpy
-from src.searches.graphsearch import print_search_status
-
 from src.domain.state import State
-
 from src.frontiers.best_first import FrontierBestFirst
 from src.frontiers.bfs import FrontierBFS
 from src.frontiers.dfs import FrontierDFS
 from src.frontiers.iw import FrontierIW
-
 from src.heuristics.astar import HeuristicAStar
 from src.heuristics.complex_dijkstra import HeuristicComplexDijkstra
 from src.heuristics.manhattan import HeuristicManhattan
 from src.heuristics.simple import HeuristicSimple
 from src.heuristics.simple_dijkstra import HeuristicSimpleDijkstra
 from src.heuristics.wastar import HeuristicWeightedAStar
-
 from src.searches.graphsearch import Info, graph_search
-
 from src.utils import memory
+from src.utils.info import handle_debug
 
 
 class SearchClient:
@@ -81,7 +75,6 @@ class SearchClient:
         elif args.iw:
             return FrontierIW(heuristic, 2)
         else:
-            # Default to BFS search.
             print(
                 "Defaulting to BFS search. "
                 "Use arguments -bfs, -dfs, -astar, -wastar, or -greedy to set the search strategy.",
@@ -145,13 +138,14 @@ class SearchClient:
                 file=sys.stderr,
                 flush=True,
             )
-            states = [None for _ in range(len(plan) + 1)]
+            states = [None] * (len(plan) + 1)
             states[0] = initial_state
             for ip, joint_action in enumerate(plan):
                 states[ip + 1] = states[ip].result(joint_action)
-                my_message = None
-                # TODO: Make ComplexDijkstra work with this
-                my_message = str(heuristic.f(states[ip + 1])) if isinstance(heuristic, HeuristicComplexDijkstra) else None
+                if isinstance(heuristic, HeuristicComplexDijkstra):
+                    my_message = str(heuristic.f(states[ip + 1]))
+                else:
+                    my_message = None
                 print("|".join(a.get_name() + '@' + (my_message if my_message is not None else a.get_name()) for a in
                                joint_action), flush=True)
                 server_messages.readline()
@@ -159,18 +153,13 @@ class SearchClient:
     @staticmethod
     def main(args) -> None:
         initial_state, heuristic, frontier = SearchClient.initialize_and_configure(args)
-        SearchClient.execute_and_print_plan(
-            initial_state, frontier, heuristic, sys.stdin
-        )
+        SearchClient.execute_and_print_plan(initial_state, frontier, heuristic, sys.stdin)
 
 
 debug = False
 fail_info = True
 if __name__ == "__main__":
-    if debug:
-        debugpy.listen(("localhost", 1234))  # Open a debugging server at localhost:1234
-        debugpy.wait_for_client()  # Wait for the debugger to connect
-        debugpy.breakpoint()  # Ensure the program starts paused
+    handle_debug(debug)
 
     # Program arguments.
     parser = argparse.ArgumentParser(
@@ -189,6 +178,7 @@ if __name__ == "__main__":
         type=str,
         default="default",
         help="Name the file where the information will be stored.",
+        required=False
     )
     parser.add_argument(
         "--test-folder",
@@ -196,6 +186,13 @@ if __name__ == "__main__":
         type=str,
         default="./tests",
         help="Name the folder the files with the information will be stored.",
+        required=False
+    )
+    parser.add_argument(
+        "--profile",
+        action="store_true",
+        default=False,
+        help="Enable profiling with cProfile."
     )
 
     strategy_group = parser.add_mutually_exclusive_group()
@@ -253,5 +250,16 @@ if __name__ == "__main__":
     # Set max memory usage allowed (soft limit).
     memory.max_usage = args.max_memory
 
+    if args.profile:
+        import cProfile
+        import pstats
+        profiler = cProfile.Profile()
+        profiler.enable()
+
     # Run client.
     SearchClient.main(args)
+
+    if args.profile:
+        profiler.disable()
+        stats = pstats.Stats(profiler).sort_stats('cumulative')
+        stats.dump_stats('profile.prof')

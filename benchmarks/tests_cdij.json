@@ -1,0 +1,39 @@
+{
+    "AgentWayz": {
+        "Passed": false
+    },
+    "RoboMatic": {
+        "Passed": true,
+        "Expanded": 17,
+        "Frontier": 647,
+        "Generated": 664,
+        "Solution length": 16,
+        "Time": 0.6351339000393637
+    },
+    "Tryhard": {
+        "Passed": false
+    },
+    "AIMASqln": {
+        "Passed": false
+    },
+    "Sixty": {
+        "Passed": true,
+        "Expanded": 1373,
+        "Frontier": 1401,
+        "Generated": 2774,
+        "Solution length": 33,
+        "Time": 6.20287899998948
+    },
+    "NHL": {
+        "Passed": false
+    },
+    "FastCipka": {
+        "Passed": false
+    },
+    "cbsSolve": {
+        "Passed": false
+    },
+    "Wallies": {
+        "Passed": false
+    }
+}

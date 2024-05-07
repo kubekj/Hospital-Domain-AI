@@ -15,10 +15,10 @@ from src.utils import memory
 from src.utils.info import Info
 
 start_time = time.perf_counter()
-saved_once = False
+saved_once = True
 
 
-def graph_search(initial_state: State, frontier: Frontier):
+def graph_search(initial_state, frontier: Frontier):
     if not saved_once:
         save_run_information(None, None, None, {"Passed": False})
 
@@ -37,7 +37,7 @@ def graph_search(initial_state: State, frontier: Frontier):
             else:
                 return None
 
-        state: State = frontier.pop()
+        state = frontier.pop()
         explored.add(state)
 
         if state.is_goal_state():
@@ -47,6 +47,7 @@ def graph_search(initial_state: State, frontier: Frontier):
 
         # Assuming expanded_states is obtained from some state.get_expanded_states() method
         expanded_states = state.get_expanded_states()
+        # print("#Expanded states:", expanded_states)
 
         if isinstance(frontier, (FrontierIW, FrontierBestFirst)):
             heuristics = [frontier.heuristic.h(s) for s in expanded_states]
