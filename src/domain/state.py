@@ -24,21 +24,20 @@ class State:
         self._hash = None
 
         self.lastMovedBox = [None] * len(self.agent_locations)
-        self.recalculateDistanceOfBox = [None] * len(self.agent_locations)
+        self.recalculateDistanceOfBox:list[Box] = [None] * len(self.agent_locations)
 
     @staticmethod
     def make_initial_state(server_messages):
-        agent_colors, box_colors, boxes = State.read_colors(server_messages)
+        agent_colors, box_colors = State.read_colors(server_messages)
 
-        State.agent_colors = agent_colors
-        State.box_colors = box_colors
-        State.agent_box_dict = State.create_agent_box_dict(agent_colors, box_colors)
+        State.agent_colors:list[str] = [a for a in agent_colors if a is not None]
+        State.box_colors:list[str] =  [a for a in box_colors if a is not None] 
+        State.agent_box_dict:dict[int, list[str]] = State.create_agent_box_dict(agent_colors, box_colors)
 
         literals, num_rows, num_cols, walls = State.read_level(server_messages, State.agent_box_dict)
         goal_literals = State.read_goal_state(server_messages, num_rows)
-        
+
         State.goal_literals = goal_literals
-        State.boxes = boxes
         return State(literals)
 
     @staticmethod
@@ -46,7 +45,7 @@ class State:
         server_messages.readline()  # colors
         agent_colors = [None] * 10
         box_colors = [None] * 26
-        boxes = {}
+        
         line = server_messages.readline()
         while not line.startswith("#"):
             split = line.split(":")
@@ -56,12 +55,9 @@ class State:
                 if "0" <= e <= "9":
                     agent_colors[ord(e) - ord("0")] = color
                 elif "A" <= e <= "Z":
-                    if e not in boxes:
-                        boxes[e] = []
-                    boxes[e].append(Box(e, len(boxes[e])))
                     box_colors[ord(e) - ord("A")] = color
             line = server_messages.readline()
-        return agent_colors, box_colors, boxes
+        return agent_colors, box_colors
 
     def read_level(server_messages, agent_box_dict):
         literals = []
@@ -79,6 +75,7 @@ class State:
             line = server_messages.readline()
 
         walls = [[False] * num_cols for _ in range(num_rows)]
+        State.boxes:dict[str,list[Box]] = {}
         row = 0
         for line in level_lines:
             for col, c in enumerate(line):
@@ -95,9 +92,13 @@ class State:
                     if not box_is_movable:
                         walls[row][col] = True  # Treat as a wall if no agent can move this box
                     else:
-                        literals += [BoxAt(c, Location(row, col))]  # Treat as a movable box
-                    box = c
-                    literals += [BoxAt(box, Location(row, col))]
+                        if c not in State.boxes:
+                            State.boxes[c] = []
+                        new_box = Box(c, len(State.boxes[c]))
+                        State.boxes[c].append(new_box)
+                        literals += [BoxAt(new_box, Location(row, col))]  # Treat as a movable box
+                    # box = c
+                    # literals += [BoxAt(box, Location(row, col))]
                 elif c == "+" or c == "\n":
                     walls[row][col] = True
             row += 1
