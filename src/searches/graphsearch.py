@@ -47,12 +47,15 @@ def graph_search(initial_state, frontier: Frontier):
 
         # Assuming expanded_states is obtained from some state.get_expanded_states() method
         expanded_states = state.get_expanded_states()
-        # print("#Expanded states:", expanded_states)
+        # if c >18 and c<23: print("#Expanded states:", state)
 
         if isinstance(frontier, (FrontierIW, FrontierBestFirst)):
             heuristics = [frontier.heuristic.h(s) for s in expanded_states]
             sorted_states = sorted(zip(heuristics, expanded_states), key=lambda x: x[0])
             expanded_states = [s for _, s in sorted_states]
+            # if c >19 and c<23: print("#Current state:", state)
+            # if c >19 and c<23: print("#Expanded states:\n#", "\n#".join(str(a) for a in sorted_states),"\n#")
+
 
         for expanded_state in expanded_states:
             if not frontier.contains(expanded_state) and expanded_state not in explored:

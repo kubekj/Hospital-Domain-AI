@@ -1,6 +1,6 @@
 import random
 
-from src.domain.atom import Atom, Location, AtomType, atoms_by_type, encode_atom, encode_atom_pos
+from src.domain.atom import Atom, Location, AtomType, atoms_by_type, encode_atom, encode_atom_pos, atom_repr
 from src.utils.color import Color
 from src.domain.action import Action, Move, Pull, Push
 
@@ -87,7 +87,7 @@ class State:
             State.populate_literals(literals, line, row, walls)
             row += 1
 
-        Location.calculate_all_neighbours(walls, literals)
+        Location.calculate_all_neighbours(walls)
         return literals, num_rows, num_cols, walls
 
     @staticmethod
@@ -140,6 +140,10 @@ class State:
         return copy_state
 
     def is_goal_state(self) -> bool:
+        # b = [a in self.literals for a in self.goal_literals]
+        # if any(b):
+        #     print("#", [atom_repr(a) for a in self.goal_literals])
+        #     print("#", b)
         for goal in self.goal_literals:
             if goal not in self.literals:
                 return False
@@ -274,4 +278,4 @@ class State:
         return False
 
     def __repr__(self):
-        return f"||{'^'.join(str(lit) for lit in self.literals)}||"
+        return f"||{'^'.join(atom_repr(lit) for lit in self.literals)}||"

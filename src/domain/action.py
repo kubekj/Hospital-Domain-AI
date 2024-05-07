@@ -6,6 +6,9 @@ class Action:
     def __init__(self, agt: int):
         self.agt = agt
 
+    def __repr__(self) -> str:
+        return f"Action({self.agt})"
+
     def check_preconditions(self, literals: set[Atom]):
         return True
 
@@ -21,6 +24,11 @@ class Move(Action):
         super().__init__(agt)
         self.agtfrom = agtfrom
         self.agtto = agtto
+
+    def __repr__(self) -> str:
+        fr,fc = self.agtfrom
+        tr,tc = self.agtto
+        return f"Move({self.agt}, {(fr,fc)}, {(tr,tc)})"
 
     def check_preconditions(self, literals: set[Atom]):
         """
@@ -92,6 +100,12 @@ class Push(Action):
         self.boxfrom = boxfrom
         self.boxto = boxto
 
+    def __repr__(self) -> str:
+        afr,afc = self.agtfrom
+        bfr,bfc = self.boxfrom
+        btr,btc = self.boxto
+        return f"Push({self.agt}, {(afr,afc)}, {chr(self.box + ord("A"))}, {(bfr,bfc)}, {(btr,btc)})"
+
     def check_preconditions(self, literals: set[Atom]):
         """
         Check if the preconditions of the Move action are satisfied in the given state.
@@ -104,7 +118,7 @@ class Push(Action):
         """
         return (
             encode_atom_pos(AtomType.AGENT_AT, self.agtfrom, self.agt) in literals #Agent_at
-            and encode_atom_pos(AtomType.BOX_AT, self.boxfrom, self.agt) in literals #Box_at
+            and encode_atom_pos(AtomType.BOX_AT, self.boxfrom, self.box) in literals #Box_at
             and eval_neighbour(self.agtfrom, self.boxfrom)
             and eval_neighbour(self.boxfrom, self.boxto)
             and eval_free(self.boxto, literals)
@@ -182,6 +196,12 @@ class Pull(Action):
         self.agtto = agtto
         self.agtfrom = agtfrom
         self.boxfrom = boxfrom
+
+    def __repr__(self) -> str:
+        atr,atc = self.agtto
+        afr,afc = self.agtfrom
+        bfr,bfc = self.boxfrom
+        return f"Pull({self.agt}, {(afr,afc)}, {(atr,atc)}, {chr(self.box + ord("A"))}, {(bfr,bfc)})"
 
     def check_preconditions(self, literals: set[Atom]):
         """

@@ -1,39 +1,49 @@
 from typing import NamedTuple, Tuple
 from enum import Enum
+import numpy as np
 
-Atom = int #Making it easiet to spot the encoded integers
+Atom = int #Making it easiet to spot the encoded literal
 Pos = NamedTuple('Pos', [('row', int), ('col', int)])
 # Pos = tuple[int, int]
 
 class Location:
-    all_locations: list[Pos] = []
-    all_neighbours: dict[Pos, list[Pos]] = {}
-    walls: list[list[bool]] = []
+    all_neighbours: np.ndarray  # Use a 3D numpy array to store neighbour positions.
+    walls: np.ndarray
 
     @staticmethod
-    def calculate_neighbours(loc: Pos, walls: list[list[bool]]):
-        row, col = loc
-        possibilities = [(row, col - 1), (row, col + 1), (row - 1, col), (row + 1, col)]
-        Location.all_neighbours[loc] = []
-        for (r, c) in possibilities:
-            if 0 <= r < len(walls) and 0 <= c < len(walls[r]) and not walls[r][c]:
-                new_loc = Pos(r, c)
-                if new_loc not in Location.all_locations: Location.all_locations += [new_loc] 
-                Location.all_neighbours[loc].append(new_loc)
+    def init_arrays(height: int, width: int):
+        Location.walls = np.zeros((height, width), dtype=bool)
+        Location.all_neighbours = np.empty((height, width), dtype=object)
+        for i in range(height):
+            for j in range(width):
+                Location.all_neighbours[i, j] = []
 
     @staticmethod
-    def calculate_all_neighbours(walls: list[list[bool]], lit: list[Atom] = None):
-        """ Recalculate neighbours for all known locations. """
-        Location.walls = walls
-        for atom in lit:
-            loc = get_atom_location(atom)
-            Location.all_locations += [loc]
-        for loc in Location.all_locations:
-            Location.calculate_neighbours(loc, walls)
+    def calculate_neighbours():
+        height, width = Location.walls.shape
+        for row in range(height):
+            for col in range(width):
+                if not Location.walls[row, col]:
+                    possibilities = [
+                        (row, col - 1), (row, col + 1),
+                        (row - 1, col), (row + 1, col)
+                    ]
+                    valid_neighbours = []
+                    for r, c in possibilities:
+                        if 0 <= r < height and 0 <= c < width and not Location.walls[r, c]:
+                            valid_neighbours.append(Pos(r, c))
+                    Location.all_neighbours[row, col] = valid_neighbours
 
     @staticmethod
     def get_neighbours(loc: Pos) -> list[Pos]:
-        return Location.all_neighbours.get(loc, [])
+        row, col = loc
+        return Location.all_neighbours[row, col]
+
+    @staticmethod
+    def calculate_all_neighbours(walls: list[list[bool]]):
+        Location.init_arrays(len(walls), len(walls[0]))
+        Location.walls = np.array(walls, dtype=bool)
+        Location.calculate_neighbours()
 
 class AtomType(Enum):
     FREE = 0 # unused
@@ -86,8 +96,9 @@ def decode_atom(encoded: Atom) -> Tuple[AtomType, int, int, int]:
     return atom_type, row, col, atom_id#, extra
 
 def atom_repr(encoded: Atom) -> str:
-    atom_type, row, col, atom_id, extra = decode_atom(encoded)
-    return f"{atom_type.name}(row={row}, col={col}, id={atom_id}, extra={extra})"
+    atom_type, row, col, atom_id = decode_atom(encoded)
+    atom_id = atom_id if atom_type == AtomType.AGENT_AT.value else f"'{chr(atom_id+ord('A'))}'"
+    return f"{AtomType(atom_type).name}({atom_id}, Loc({row},{col}))"
 
 def eval_neighbour(loc1: Pos, loc2: Pos) -> bool:
     row1, col1 = loc1
