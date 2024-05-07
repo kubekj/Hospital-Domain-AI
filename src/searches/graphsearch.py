@@ -18,7 +18,7 @@ start_time = time.perf_counter()
 saved_once = True
 
 
-def graph_search(initial_state:State, frontier: Frontier):
+def graph_search(initial_state: State, frontier: FrontierIW):
     if not saved_once:
         save_run_information(None, None, None, {"Passed": False})
 
