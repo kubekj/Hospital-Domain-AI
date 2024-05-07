@@ -1,7 +1,7 @@
 #domain
 hospital
 #levelname
-MAPFreorder
+MAPFreorderJ3
 #colors
 blue: 0,1,2,3,4,5
 #initial
@@ -13,7 +13,7 @@ blue: 0,1,2,3,4,5
 #goal
      ++++
 +++++++ +++++++
-+       432510+
++       435210+
 +++++++ +++++++
       +++
 #end
