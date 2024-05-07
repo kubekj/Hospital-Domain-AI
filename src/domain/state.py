@@ -6,7 +6,6 @@ from src.domain.action import Action, Move, Pull, Push
 
 from typing import Optional, Self
 
-
 class State:
     _RNG = random.Random(1)
     agent_colors = []
@@ -30,7 +29,7 @@ class State:
     @staticmethod
     def make_initial_state(server_messages):
         agent_colors, box_colors = State.read_colors(server_messages)
-        literals, num_rows, num_cols, walls = State.read_level(server_messages)
+        literals, num_rows, num_cols, walls = State.read_level(server_messages, agent_colors, box_colors)
         goal_literals = State.read_goal_state(server_messages, num_rows)
 
         State.agent_colors = agent_colors
@@ -58,14 +57,16 @@ class State:
             line = server_messages.readline()
         return agent_colors, box_colors
 
-    @staticmethod
-    def read_level(server_messages):
+    def read_level(server_messages, agent_colors, box_colors):
         literals = []
         num_rows = 0
         num_cols = 0
         level_lines = []
         line = server_messages.readline()
         while not line.startswith("#"):
+            #extra trimming
+            last_plus_index = line.rfind('+') # Finding the last index of '+'
+            line = line[:last_plus_index + 1] # Slicing the string to keep everything up to the last '+'
             level_lines.append(line)
             num_cols = max(num_cols, len(line))
             num_rows += 1
@@ -79,8 +80,11 @@ class State:
                     agent = ord(c) - ord("0")
                     literals += [AgentAt(agent, Location(row, col))]
                 elif "A" <= c <= "Z":
-                    box = c
-                    literals += [BoxAt(box, Location(row, col))]
+                    if c in box_colors and c not in agent_colors:
+                        walls[row][col] = True  # Treat as a wall if no agent can move this box
+                    else:
+                        box = c
+                        literals += [BoxAt(box, Location(row, col))]
                 elif c == "+" or c == "\n":
                     walls[row][col] = True
             row += 1
