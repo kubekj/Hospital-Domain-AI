@@ -47,23 +47,35 @@ class HeuristicComplexDijkstra(Heuristic):
                                      b in self.box_goal_positions and
                                         self.box_goal_positions[b] != boxes[b]]
             except Exception as exc:
-                print(State.agent_box_dict)
-                print(self.box_goal_positions)
-                print('H' in self.box_goal_positions)
+                print("#",State.agent_box_dict)
+                print("#",self.box_goal_positions)
+                print("#",0 in self.box_goal_positions)
+                print("#",boxes)
                 raise Exception(exc)
 
             if len(boxes_not_in_goal):
-                close_boxes = get_close_boxes(agent_loc, {b: boxes[b] for b in boxes if b in State.agent_box_dict[agent]})
+                close_boxes = get_close_boxes(
+                    agent_loc,
+                    {b: boxes[b] for b in boxes if b in State.agent_box_dict[agent]},
+                )
                 if len(close_boxes) == 0:
                     # Distance of the agent to the closest box
-                    closest_box = min(boxes_not_in_goal,
-                                      key=lambda b: self.initial_distances_from_box[b][agent_loc.row][agent_loc.col])
-                    total_distance += self.initial_distances_from_box[closest_box][agent_loc.row][agent_loc.col]
+                    closest_box = min(
+                        boxes_not_in_goal,
+                        key=lambda b: self.initial_distances_from_box[b][agent_loc.row][
+                            agent_loc.col
+                        ],
+                    )
+                    total_distance += self.initial_distances_from_box[closest_box][
+                        agent_loc.row
+                    ][agent_loc.col] - 1
 
                 # Distance of boxes to their goals
                 for other_box in boxes_not_in_goal:
                     box_position = boxes[other_box]
-                    total_distance += self.distances_from_box_goals[other_box][box_position.row][box_position.col]
+                    total_distance += self.distances_from_box_goals[other_box][
+                        box_position.row
+                    ][box_position.col]
 
                 # Extra Goal Counting factor
                 for box, box_loc in self.box_goal_positions.items():
@@ -78,10 +90,11 @@ class HeuristicComplexDijkstra(Heuristic):
                 #             # total_distance += 1 # VERSION 1: CONSTANT COOPERATION COST
                 #             total_distance += HeuristicManhattan.calculate_manhattan_distance((agent_loc.row, agent_loc.col), (
                 #                 in_agent_row, in_agent_col))  # VERSION 2: VARIALBE COOPERATION COST
-
-            else:
-                if agent in self.distances_from_agent_goals:
-                    total_distance += self.distances_from_agent_goals[agent][agent_loc.row][agent_loc.col]
+            if agent in self.distances_from_agent_goals:
+                total_distance += (
+                    self.distances_from_agent_goals[agent][agent_loc.row][agent_loc.col]
+                    / 2
+                )
 
         return total_distance
 
@@ -128,16 +141,23 @@ class HeuristicComplexDijkstra(Heuristic):
         self.distances_from_box_goals = {}
         self.initial_distances_from_box = {}
         for agent, loc in self.agent_goal_positions.items():
-            self.distances_from_agent_goals[agent] = HeuristicSimpleDijkstra.create_mapping(state, loc.row, loc.col,
-                                                                                            num_rows, num_cols)
+            self.distances_from_agent_goals[agent] = (
+                HeuristicSimpleDijkstra.create_mapping(
+                    state, loc.row, loc.col, num_rows, num_cols
+                )
+            )
         for box, loc in self.box_goal_positions.items():
-            self.distances_from_box_goals[box] = HeuristicSimpleDijkstra.create_mapping(state, loc.row, loc.col,
-                                                                                        num_rows, num_cols)
-            
+            self.distances_from_box_goals[box] = HeuristicSimpleDijkstra.create_mapping(
+                state, loc.row, loc.col, num_rows, num_cols
+            )
+
         boxes = atoms_by_type(state.literals, AtomType.BOX_AT)
         for box, loc in boxes.items():
-            self.initial_distances_from_box[box] = HeuristicSimpleDijkstra.create_mapping(state, loc.row, loc.col,
-                                                                                          num_rows, num_cols)
+            self.initial_distances_from_box[box] = (
+                HeuristicSimpleDijkstra.create_mapping(
+                    state, loc.row, loc.col, num_rows, num_cols
+                )
+            )
 
 
 def get_close_boxes(loc: Location, boxes: dict):

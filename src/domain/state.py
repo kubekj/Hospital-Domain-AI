@@ -1,10 +1,12 @@
 import random
+
+from src.domain.atom import Atom, Location, AtomType, atoms_by_type, encode_atom, encode_atom_pos, atom_repr
+from src.utils.color import Color
+from src.domain.action import Action, Move, Pull, Push
+
 from typing import Optional, Self
 
-from src.domain.action import Action, Move, Pull, Push
-from src.domain.atom import Atom, Location, AtomType, atoms_by_type, encode_atom_pos
 from src.utils.level_parser import Parser
-
 
 class State:
     _RNG = random.Random(1)
@@ -26,15 +28,15 @@ class State:
 
     @staticmethod
     def make_initial_state(server_messages):
-        agent_colors, box_colors = Parser.read_colors(server_messages)
-        literals, num_rows, num_cols, walls = Parser.read_level(server_messages)
+        agent_colors, box_colors, boxes = Parser.read_colors(server_messages)
+        State.agent_box_dict = Parser.create_agent_box_dict(agent_colors, box_colors)
+        literals, num_rows, num_cols, walls = Parser.read_level(server_messages, State.agent_box_dict)
         goal_literals = Parser.read_goal_state(server_messages)
 
         State.agent_colors = agent_colors
         State.box_colors = box_colors
-        State.agent_box_dict = Parser.create_agent_box_dict(agent_colors, box_colors)
         State.goal_literals = goal_literals
-
+        State.boxes = boxes
         return State(literals)
 
     def result(self, joint_action: list[Action], copy_literals: Optional[set[Atom]] = None) -> Self:
@@ -64,6 +66,10 @@ class State:
         return copy_state
 
     def is_goal_state(self) -> bool:
+        # b = [a in self.literals for a in self.goal_literals]
+        # if any(b):
+        #     print("#", [atom_repr(a) for a in self.goal_literals])
+        #     print("#", b)
         for goal in self.goal_literals:
             if goal not in self.literals:
                 return False
@@ -198,4 +204,4 @@ class State:
         return False
 
     def __repr__(self):
-        return f"||{'^'.join(str(lit) for lit in self.literals)}||"
+        return f"||{'^'.join(atom_repr(lit) for lit in self.literals)}||"
