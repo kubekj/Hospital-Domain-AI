@@ -1,6 +1,6 @@
 import random
 
-from src.domain.atom import Atom, AgentAt, Box, BoxAt, Free, Location
+from src.domain.atom import Atom, Location, AtomType, atoms_by_type, encode_atom, encode_atom_pos, atom_repr
 from src.utils.color import Color
 from src.domain.action import Action, Move, Pull, Push
 
@@ -15,9 +15,7 @@ class State:
 
     def __init__(self, literals):
         self.literals: set[Atom] = literals
-        self.agent_locations = {
-            lit.agt: lit.loc for lit in self.literals if isinstance(lit, AgentAt)
-        }
+        self.agent_locations = atoms_by_type(self.literals, AtomType.AGENT_AT)
         self.parent = None
         self.joint_action = None
         self.g = 0
@@ -34,7 +32,7 @@ class State:
         State.box_colors = box_colors
         State.agent_box_dict = State.create_agent_box_dict(agent_colors, box_colors)
 
-        literals, num_rows, num_cols, walls = State.read_level(server_messages, State.agent_box_dict)
+        literals, num_rows, num_cols, walls = State.read_level(server_messages)
         goal_literals = State.read_goal_state(server_messages, num_rows)
         
         State.goal_literals = goal_literals
@@ -58,12 +56,32 @@ class State:
                 elif "A" <= e <= "Z":
                     if e not in boxes:
                         boxes[e] = []
-                    boxes[e].append(Box(e, len(boxes[e])))
+                    boxes[e].append((e, len(boxes[e])))
                     box_colors[ord(e) - ord("A")] = color
             line = server_messages.readline()
         return agent_colors, box_colors, boxes
 
-    def read_level(server_messages, agent_box_dict):
+    @staticmethod
+    def populate_literals(literals: list[Atom], line, row: int, walls: list[list[bool]] = None):
+        for col, c in enumerate(line):
+            if "0" <= c <= "9":
+                agent = ord(c) - ord("0")
+                literals += [encode_atom(AtomType.AGENT_AT, row, col, agent)]
+            elif "A" <= c <= "Z":
+                box = ord(c) - ord("A")
+                if(walls == None):
+                    literals += [encode_atom(AtomType.BOX_AT, row, col, box)]
+                else:
+                    box_is_movable = any(box in boxes for boxes in State.agent_box_dict.values())
+                    if not box_is_movable:
+                        walls[row][col] = True  # Treat as a wall if no agent can move this box
+                    else:
+                        literals += [encode_atom(AtomType.BOX_AT, row, col, box)]  # Treat as a movable box
+            elif walls != None and (c == "+" or c == "\n"):
+                walls[row][col] = True
+
+    @staticmethod
+    def read_level(server_messages):
         literals = []
         num_rows = 0
         num_cols = 0
@@ -81,29 +99,9 @@ class State:
         walls = [[False] * num_cols for _ in range(num_rows)]
         row = 0
         for line in level_lines:
-            for col, c in enumerate(line):
-                if "0" <= c <= "9":
-                    agent = ord(c) - ord("0")
-                    literals += [AgentAt(agent, Location(row, col))]
-                elif "A" <= c <= "Z":
-                    box_is_movable = False
-                    for boxes in agent_box_dict.values():
-                        if c in boxes:
-                            box_is_movable = True
-                            break
-
-                    if not box_is_movable:
-                        walls[row][col] = True  # Treat as a wall if no agent can move this box
-                    else:
-                        literals += [BoxAt(c, Location(row, col))]  # Treat as a movable box
-                    box = c
-                    literals += [BoxAt(box, Location(row, col))]
-                elif c == "+" or c == "\n":
-                    walls[row][col] = True
+            State.populate_literals(literals, line, row, walls)
             row += 1
-
         Location.calculate_all_neighbours(walls)
-        Free.walls = walls
         return literals, num_rows, num_cols, walls
 
     @staticmethod
@@ -112,13 +110,7 @@ class State:
         line = server_messages.readline()
         row = 0
         while not line.startswith("#"):
-            for col, c in enumerate(line):
-                if "0" <= c <= "9":
-                    agent = ord(c) - ord("0")
-                    goal_literals += [AgentAt(agent, Location(row, col))]
-                elif "A" <= c <= "Z":
-                    box = c
-                    goal_literals += [BoxAt(box, Location(row, col))]
+            State.populate_literals(goal_literals, line, row)
             row += 1
             line = server_messages.readline()
         return goal_literals
@@ -127,7 +119,7 @@ class State:
     def create_agent_box_dict(agent_colors, box_colors):
         return {
             i: [
-                chr(j + ord("A"))
+                j
                 for j, b in enumerate(box_colors)
                 if b is not None and b == a
             ]
@@ -162,6 +154,10 @@ class State:
         return copy_state
 
     def is_goal_state(self) -> bool:
+        # b = [a in self.literals for a in self.goal_literals]
+        # if any(b):
+        #     print("#", [atom_repr(a) for a in self.goal_literals])
+        #     print("#", b)
         for goal in self.goal_literals:
             if goal not in self.literals:
                 return False
@@ -207,62 +203,45 @@ class State:
 
     @staticmethod
     def is_applicable(action: Action, literals: set[Atom]) -> bool:
-        if isinstance(action, Move):
-            return Move(
-                action.agt, action.agtfrom, action.agtto
-            ).check_preconditions(literals)
-        elif isinstance(action, Push):
-            return Push(
-                action.agt, action.agtfrom, action.box, action.boxfrom, action.boxto
-            ).check_preconditions(literals)
-        elif isinstance(action, Pull):
-            return Pull(
-                action.agt, action.agtfrom, action.agtto, action.box, action.boxfrom
-            ).check_preconditions(literals)
-        elif isinstance(action, Action):
-            return Action(action.agt).check_preconditions(literals)
-
-        return False
+        return action.check_preconditions(literals)
 
     def get_applicable_actions(self, agent: int) -> Action:
         agtfrom = self.agent_locations[agent]
         possibilities = []
         possible_actions = [Action, Move, Push, Pull]
 
+        agtfrom_neighbours = Location.get_neighbours(agtfrom)
         for action in possible_actions:
             if action is Move:
-                for agtto in agtfrom.neighbours:
+                for agtto in agtfrom_neighbours:
                     action = Move(agent, agtfrom, agtto)
-                    if self.is_applicable(action, set(self.literals)):
-                        possibilities.append(Move(agent, agtfrom, agtto))
+                    if self.is_applicable(action, self.literals):
+                        possibilities.append(action)
             elif action is Push:
-                for boxfrom in agtfrom.neighbours:
+                for boxfrom in agtfrom_neighbours:
                     boxes = [
                         c
                         for c in State.agent_box_dict[agent]
-                        if BoxAt(c, boxfrom) in self.literals
+                        if encode_atom_pos(AtomType.BOX_AT, boxfrom, c) in self.literals
                     ]
+                    boxfrom_neighbours = Location.get_neighbours(boxfrom)
                     for box in boxes:
-                        for boxto in boxfrom.neighbours:
+                        for boxto in boxfrom_neighbours:
                             action = Push(agent, agtfrom, box, boxfrom, boxto)
-                            if self.is_applicable(action, set(self.literals)):
-                                possibilities.append(
-                                    Push(agent, agtfrom, box, boxfrom, boxto)
-                                )
+                            if self.is_applicable(action, self.literals):
+                                possibilities.append(action)
             elif action is Pull:
-                for boxfrom in agtfrom.neighbours:
+                for boxfrom in agtfrom_neighbours:
                     boxes = [
                         c
                         for c in State.agent_box_dict[agent]
-                        if BoxAt(c, boxfrom) in self.literals
+                        if encode_atom_pos(AtomType.BOX_AT, boxfrom, c) in self.literals
                     ]
                     for box in boxes:
-                        for agtto in agtfrom.neighbours:
+                        for agtto in agtfrom_neighbours:
                             action = Pull(agent, agtfrom, agtto, box, boxfrom)
-                            if self.is_applicable(action, set(self.literals)):
-                                possibilities.append(
-                                    Pull(agent, agtfrom, agtto, box, boxfrom)
-                                )
+                            if self.is_applicable(action, self.literals):
+                                possibilities.append(action)
             elif action is Action:
                 possibilities.append(Action(agent))
 
@@ -276,7 +255,7 @@ class State:
 
         for agt, action in enumerate(joint_action):
             if self.is_applicable(action, literals):
-                literals = action.apply_effects(literals)
+                literals = action.apply_effects(literals, True)
             else:
                 return (True, None)
 
@@ -313,4 +292,4 @@ class State:
         return False
 
     def __repr__(self):
-        return f"||{'^'.join(str(lit) for lit in self.literals)}||"
+        return f"||{'^'.join(atom_repr(lit) for lit in self.literals)}||"

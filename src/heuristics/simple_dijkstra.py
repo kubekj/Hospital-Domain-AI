@@ -1,7 +1,7 @@
 import heapq
 import math
 
-from src.domain.atom import Free, Location
+from src.domain.atom import Location, eval_free
 from src.heuristics.heuristic import Heuristic
 from src.domain.state import State
 from src.utils.info import Info
@@ -50,9 +50,9 @@ class HeuristicSimpleDijkstra(Heuristic):
 
         def my_is_free(row, col):
             if take_boxes_into_account:
-                return Free(Location(row, col)).eval(state.literals)
+                return eval_free(Location.all_locations(row, col), state.literals) #FIXME Broke?
             else:
-                return Free.walls[row][col]
+                return Location.walls[row][col]
 
         # Check if the initial position is a wall
         if my_is_free(row, col):

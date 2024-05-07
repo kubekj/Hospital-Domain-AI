@@ -1,4 +1,4 @@
-from src.domain.atom import AgentAt, BoxAt
+from src.domain.atom import AtomType, atoms_by_type
 from src.domain.state import State
 from src.heuristics.heuristic import Heuristic
 
@@ -9,8 +9,8 @@ class HeuristicManhattan(Heuristic):
 
     def h(self, state: 'State') -> 'int':
         total_distance = 0
-        agent_positions = self.extract_agent_positions(state)
-        box_positions = self.extract_box_positions(state)
+        agent_positions = atoms_by_type(state.literals, AtomType.AGENT_AT)
+        box_positions = atoms_by_type(state.literals, AtomType.BOX_AT)
 
         # Calculate distance from boxes to their goals
         for box, (box_row, box_col) in box_positions.items():
@@ -38,19 +38,4 @@ class HeuristicManhattan(Heuristic):
     def calculate_manhattan_distance(first_position, second_position):
         return abs(first_position[0] - second_position[0]) + abs(first_position[1] - second_position[1])
 
-    @staticmethod
-    def extract_agent_positions(state: 'State'):
-        agent_positions = {}
-        for lit in state.literals:
-            if isinstance(lit, AgentAt):
-                agent_positions[lit.agt] = (lit.loc.row, lit.loc.col)
-        return agent_positions
-
-    @staticmethod
-    def extract_box_positions(state: 'State'):
-        box_positions = {}
-        for lit in state.literals:
-            if isinstance(lit, BoxAt):
-                box_positions[lit.box] = (lit.loc.row, lit.loc.col)
-        return box_positions
 
