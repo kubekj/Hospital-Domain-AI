@@ -6,7 +6,6 @@ from src.domain.action import Action, Move, Pull, Push
 
 from typing import Optional, Self
 
-
 class State:
     _RNG = random.Random(1)
     agent_colors = []
@@ -36,6 +35,10 @@ class State:
         State.agent_colors = agent_colors
         State.box_colors = box_colors
         State.agent_box_dict = State.create_agent_box_dict(agent_colors, box_colors)
+
+        literals, num_rows, num_cols, walls = State.read_level(server_messages, State.agent_box_dict)
+        goal_literals = State.read_goal_state(server_messages, num_rows)
+        
         State.goal_literals = goal_literals
         State.boxes = boxes
         return State(literals)
@@ -62,14 +65,16 @@ class State:
             line = server_messages.readline()
         return agent_colors, box_colors, boxes
 
-    @staticmethod
-    def read_level(server_messages):
+    def read_level(server_messages, agent_box_dict):
         literals = []
         num_rows = 0
         num_cols = 0
         level_lines = []
         line = server_messages.readline()
         while not line.startswith("#"):
+            #extra trimming
+            last_plus_index = line.rfind('+') # Finding the last index of '+'
+            line = line[:last_plus_index + 1] # Slicing the string to keep everything up to the last '+'
             level_lines.append(line)
             num_cols = max(num_cols, len(line))
             num_rows += 1
@@ -83,6 +88,16 @@ class State:
                     agent = ord(c) - ord("0")
                     literals += [AgentAt(agent, Location(row, col))]
                 elif "A" <= c <= "Z":
+                    box_is_movable = False
+                    for boxes in agent_box_dict.values():
+                        if c in boxes:
+                            box_is_movable = True
+                            break
+
+                    if not box_is_movable:
+                        walls[row][col] = True  # Treat as a wall if no agent can move this box
+                    else:
+                        literals += [BoxAt(c, Location(row, col))]  # Treat as a movable box
                     box = c
                     literals += [BoxAt(box, Location(row, col))]
                 elif c == "+" or c == "\n":
