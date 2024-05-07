@@ -1,10 +1,10 @@
 {
     "SACrunch": {
         "Passed": true,
-        "Expanded": 283,
-        "Frontier": 89,
-        "Generated": 372,
-        "Solution length": 51,
-        "Time": 0.5785573998000473
+        "Expanded": 988,
+        "Frontier": 130,
+        "Generated": 1118,
+        "Solution length": 45,
+        "Time": 0.42135180000332184
     }
 }

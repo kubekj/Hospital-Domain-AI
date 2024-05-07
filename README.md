@@ -63,6 +63,6 @@ java -jar ./server.jar -l ./complevels/Tryhard.lvl -c "python searchclient.py -i
 
 Without saving the tests:
 ```bash
-java -jar ./server.jar -l ./levels/SACrunch.lvl -c "python searchclient.py -iw -c_dij" -g
+java -jar ./server.jar -l ./levels/MAPFreorder.lvl -c "python searchclient.py -iw -c_dij" -g
 ```
 

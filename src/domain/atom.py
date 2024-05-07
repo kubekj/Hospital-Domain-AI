@@ -87,8 +87,10 @@ class Box:
     def __hash__(self) -> int:
         return hash(str(self))
     def __eq__(self, other: Self):
-        return self.name == other.name and self.id == other.id
+        return other is None or (self.name == other.name and self.id == other.id)
     
+class BoxGoal(Box):
+    pass
 
 class BoxAt(Atom):
     def __init__(self, box: Box, loc: Location):

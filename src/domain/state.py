@@ -1,6 +1,6 @@
 import random
 
-from src.domain.atom import Atom, AgentAt, Box, BoxAt, Free, Location
+from src.domain.atom import Atom, AgentAt, Box, BoxAt, BoxGoal, Free, Location
 from src.utils.color import Color
 from src.domain.action import Action, Move, Pull, Push
 
@@ -15,8 +15,11 @@ class State:
 
     def __init__(self, literals):
         self.literals: set[Atom] = literals
-        self.agent_locations = {
+        self.agent_locations:dict[int, Location] = {
             lit.agt: lit.loc for lit in self.literals if isinstance(lit, AgentAt)
+        }
+        self.box_locations:dict[Box, Location] = {
+            lit.box: lit.loc for lit in self.literals if isinstance(lit, BoxAt)
         }
         self.parent = None
         self.joint_action = None
@@ -109,17 +112,21 @@ class State:
 
     @staticmethod
     def read_goal_state(server_messages, num_rows):
-        goal_literals = []
+        goal_literals:dict[str,list[BoxGoal]] = []
         line = server_messages.readline()
         row = 0
+        State.boxgoals:dict[str,list[BoxGoal]] = {}
         while not line.startswith("#"):
             for col, c in enumerate(line):
                 if "0" <= c <= "9":
                     agent = ord(c) - ord("0")
                     goal_literals += [AgentAt(agent, Location(row, col))]
                 elif "A" <= c <= "Z":
-                    box = c
-                    goal_literals += [BoxAt(box, Location(row, col))]
+                    if c not in State.boxgoals:
+                        State.boxgoals[c] = []
+                    new_boxgoal = BoxGoal(c, len(State.boxgoals[c]))
+                    State.boxgoals[c].append(new_boxgoal)
+                    goal_literals += [BoxAt(new_boxgoal, Location(row, col))]
             row += 1
             line = server_messages.readline()
         return goal_literals
@@ -239,9 +246,10 @@ class State:
             elif action is Push:
                 for boxfrom in agtfrom.neighbours:
                     boxes = [
-                        c
+                        b
                         for c in State.agent_box_dict[agent]
-                        if BoxAt(c, boxfrom) in self.literals
+                        for b in State.boxes[c]
+                        if BoxAt(b, boxfrom) in self.literals
                     ]
                     for box in boxes:
                         for boxto in boxfrom.neighbours:
@@ -253,9 +261,10 @@ class State:
             elif action is Pull:
                 for boxfrom in agtfrom.neighbours:
                     boxes = [
-                        c
+                        b
                         for c in State.agent_box_dict[agent]
-                        if BoxAt(c, boxfrom) in self.literals
+                        for b in State.boxes[c]
+                        if BoxAt(b, boxfrom) in self.literals
                     ]
                     for box in boxes:
                         for agtto in agtfrom.neighbours:

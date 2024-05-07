@@ -1,4 +1,4 @@
-from src.domain.atom import AgentAt, Box, BoxAt, Free, Location
+from src.domain.atom import AgentAt, Box, BoxAt, BoxGoal, Free, Location
 from src.domain.state import State
 from src.heuristics.heuristic import Heuristic
 from src.heuristics.manhattan import HeuristicManhattan
@@ -27,9 +27,10 @@ class HeuristicComplexDijkstra(Heuristic):
                 break
         
         
-        self.assign_boxes_to_agents(initial_state)
+        self.agent_assigned_to_box:dict[int,list[Box]] = self.assign_boxes_to_agents(initial_state)
+        self.boxgoal_assigned_to_box:dict[Box,BoxGoal] = self.assign_boxes_to_goals(initial_state)
 
-        self.box_priority = {}
+        self.box_priority: dict[int, dict[Box, float]] = {}
         for agent, agent_boxes in self.agent_assigned_to_box.items():
             agent_loc = initial_state.agent_locations[agent]
             sorted_boxes = sorted(
@@ -43,79 +44,41 @@ class HeuristicComplexDijkstra(Heuristic):
 
     def h(self, state: State) -> int:
         total_distance = 0
-        agents = {
-            lit.agt: lit.loc for lit in state.literals if isinstance(lit, AgentAt)
-        }
-        boxes = {lit.box: lit.loc for lit in state.literals if isinstance(lit, BoxAt)}
 
         for agt, box in enumerate(state.recalculateDistanceOfBox):
             if box != None:
                 # print(f"Recalculating box {box} last moved by agent {agt}")
                 self.initial_distances_from_box[box] = (
                     HeuristicSimpleDijkstra.create_mapping(state,
-                                                        boxes[box].row,
-                                                        boxes[box].col,
+                                                        state.box_locations[box].row,
+                                                        state.box_locations[box].col,
                                                         len(Free.walls),
                                                         len(Free.walls[0])))
 
-        for agent, agent_loc in agents.items():
+        for agent, agent_loc in state.agent_locations.items():
             try:
                 boxes_not_in_goal = [b for b_name in State.agent_box_dict[agent] for b in State.boxes[b_name] if
                                      b_name in self.box_goal_positions and
-                                        self.box_goal_positions[b_name] != boxes[b]]
+                                        self.box_goal_positions[b_name] != state.box_locations[b]]
             except Exception as exc:
                 print(State.agent_box_dict)
                 print(self.box_goal_positions)
                 print('H' in self.box_goal_positions)
                 raise Exception(exc)
 
-            for b in self.agent_assigned_to_box[agent]:
+            for box in self.agent_assigned_to_box[agent]:
+                box_loc = state.box_locations[box]
                 box_distance = 0
                 # Distance from the agent to the box
-                box_distance += self.initial_distances_from_box[b][
+                box_distance += self.initial_distances_from_box[box][
                         agent_loc.row
                     ][agent_loc.col] - 1 
                 # Distance from the box to its goal
-                box_distance += self.distances_from_box_goals[b.name]
-                total_distance += box_distance
+                box_distance += self.distances_from_box_goals[
+                    self.boxgoal_assigned_to_box[box]
+                ][box_loc.row][box_loc.col]
+                total_distance += box_distance * self.box_priority[agent][box]
 
-            if len(boxes_not_in_goal):
-                close_boxes = get_close_boxes(
-                    agent_loc,
-                    {b: boxes[b] for b in boxes if b in State.agent_box_dict[agent]},
-                )
-                if len(close_boxes) == 0:
-                    # Distance of the agent to the closest box
-                    closest_box = min(
-                        boxes_not_in_goal,
-                        key=lambda b: self.initial_distances_from_box[b][agent_loc.row][
-                            agent_loc.col
-                        ],
-                    )
-                    total_distance += self.initial_distances_from_box[closest_box][
-                        agent_loc.row
-                    ][agent_loc.col] - 1
-
-                # Distance of boxes to their goals
-                for other_box in boxes_not_in_goal:
-                    box_position = boxes[other_box]
-                    total_distance += self.distances_from_box_goals[other_box][
-                        box_position.row
-                    ][box_position.col]
-
-                # Extra Goal Counting factor
-                for box, box_loc in self.box_goal_positions.items():
-                    if boxes[box] != box_loc:
-                        total_distance += 1
-
-                # COOPERATION COST
-                # if self.choke_point_detection[agent_loc.row][agent_loc.col] != NO_CHOKE_POINT:
-                #     for in_agent_index, (in_agent_row, in_agent_col) in enumerate(agents[agent_index + 1:]):
-                #         if self.choke_point_detection[agent_loc.row][agent_loc.col] == \
-                #                 self.choke_point_detection[in_agent_row][in_agent_col]:
-                #             # total_distance += 1 # VERSION 1: CONSTANT COOPERATION COST
-                #             total_distance += HeuristicManhattan.calculate_manhattan_distance((agent_loc.row, agent_loc.col), (
-                #                 in_agent_row, in_agent_col))  # VERSION 2: VARIALBE COOPERATION COST
             if agent in self.distances_from_agent_goals:
                 total_distance += (
                     self.distances_from_agent_goals[agent][agent_loc.row][agent_loc.col]
@@ -164,7 +127,7 @@ class HeuristicComplexDijkstra(Heuristic):
         num_rows = len(Free.walls)
         num_cols = len(Free.walls[0])
         self.distances_from_agent_goals:dict[int, int] = {}
-        self.distances_from_box_goals:dict[str, int] = {}
+        self.distances_from_box_goals:dict[BoxGoal, list[list[int|float]]] = {}
         self.initial_distances_from_box:dict[Box, int] = {}
         for agent, loc in self.agent_goal_positions.items():
             self.distances_from_agent_goals[agent] = (
@@ -172,36 +135,28 @@ class HeuristicComplexDijkstra(Heuristic):
                     state, loc.row, loc.col, num_rows, num_cols
                 )
             )
+
         for box_name, loc in self.box_goal_positions.items():
             self.distances_from_box_goals[box_name] = HeuristicSimpleDijkstra.create_mapping(
                 state, loc.row, loc.col, num_rows, num_cols
             )
 
-        boxes = {lit.box: lit.loc for lit in state.literals if isinstance(lit, BoxAt)}
-        for box, loc in boxes.items():
+        for box, loc in state.box_locations.items():
             self.initial_distances_from_box[box] = (
                 HeuristicSimpleDijkstra.create_mapping(
                     state, loc.row, loc.col, num_rows, num_cols
                 )
             )
 
-    def assign_boxes_to_agents(self, state:State):
-        self.agent_assigned_to_box:dict[int,list[Box]] = {}
-        # for agent, agent_boxes_names in State.agent_box_dict:
-        #     agent_loc = initial_state.agent_locations[agent]
-        #     sorted_boxes = sorted(
-        #                 [b for b_name in agent_boxes_names for b in State.boxes[b_name]],
-        #                 key=lambda b: self.initial_distances_from_box[b][agent_loc.row][
-        #                     agent_loc.col
-        #                 ],
-        #             )
+    def assign_boxes_to_agents(self, state:State) -> dict[int,list[Box]]:
+        agent_assigned_to_box:dict[int,list[Box]] = {}
                 
         for agent in State.agent_box_dict:
-            self.agent_assigned_to_box[agent] = []
+            agent_assigned_to_box[agent] = []
 
         for color in set(State.agent_colors):
             # Create a list of boxes sorted by color matching and distance to each agent
-            agent_boxes:dict[int, list[(Box,int)]] = {agent: [] for agent in State.agent_box_dict if State.agent_colors[agent] == color}
+            agent_boxes:dict[int, list[tuple[Box,int]]] = {agent: [] for agent in State.agent_box_dict if State.agent_colors[agent] == color}
             for agent in agent_boxes:
                 agent_loc = state.agent_locations[agent]
                 for box in [box for box_name in State.agent_box_dict[agent] for box in State.boxes[box_name]]:
@@ -216,10 +171,10 @@ class HeuristicComplexDijkstra(Heuristic):
             while not all_assigned:
                 all_assigned = True
                 # Determine the minimum number of boxes assigned to any agent
-                min_boxes = min(len(self.agent_assigned_to_box[agent]) for agent in State.agent_box_dict)
+                min_boxes = min(len(agent_assigned_to_box[agent]) for agent in State.agent_box_dict)
 
                 # Collect eligible agents who either have 'min_boxes' or everyone if all are the same
-                eligible_agents = [agent for agent in State.agent_box_dict if len(self.agent_assigned_to_box[agent]) == min_boxes]
+                eligible_agents = [agent for agent in State.agent_box_dict if len(agent_assigned_to_box[agent]) == min_boxes]
 
                 # From the eligible agents, pick the agent with the closest box
                 best_agent = None
@@ -241,9 +196,39 @@ class HeuristicComplexDijkstra(Heuristic):
                     box_to_add:Box = agent_boxes[best_agent].pop(0)[0]
                     for a in agent_boxes:
                         if box_to_add in (b for (b,_) in agent_boxes[a]):
-                            agent_boxes[a].remove(box_to_add)
-                    self.agent_assigned_to_box[best_agent].append(box_to_add)
-def getPriority(i):
+                            filtered = [(b,t) for (b,t) in agent_boxes[a] if b == box_to_add]
+                            for f in filtered:
+                                agent_boxes[a].remove(f)
+                    agent_assigned_to_box[best_agent].append(box_to_add)
+        return agent_assigned_to_box
+
+    def assign_boxes_to_goals(self, state: State) -> dict[Box,BoxGoal]:
+        boxgoal_assigned_to_box:dict[Box,BoxGoal] = {}
+        
+        goal_boxes:dict[BoxGoal, list[tuple[Box,int|float]]] = {boxgoal: [] for box_name in State.boxgoals for boxgoal in State.boxgoals[box_name]}
+        for box_goal in goal_boxes:
+            for box in State.boxes[box_goal.name]:
+                box_loc = state.box_locations[box]
+                goal_boxes[box_goal].append((box, self.distances_from_box_goals[box_goal][box_loc.row][box_loc.col]))
+
+        # Sort each agent's list of boxes by distance
+        for box_goal in goal_boxes:
+            goal_boxes[box_goal].sort(key=lambda x: x[1])
+        
+        for box_goal in goal_boxes:
+            if len(goal_boxes[box_goal]) == 0:
+                continue
+            new_box = goal_boxes[box_goal].pop(0)[0]
+            boxgoal_assigned_to_box[new_box] = box_goal
+            for box_goal_2 in goal_boxes:
+                if new_box in [b for (b,_) in goal_boxes[box_goal_2]]:
+                    filtered = [(b,t) for (b,t) in goal_boxes[box_goal_2] if b == new_box]
+                    for f in filtered:
+                        goal_boxes[box_goal_2].remove(f)
+        return boxgoal_assigned_to_box
+
+
+def getPriority(i: int) -> float:
     return 1 / 2**(i+1)
 
 def get_close_boxes(loc: Location, boxes: dict):

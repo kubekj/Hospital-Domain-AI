@@ -40,13 +40,13 @@ class HeuristicSimpleDijkstra(Heuristic):
         return "Dijkstra heuristic"
 
     @staticmethod
-    def create_mapping(state: State, row, col, num_rows, num_cols, take_boxes_into_account=False):
+    def create_mapping(state: State, row, col, num_rows, num_cols, take_boxes_into_account=False) -> list[list[int | float]]:
         """
         Return a map of the shape [num_rows, num_cols] with every cell filled with the distance to the cell (row, col),
         calculated with the Dijkstra algorithm. If a cell (i,j) is a wall, which we know by State.walls[i][j] == true, then
         the distance will be math.inf
         """
-        distances = [[math.inf] * num_cols for _ in range(num_rows)]
+        distances:list[list[int | float]] = [[math.inf] * num_cols for _ in range(num_rows)]
 
         def my_is_free(row, col):
             if take_boxes_into_account:
