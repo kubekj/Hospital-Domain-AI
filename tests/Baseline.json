@@ -1,0 +1,178 @@
+{
+    "BFSfriendly-1": {
+        "Passed": true,
+        "Expanded": 3,
+        "Frontier": 1,
+        "Generated": 4,
+        "Solution length": 2,
+        "Time": 0.012068900046870112
+    },
+    "BFSfriendly-2": {
+        "Passed": true,
+        "Expanded": 3,
+        "Frontier": 1,
+        "Generated": 4,
+        "Solution length": 2,
+        "Time": 0.007575600175186992
+    },
+    "BFSfriendly-3": {
+        "Passed": true,
+        "Expanded": 3,
+        "Frontier": 1,
+        "Generated": 4,
+        "Solution length": 2,
+        "Time": 0.008157799951732159
+    },
+    "BFSfriendly-4": {
+        "Passed": true,
+        "Expanded": 3,
+        "Frontier": 1,
+        "Generated": 4,
+        "Solution length": 2,
+        "Time": 0.007657899986952543
+    },
+    "BFSfriendly-5": {
+        "Passed": true,
+        "Expanded": 3,
+        "Frontier": 1,
+        "Generated": 4,
+        "Solution length": 2,
+        "Time": 0.008323899935930967
+    },
+    "MAPF00": {
+        "Passed": true,
+        "Expanded": 15,
+        "Frontier": 14,
+        "Generated": 29,
+        "Solution length": 14,
+        "Time": 0.009870400186628103
+    },
+    "MAPF01": {
+        "Passed": true,
+        "Expanded": 16,
+        "Frontier": 24,
+        "Generated": 40,
+        "Solution length": 15,
+        "Time": 0.018212099792435765
+    },
+    "MAPF02": {
+        "Passed": true,
+        "Expanded": 16,
+        "Frontier": 34,
+        "Generated": 50,
+        "Solution length": 14,
+        "Time": 0.06563119986094534
+    },
+    "MAPF02B": {
+        "Passed": true,
+        "Expanded": 15,
+        "Frontier": 17,
+        "Generated": 32,
+        "Solution length": 14,
+        "Time": 0.012192700058221817
+    },
+    "MAPF02C": {
+        "Passed": true,
+        "Expanded": 15,
+        "Frontier": 34,
+        "Generated": 49,
+        "Solution length": 14,
+        "Time": 0.05554690002463758
+    },
+    "MAPF03": {
+        "Passed": true,
+        "Expanded": 15,
+        "Frontier": 34,
+        "Generated": 49,
+        "Solution length": 14,
+        "Time": 0.3106019999831915
+    },
+    "MAPF03B": {
+        "Passed": true,
+        "Expanded": 15,
+        "Frontier": 17,
+        "Generated": 32,
+        "Solution length": 14,
+        "Time": 0.012530899839475751
+    },
+    "MAPF03C": {
+        "Passed": true,
+        "Expanded": 17,
+        "Frontier": 48,
+        "Generated": 65,
+        "Solution length": 16,
+        "Time": 0.21399610000662506
+    },
+    "MAPFreorder": {
+        "Passed": true,
+        "Expanded": 6726,
+        "Frontier": 914,
+        "Generated": 7640,
+        "Solution length": 44,
+        "Time": 41.48272820003331
+    },
+    "SACrunch": {
+        "Passed": true,
+        "Expanded": 350,
+        "Frontier": 94,
+        "Generated": 444,
+        "Solution length": 50,
+        "Time": 0.4172941998112947
+    },
+    "MAPFreorderJ3": {
+        "Passed": true,
+        "Expanded": 142,
+        "Frontier": 159,
+        "Generated": 301,
+        "Solution length": 18,
+        "Time": 0.6052933000028133
+    },
+    "MAPFreorderJ4": {
+        "Passed": true,
+        "Expanded": 6726,
+        "Frontier": 914,
+        "Generated": 7640,
+        "Solution length": 44,
+        "Time": 30.79233009996824
+    },
+    "MAPFslidingpuzzle": {
+        "Passed": true,
+        "Expanded": 118,
+        "Frontier": 83,
+        "Generated": 201,
+        "Solution length": 44,
+        "Time": 7.453547799959779
+    },
+    "SAFirefly": {
+        "Passed": true,
+        "Expanded": 124,
+        "Frontier": 110,
+        "Generated": 234,
+        "Solution length": 69,
+        "Time": 0.550857599824667
+    },
+    "test": {
+        "Passed": true,
+        "Expanded": 14,
+        "Frontier": 1,
+        "Generated": 15,
+        "Solution length": 13,
+        "Time": 0.011389699997380376
+    },
+    "test_push": {
+        "Passed": true,
+        "Expanded": 8,
+        "Frontier": 0,
+        "Generated": 8,
+        "Solution length": 7,
+        "Time": 0.009268400026485324
+    },
+    "MAPFreorder2": {
+        "Passed": true,
+        "Expanded": 29015,
+        "Frontier": 318,
+        "Generated": 29333,
+        "Solution length": 81,
+        "Time": 113.40647289995104
+    },
+}
