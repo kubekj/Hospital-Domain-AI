@@ -53,7 +53,7 @@ class SearchClient:
             return HeuristicSimple(initial_state)
 
     @staticmethod
-    def set_frontier_strategy(args, initial_state, heuristic):
+    def set_frontier_strategy(args, initial_state:State, heuristic, initialWidth=2):
         """
         Sets the frontier strategy based on the provided arguments.
 
@@ -73,7 +73,9 @@ class SearchClient:
         elif args.greedy:
             return FrontierBestFirst(heuristic)
         elif args.iw:
-            return FrontierIW(heuristic, 2)
+            # Set initial width to the minimum of the number of agents or the initial width.
+            width = min(len(initial_state.agent_locations), initialWidth)
+            return FrontierIW(heuristic, width)
         else:
             print(
                 "Defaulting to BFS search. "
