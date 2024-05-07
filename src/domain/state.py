@@ -29,12 +29,14 @@ class State:
     @staticmethod
     def make_initial_state(server_messages):
         agent_colors, box_colors = State.read_colors(server_messages)
-        literals, num_rows, num_cols, walls = State.read_level(server_messages, agent_colors, box_colors)
-        goal_literals = State.read_goal_state(server_messages, num_rows)
 
         State.agent_colors = agent_colors
         State.box_colors = box_colors
         State.agent_box_dict = State.create_agent_box_dict(agent_colors, box_colors)
+
+        literals, num_rows, num_cols, walls = State.read_level(server_messages, State.agent_box_dict)
+        goal_literals = State.read_goal_state(server_messages, num_rows)
+        
         State.goal_literals = goal_literals
 
         return State(literals)
@@ -57,7 +59,7 @@ class State:
             line = server_messages.readline()
         return agent_colors, box_colors
 
-    def read_level(server_messages, agent_colors, box_colors):
+    def read_level(server_messages, agent_box_dict):
         literals = []
         num_rows = 0
         num_cols = 0
@@ -80,11 +82,18 @@ class State:
                     agent = ord(c) - ord("0")
                     literals += [AgentAt(agent, Location(row, col))]
                 elif "A" <= c <= "Z":
-                    if c in box_colors and c not in agent_colors:
+                    box_is_movable = False
+                    for boxes in agent_box_dict.values():
+                        if c in boxes:
+                            box_is_movable = True
+                            break
+
+                    if not box_is_movable:
                         walls[row][col] = True  # Treat as a wall if no agent can move this box
                     else:
-                        box = c
-                        literals += [BoxAt(box, Location(row, col))]
+                        literals += [BoxAt(c, Location(row, col))]  # Treat as a movable box
+                    box = c
+                    literals += [BoxAt(box, Location(row, col))]
                 elif c == "+" or c == "\n":
                     walls[row][col] = True
             row += 1
