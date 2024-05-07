@@ -28,15 +28,6 @@ class HeuristicComplexDijkstra(Heuristic):
 
     def h(self, state: State) -> int:
         total_distance = 0
-        # if state.recalculateDistanceOfBox is not None:
-        #     (box_row, box_col) = state.boxes_dict[state.recalculateDistanceOfBox]
-        #     self.initial_distances_from_box[state.recalculateDistanceOfBox] = (
-        #         HeuristicSimpleDijkstra.create_mapping(state,
-        #                                                box_row,
-        #                                                box_col,
-        #                                                len(Free.walls),
-        #                                                len(Free.walls[0])))
-        #     state.recalculateDistanceOfBox = None
         agents = {
             lit.agt: lit.loc for lit in state.literals if isinstance(lit, AgentAt)
         }
@@ -78,7 +69,7 @@ class HeuristicComplexDijkstra(Heuristic):
                     )
                     total_distance += self.initial_distances_from_box[closest_box][
                         agent_loc.row
-                    ][agent_loc.col]
+                    ][agent_loc.col] - 1
 
                 # Distance of boxes to their goals
                 for other_box in boxes_not_in_goal:
