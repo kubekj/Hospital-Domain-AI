@@ -29,8 +29,6 @@ class State:
     @staticmethod
     def make_initial_state(server_messages):
         agent_colors, box_colors, boxes = State.read_colors(server_messages)
-        literals, num_rows, num_cols, walls = State.read_level(server_messages)
-        goal_literals = State.read_goal_state(server_messages, num_rows)
 
         State.agent_colors = agent_colors
         State.box_colors = box_colors

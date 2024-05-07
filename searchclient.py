@@ -168,7 +168,7 @@ class SearchClient:
         SearchClient.execute_and_print_plan(initial_state, frontier, heuristic, sys.stdin)
 
 
-debug = True
+debug = False
 fail_info = True
 if __name__ == "__main__":
     handle_debug(debug)
