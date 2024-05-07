@@ -76,9 +76,22 @@ class Neighbour(Atom):
     def eval(self):
         return self.loc1.is_neighbour(self.loc2)
 
+class Box:
+    def __init__(self, name:str, id:int) -> None:
+        self.name = name
+        self.id = id
+    def __str__(self) -> str:
+        return f"{self.name}{self.id}"
+    def __repr__(self) -> str:
+        return str(self)
+    def __hash__(self) -> int:
+        return hash(str(self))
+    def __eq__(self, other: Self):
+        return self.name == other.name and self.id == other.id
+    
 
 class BoxAt(Atom):
-    def __init__(self, box: str, loc: Location):
+    def __init__(self, box: Box, loc: Location):
         super().__init__("BoxAt", (box, loc))
         self.box = box
         self.loc = loc

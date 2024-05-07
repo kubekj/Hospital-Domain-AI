@@ -1,6 +1,6 @@
 import random
 
-from src.domain.atom import Atom, AgentAt, BoxAt, Free, Location
+from src.domain.atom import Atom, AgentAt, Box, BoxAt, Free, Location
 from src.utils.color import Color
 from src.domain.action import Action, Move, Pull, Push
 
@@ -29,7 +29,7 @@ class State:
 
     @staticmethod
     def make_initial_state(server_messages):
-        agent_colors, box_colors = State.read_colors(server_messages)
+        agent_colors, box_colors, boxes = State.read_colors(server_messages)
         literals, num_rows, num_cols, walls = State.read_level(server_messages)
         goal_literals = State.read_goal_state(server_messages, num_rows)
 
@@ -37,7 +37,7 @@ class State:
         State.box_colors = box_colors
         State.agent_box_dict = State.create_agent_box_dict(agent_colors, box_colors)
         State.goal_literals = goal_literals
-
+        State.boxes = boxes
         return State(literals)
 
     @staticmethod
@@ -45,6 +45,7 @@ class State:
         server_messages.readline()  # colors
         agent_colors = [None] * 10
         box_colors = [None] * 26
+        boxes = {}
         line = server_messages.readline()
         while not line.startswith("#"):
             split = line.split(":")
@@ -54,9 +55,12 @@ class State:
                 if "0" <= e <= "9":
                     agent_colors[ord(e) - ord("0")] = color
                 elif "A" <= e <= "Z":
+                    if e not in boxes:
+                        boxes[e] = []
+                    boxes[e].append(Box(e, len(boxes[e])))
                     box_colors[ord(e) - ord("A")] = color
             line = server_messages.readline()
-        return agent_colors, box_colors
+        return agent_colors, box_colors, boxes
 
     @staticmethod
     def read_level(server_messages):
