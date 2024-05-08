@@ -1,0 +1,130 @@
+{
+    "BFSfriendly-1": {
+        "Passed": true,
+        "Expanded": 3,
+        "Frontier": 1,
+        "Generated": 4,
+        "Solution length": 2,
+        "Time": 0.009386700112372637
+    },
+    "BFSfriendly-2": {
+        "Passed": true,
+        "Expanded": 3,
+        "Frontier": 1,
+        "Generated": 4,
+        "Solution length": 2,
+        "Time": 0.011362599907442927
+    },
+    "BFSfriendly-3": {
+        "Passed": true,
+        "Expanded": 3,
+        "Frontier": 1,
+        "Generated": 4,
+        "Solution length": 2,
+        "Time": 0.014489799970760942
+    },
+    "BFSfriendly-4": {
+        "Passed": true,
+        "Expanded": 3,
+        "Frontier": 1,
+        "Generated": 4,
+        "Solution length": 2,
+        "Time": 0.019249199889600277
+    },
+    "BFSfriendly-5": {
+        "Passed": true,
+        "Expanded": 3,
+        "Frontier": 1,
+        "Generated": 4,
+        "Solution length": 2,
+        "Time": 0.023578199790790677
+    },
+    "MAPF00": {
+        "Passed": true,
+        "Expanded": 15,
+        "Frontier": 14,
+        "Generated": 29,
+        "Solution length": 14,
+        "Time": 0.018573699984699488
+    },
+    "MAPF01": {
+        "Passed": true,
+        "Expanded": 18,
+        "Frontier": 24,
+        "Generated": 42,
+        "Solution length": 15,
+        "Time": 0.08542280015535653
+    },
+    "MAPF02": {
+        "Passed": true,
+        "Expanded": 16,
+        "Frontier": 349,
+        "Generated": 365,
+        "Solution length": 14,
+        "Time": 0.1498358000535518
+    },
+    "MAPF03": {
+        "Passed": true,
+        "Expanded": 15,
+        "Frontier": 385,
+        "Generated": 400,
+        "Solution length": 14,
+        "Time": 0.4920268999412656
+    },
+    "MAPF03C": {
+        "Passed": true,
+        "Expanded": 17,
+        "Frontier": 557,
+        "Generated": 574,
+        "Solution length": 16,
+        "Time": 0.5146150002256036
+    },
+    "SACrunch": {
+        "Passed": true,
+        "Expanded": 988,
+        "Frontier": 130,
+        "Generated": 1118,
+        "Solution length": 45,
+        "Time": 0.8918570000678301
+    },
+    "MAPFreorderJ3": {
+        "Passed": true,
+        "Expanded": 142,
+        "Frontier": 159,
+        "Generated": 301,
+        "Solution length": 18,
+        "Time": 0.8375186999328434
+    },
+    "MAPFslidingpuzzle": {
+        "Passed": true,
+        "Expanded": 91,
+        "Frontier": 55,
+        "Generated": 146,
+        "Solution length": 36,
+        "Time": 0.12639159988611937
+    },
+    "SAFirefly": {
+        "Passed": true,
+        "Expanded": 8211,
+        "Frontier": 618,
+        "Generated": 8829,
+        "Solution length": 126,
+        "Time": 6.184046499896795
+    },
+    "test": {
+        "Passed": true,
+        "Expanded": 14,
+        "Frontier": 1,
+        "Generated": 15,
+        "Solution length": 13,
+        "Time": 0.0231606001034379
+    },
+    "test_push": {
+        "Passed": true,
+        "Expanded": 8,
+        "Frontier": 0,
+        "Generated": 8,
+        "Solution length": 7,
+        "Time": 0.013492099940776825
+    }
+}

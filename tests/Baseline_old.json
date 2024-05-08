@@ -1,0 +1,170 @@
+{
+    "BFSfriendly-1": {
+        "Passed": true,
+        "Expanded": 3,
+        "Frontier": 1,
+        "Generated": 4,
+        "Solution length": 2,
+        "Time": 0.009377399925142527
+    },
+    "BFSfriendly-2": {
+        "Passed": true,
+        "Expanded": 3,
+        "Frontier": 1,
+        "Generated": 4,
+        "Solution length": 2,
+        "Time": 0.009539099875837564
+    },
+    "BFSfriendly-3": {
+        "Passed": true,
+        "Expanded": 3,
+        "Frontier": 1,
+        "Generated": 4,
+        "Solution length": 2,
+        "Time": 0.012996200006455183
+    },
+    "BFSfriendly-4": {
+        "Passed": true,
+        "Expanded": 3,
+        "Frontier": 1,
+        "Generated": 4,
+        "Solution length": 2,
+        "Time": 0.020780700026080012
+    },
+    "BFSfriendly-5": {
+        "Passed": true,
+        "Expanded": 3,
+        "Frontier": 1,
+        "Generated": 4,
+        "Solution length": 2,
+        "Time": 0.021394999930635095
+    },
+    "MAPF00": {
+        "Passed": true,
+        "Expanded": 15,
+        "Frontier": 14,
+        "Generated": 29,
+        "Solution length": 14,
+        "Time": 0.01906639989465475
+    },
+    "MAPF01": {
+        "Passed": true,
+        "Expanded": 16,
+        "Frontier": 24,
+        "Generated": 40,
+        "Solution length": 15,
+        "Time": 0.029280999908223748
+    },
+    "MAPF02": {
+        "Passed": true,
+        "Expanded": 16,
+        "Frontier": 34,
+        "Generated": 50,
+        "Solution length": 14,
+        "Time": 0.11012389999814332
+    },
+    "MAPF02B": {
+        "Passed": true,
+        "Expanded": 15,
+        "Frontier": 17,
+        "Generated": 32,
+        "Solution length": 14,
+        "Time": 0.02066250005736947
+    },
+    "MAPF02C": {
+        "Passed": true,
+        "Expanded": 15,
+        "Frontier": 34,
+        "Generated": 49,
+        "Solution length": 14,
+        "Time": 0.10246710013598204
+    },
+    "MAPF03": {
+        "Passed": true,
+        "Expanded": 15,
+        "Frontier": 34,
+        "Generated": 49,
+        "Solution length": 14,
+        "Time": 0.5070722999516875
+    },
+    "MAPF03B": {
+        "Passed": true,
+        "Expanded": 15,
+        "Frontier": 17,
+        "Generated": 32,
+        "Solution length": 14,
+        "Time": 0.02156009990721941
+    },
+    "MAPF03C": {
+        "Passed": true,
+        "Expanded": 17,
+        "Frontier": 48,
+        "Generated": 65,
+        "Solution length": 16,
+        "Time": 0.4239930999465287
+    },
+    "MAPFreorder": {
+        "Passed": true,
+        "Expanded": 6726,
+        "Frontier": 914,
+        "Generated": 7640,
+        "Solution length": 44,
+        "Time": 78.87009529978968
+    },
+    "SACrunch": {
+        "Passed": true,
+        "Expanded": 350,
+        "Frontier": 94,
+        "Generated": 444,
+        "Solution length": 50,
+        "Time": 0.49767909990623593
+    },
+    "MAPFreorderJ3": {
+        "Passed": true,
+        "Expanded": 142,
+        "Frontier": 159,
+        "Generated": 301,
+        "Solution length": 18,
+        "Time": 1.3390661000739783
+    },
+    "MAPFreorderJ4": {
+        "Passed": true,
+        "Expanded": 6726,
+        "Frontier": 914,
+        "Generated": 7640,
+        "Solution length": 44,
+        "Time": 81.68616189993918
+    },
+    "MAPFslidingpuzzle": {
+        "Passed": true,
+        "Expanded": 118,
+        "Frontier": 83,
+        "Generated": 201,
+        "Solution length": 44,
+        "Time": 17.471417300170287
+    },
+    "SAFirefly": {
+        "Passed": true,
+        "Expanded": 124,
+        "Frontier": 110,
+        "Generated": 234,
+        "Solution length": 69,
+        "Time": 0.4217556999064982
+    },
+    "test": {
+        "Passed": true,
+        "Expanded": 14,
+        "Frontier": 1,
+        "Generated": 15,
+        "Solution length": 13,
+        "Time": 0.014190600020810962
+    },
+    "test_push": {
+        "Passed": true,
+        "Expanded": 8,
+        "Frontier": 0,
+        "Generated": 8,
+        "Solution length": 7,
+        "Time": 0.013521400047466159
+    }
+}

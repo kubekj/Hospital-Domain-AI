@@ -16,7 +16,6 @@ from src.searches.graphsearch import Info, graph_search
 from src.utils import memory
 from src.utils.info import handle_debug
 
-
 class SearchClient:
     @staticmethod
     def parse_level(server_messages) -> State:
@@ -35,12 +34,6 @@ class SearchClient:
 
     @staticmethod
     def set_heuristic_strategy(args, initial_state):
-        """
-        Sets the heuristic strategy based on the provided arguments.
-
-        :param args: The command line arguments.
-        :param initial_state: The initial state of the search.
-        """
         if args.simple:
             return HeuristicSimple(initial_state)
         elif args.s_dij:
@@ -54,14 +47,6 @@ class SearchClient:
 
     @staticmethod
     def set_frontier_strategy(args, initial_state: State, heuristic, initialWidth=2):
-        """
-        Sets the frontier strategy based on the provided arguments.
-
-        :param args: The command line arguments.
-        :param initial_state: The initial state of the search.
-        :param heuristic: The heuristic used by the greedy or IW search algorithm. (Other frontiers have default heuristics)
-        :return: The frontier object based on the selected strategy.
-        """
         if args.bfs:
             return FrontierBFS()
         elif args.dfs:
@@ -87,12 +72,6 @@ class SearchClient:
 
     @staticmethod
     def initialize_and_configure(args):
-        """
-        Initializes and configures the search client.
-
-        :param args: The command line arguments.
-        :return: The initial state and the frontier.
-        """
         print(
             "SearchClient initializing. I am sending this using the error output stream.",
             file=sys.stderr,
@@ -120,14 +99,6 @@ class SearchClient:
 
     @staticmethod
     def execute_and_print_plan(initial_state, frontier, heuristic, server_messages):
-        """
-        Executes the search plan and prints the results.
-
-        :param initial_state: The initial state of the search.
-        :param frontier: The frontier used by the search algorithm.
-        :param heuristic: The heuristic used by the search algorithm.
-        :param server_messages: The server messages.
-        """
         print("Starting {}.".format(frontier.get_name()), file=sys.stderr, flush=True)
         plan = graph_search(initial_state, frontier)
 
@@ -140,7 +111,7 @@ class SearchClient:
                 file=sys.stderr,
                 flush=True,
             )
-            states = [None] * (len(plan) + 1)
+            states: list[State] = [None] * (len(plan) + 1)
             states[0] = initial_state
             for ip, joint_action in enumerate(plan):
                 states[ip + 1] = states[ip].result(joint_action)
@@ -177,6 +148,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Simple client based on state-space graph search."
     )
+
     parser.add_argument(
         "--max-memory",
         metavar="<MB>",
@@ -184,6 +156,7 @@ if __name__ == "__main__":
         default=2048.0,
         help="The maximum memory usage allowed in MB (soft limit, default 2048).",
     )
+
     parser.add_argument(
         "--test-name",
         metavar="<test_name>",
@@ -192,6 +165,7 @@ if __name__ == "__main__":
         help="Name the file where the information will be stored.",
         required=False
     )
+
     parser.add_argument(
         "--test-folder",
         metavar="<test_folder_path>",
@@ -200,6 +174,7 @@ if __name__ == "__main__":
         help="Name the folder the files with the information will be stored.",
         required=False
     )
+
     parser.add_argument(
         "--profile",
         action="store_true",
