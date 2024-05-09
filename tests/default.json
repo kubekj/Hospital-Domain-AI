@@ -78,5 +78,13 @@
         "Generated": 3895,
         "Solution length": 188,
         "Time": 15.2059697000077
+    },
+    "AgentWayz": {
+        "Passed": true,
+        "Expanded": 545,
+        "Frontier": 344,
+        "Generated": 889,
+        "Solution length": 71,
+        "Time": 1312.0320838000043
     }
 }

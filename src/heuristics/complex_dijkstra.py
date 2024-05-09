@@ -175,7 +175,10 @@ class HeuristicComplexDijkstra(Heuristic):
             while not all_assigned:
                 all_assigned = True
                 # Determine the minimum number of boxes assigned to any agent
-                min_boxes = min(len(agent_assigned_to_box[agent]) for agent in State.agent_box_dict if State.agent_colors[agent] == color)
+                temp = [len(agent_assigned_to_box[agent]) for agent in State.agent_box_dict if State.agent_colors[agent] == color]
+                if len(temp) == 0:
+                    continue
+                min_boxes = min(temp)
 
                 # Collect eligible agents who either have 'min_boxes' or everyone if all are the same
                 eligible_agents = [agent for agent in State.agent_box_dict if len(agent_assigned_to_box[agent]) == min_boxes and State.agent_colors[agent] == color]
