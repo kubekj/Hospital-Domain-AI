@@ -34,8 +34,18 @@ class State:
         State.agent_colors:list[str] = [a for a in agent_colors if a is not None]
         State.box_colors:list[str] =  [a for a in box_colors if a is not None] 
         State.agent_box_dict = Parser.create_agent_box_dict(agent_colors, box_colors)
-        
+
         literals, num_rows, num_cols, walls, boxes_dict = Parser.read_level(server_messages, State.agent_box_dict)
+        agent_locations: dict[Atom, Pos] = atoms_by_type(literals, AtomType.AGENT_AT)
+        # Prune agents for which color is defined but are not in the map
+        for agent in list(State.agent_box_dict.keys()):
+            if agent not in agent_locations:
+                State.agent_box_dict.pop(agent)
+        # Prune boxes for which color is defined but are not in the map
+        for agent in State.agent_box_dict:
+            for box in State.agent_box_dict[agent]:
+                if box not in boxes_dict:
+                    State.agent_box_dict[agent].remove(box)
         goal_literals, goal_boxes_dict = Parser.read_goal_state(server_messages)
         State.boxes = boxes_dict
         State.boxgoals = goal_boxes_dict

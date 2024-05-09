@@ -6,5 +6,53 @@
         "Generated": 1118,
         "Solution length": 45,
         "Time": 0.42135180000332184
+    },
+    "test3": {
+        "Passed": true,
+        "Expanded": 15,
+        "Frontier": 2,
+        "Generated": 17,
+        "Solution length": 14,
+        "Time": 0.0049165000091306865
+    },
+    "Colada": {
+        "Passed": true,
+        "Expanded": 436,
+        "Frontier": 1337,
+        "Generated": 1773,
+        "Solution length": 67,
+        "Time": 1.5698544000042602
+    },
+    "RoboMatic": {
+        "Passed": true,
+        "Expanded": 14,
+        "Frontier": 399,
+        "Generated": 413,
+        "Solution length": 13,
+        "Time": 0.10304439999163151
+    },
+    "Tryhard": {
+        "Passed": true,
+        "Expanded": 77,
+        "Frontier": 1344,
+        "Generated": 1421,
+        "Solution length": 57,
+        "Time": 2.980151899973862
+    },
+    "Sixty": {
+        "Passed": true,
+        "Expanded": 26,
+        "Frontier": 276,
+        "Generated": 302,
+        "Solution length": 24,
+        "Time": 0.09627219999674708
+    },
+    "FastCipka_test1": {
+        "Passed": true,
+        "Expanded": 121,
+        "Frontier": 478,
+        "Generated": 599,
+        "Solution length": 118,
+        "Time": 5.308548300003167
     }
 }

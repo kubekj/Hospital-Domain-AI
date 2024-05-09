@@ -45,6 +45,7 @@ class Parser:
                 literals += [encode_box((row, col), new_boxgoal)]  # Treat as a movable box
             elif walls != None and (c == "+" or c == "\n"):
                 walls[row][col] = True
+        return
 
     @staticmethod
     def read_level(server_messages, agent_box_dict: dict[int, list[int]]):

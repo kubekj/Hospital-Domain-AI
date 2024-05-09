@@ -47,15 +47,15 @@ class HeuristicComplexDijkstra(Heuristic):
         total_distance = 0
 
         # TODO: Delete if not needed. It didn't seem to do anything before the merge, and somehow made things worse afterwards.
-        # for agt, box in enumerate(state.recalculateDistanceOfBox):
-        #     if box != None:
-        #         # print(f"Recalculating box {box} last moved by agent {agt}")
-        #         self.initial_distances_from_box[box] = (
-        #             HeuristicSimpleDijkstra.create_mapping(state,
-        #                                                 state.box_locations[box].row,
-        #                                                 state.box_locations[box].col,
-        #                                                 len(Location.walls),
-        #                                                 len(Location.walls[0])))
+        for agt, box in enumerate(state.recalculateDistanceOfBox):
+            if box != None:
+                # print(f"Recalculating box {box} last moved by agent {agt}")
+                self.initial_distances_from_box[box] = (
+                    HeuristicSimpleDijkstra.create_mapping(state,
+                                                        state.box_locations[box].row,
+                                                        state.box_locations[box].col,
+                                                        len(Location.walls),
+                                                        len(Location.walls[0])))
 
         for agent, agent_loc in state.agent_locations.items():
             try:
@@ -70,17 +70,19 @@ class HeuristicComplexDijkstra(Heuristic):
                 raise Exception(exc)
 
             for box in self.agent_assigned_to_box[agent]:
-                box_loc = state.box_locations[box]
-                box_distance = 0
-                # Distance from the agent to the box
-                box_distance += self.initial_distances_from_box[box][
-                        agent_loc.row
-                    ][agent_loc.col] - 1 
-                # Distance from the box to its goal
-                box_distance += self.distances_from_box_goals[
-                    self.boxgoal_assigned_to_box[box][0]
-                ][box_loc.row][box_loc.col]
-                total_distance += box_distance * self.box_priority[agent][box]
+                if box in self.boxgoal_assigned_to_box and box in boxes_not_in_goal:
+                    box_loc = state.box_locations[box]
+                    box_distance = 0
+                    # Distance from the agent to the box
+                    if not isBoxClose(agent_loc, box_loc):
+                        box_distance += self.initial_distances_from_box[box][
+                                agent_loc.row
+                            ][agent_loc.col] - 1 
+                    # Distance from the box to its goal
+                    box_distance += self.distances_from_box_goals[
+                        self.boxgoal_assigned_to_box[box][0]
+                    ][box_loc.row][box_loc.col]
+                    total_distance += box_distance * self.box_priority[agent][box]
 
             if agent in self.distances_from_agent_goals:
                 total_distance += (
@@ -177,7 +179,7 @@ class HeuristicComplexDijkstra(Heuristic):
                 min_boxes = min(len(agent_assigned_to_box[agent]) for agent in State.agent_box_dict)
 
                 # Collect eligible agents who either have 'min_boxes' or everyone if all are the same
-                eligible_agents = [agent for agent in State.agent_box_dict if len(agent_assigned_to_box[agent]) == min_boxes]
+                eligible_agents = [agent for agent in State.agent_box_dict if len(agent_assigned_to_box[agent]) == min_boxes if State.agent_colors[agent] == color]
 
                 # From the eligible agents, pick the agent with the closest box
                 best_agent = None
@@ -243,3 +245,7 @@ def get_close_boxes(loc: Location, boxes: dict):
                 close_boxes[box] = neig
 
     return close_boxes
+
+def isBoxClose(agent_loc: Pos, box_loc: Pos):
+    return (abs(agent_loc.row - box_loc.row) == 1 and agent_loc.col == box_loc.col) or \
+           (abs(agent_loc.col - box_loc.col) == 1 and agent_loc.row == box_loc.row)

@@ -113,6 +113,8 @@ class SearchClient:
             )
             states: list[State] = [None] * (len(plan) + 1)
             states[0] = initial_state
+            heuristic = SearchClient.set_heuristic_strategy(args, initial_state)
+            frontier = SearchClient.set_frontier_strategy(args, initial_state, heuristic)
             for ip, joint_action in enumerate(plan):
                 states[ip + 1] = states[ip].result(joint_action)
                 my_message = None
