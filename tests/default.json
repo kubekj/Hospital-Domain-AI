@@ -49,10 +49,34 @@
     },
     "FastCipka_test1": {
         "Passed": true,
-        "Expanded": 121,
-        "Frontier": 478,
-        "Generated": 599,
-        "Solution length": 118,
-        "Time": 5.308548300003167
+        "Expanded": 466,
+        "Frontier": 2062,
+        "Generated": 2528,
+        "Solution length": 81,
+        "Time": 8.471755300008226
+    },
+    "FastCipka_test1_sub1": {
+        "Passed": true,
+        "Expanded": 52,
+        "Frontier": 213,
+        "Generated": 265,
+        "Solution length": 48,
+        "Time": 1.0949880999978632
+    },
+    "FastCipka_test1_sub2": {
+        "Passed": true,
+        "Expanded": 58,
+        "Frontier": 67,
+        "Generated": 125,
+        "Solution length": 57,
+        "Time": 0.03366219997406006
+    },
+    "FastCipka": {
+        "Passed": true,
+        "Expanded": 272,
+        "Frontier": 3623,
+        "Generated": 3895,
+        "Solution length": 188,
+        "Time": 15.2059697000077
     }
 }

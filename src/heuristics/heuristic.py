@@ -28,7 +28,7 @@ class Heuristic(metaclass=ABCMeta):
             count_goals_not_met(state, self.box_goal_positions, AtomType.BOX_AT)
 
     @abstractmethod
-    def f(self, state: "State") -> "int":
+    def f(self, state: "State") -> "int|float":
         pass
 
     @abstractmethod

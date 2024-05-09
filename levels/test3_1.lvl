@@ -1,9 +1,8 @@
 #domain
 hospital
 #levelname
-FastCipka_test1
+FastCipka_test1_sub1
 #colors
-purple: 1, A, B
 blue: 0, C, D, F
 #initial
 ++++++++++++++
@@ -17,7 +16,7 @@ blue: 0, C, D, F
 +      +  +  +
 +         +  +
 +         +  +
-+      + 1+A +
++      +  +  +
 +      +  +  +
 +      +  +  +
 ++++++++++++++
@@ -35,6 +34,6 @@ blue: 0, C, D, F
 +         +  +
 +      +  +  +
 +      +  +  +
-+      + A+  +
++      +  +  +
 ++++++++++++++
 #end

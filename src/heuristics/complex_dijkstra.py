@@ -40,10 +40,10 @@ class HeuristicComplexDijkstra(Heuristic):
                             agent_loc.col
                         ],
                     )
-            self.box_priority[agent] = {box:getPriority(i) for i, box in enumerate(sorted_boxes)}
+            self.box_priority[agent] = {box:getPriority(len(sorted_boxes) - i) for i, box in enumerate(sorted_boxes)}
 
 
-    def h(self, state: State) -> int:
+    def h(self, state: State) -> float|int:
         total_distance = 0
 
         # TODO: Delete if not needed. It didn't seem to do anything before the merge, and somehow made things worse afterwards.
@@ -61,11 +61,10 @@ class HeuristicComplexDijkstra(Heuristic):
             try:
                 boxes_not_in_goal = [b for b_name in State.agent_box_dict[agent] for b in State.boxes[b_name] if
                                      b_name in self.box_goal_positions and
-                                        self.box_goal_positions[b_name] != state.box_locations[b]]
+                                         self.box_goal_positions[self.boxgoal_assigned_to_box[b][0]] != state.box_locations[b]]
             except Exception as exc:
                 print("#",State.agent_box_dict)
                 print("#",self.box_goal_positions)
-                print("#",0 in self.box_goal_positions)
                 print("#",State.boxes)
                 raise Exception(exc)
 
@@ -87,13 +86,13 @@ class HeuristicComplexDijkstra(Heuristic):
             if agent in self.distances_from_agent_goals:
                 total_distance += (
                     self.distances_from_agent_goals[agent][agent_loc.row][agent_loc.col]
-                    * getPriority(len(self.box_priority[agent]))
+                    * getPriority(1)
                 )
 
         return total_distance
 
-    def f(self, state: State) -> int:
-        return self.h(state)
+    def f(self, state: State) -> float|int:
+        return state.g + self.h(state)
 
     def __repr__(self):
         return "Dijkstra heuristic"
@@ -176,10 +175,10 @@ class HeuristicComplexDijkstra(Heuristic):
             while not all_assigned:
                 all_assigned = True
                 # Determine the minimum number of boxes assigned to any agent
-                min_boxes = min(len(agent_assigned_to_box[agent]) for agent in State.agent_box_dict)
+                min_boxes = min(len(agent_assigned_to_box[agent]) for agent in State.agent_box_dict if State.agent_colors[agent] == color)
 
                 # Collect eligible agents who either have 'min_boxes' or everyone if all are the same
-                eligible_agents = [agent for agent in State.agent_box_dict if len(agent_assigned_to_box[agent]) == min_boxes if State.agent_colors[agent] == color]
+                eligible_agents = [agent for agent in State.agent_box_dict if len(agent_assigned_to_box[agent]) == min_boxes and State.agent_colors[agent] == color]
 
                 # From the eligible agents, pick the agent with the closest box
                 best_agent = None
@@ -224,6 +223,7 @@ class HeuristicComplexDijkstra(Heuristic):
             if len(goal_boxes[box_goal]) == 0:
                 continue
             new_box = goal_boxes[box_goal].pop(0)[0]
+            # Dict[Box,BoxGoal] 
             boxgoal_assigned_to_box[new_box] = box_goal
             for box_goal_2 in goal_boxes:
                 if new_box in [b for (b,_) in goal_boxes[box_goal_2]]:
@@ -234,7 +234,7 @@ class HeuristicComplexDijkstra(Heuristic):
 
 
 def getPriority(i: int) -> float:
-    return 1 / 2**(i+1)
+    return 2**(i+1)
 
 def get_close_boxes(loc: Location, boxes: dict):
     close_boxes = {}

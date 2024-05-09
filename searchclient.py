@@ -1,6 +1,9 @@
 import argparse
+import itertools
+import os
 import sys
 
+from src.domain.action import Action
 from src.domain.state import State
 from src.frontiers.best_first import FrontierBestFirst
 from src.frontiers.bfs import FrontierBFS
@@ -15,6 +18,8 @@ from src.heuristics.wastar import HeuristicWeightedAStar
 from src.searches.graphsearch import Info, graph_search
 from src.utils import memory
 from src.utils.info import handle_debug
+
+import pickle
 
 class SearchClient:
     @staticmethod
@@ -46,7 +51,7 @@ class SearchClient:
             return HeuristicSimple(initial_state)
 
     @staticmethod
-    def set_frontier_strategy(args, initial_state: State, heuristic, initialWidth=2):
+    def set_frontier_strategy(args, initial_state: State, heuristic, initialWidth=1):
         if args.bfs:
             return FrontierBFS()
         elif args.dfs:
@@ -115,10 +120,12 @@ class SearchClient:
             states[0] = initial_state
             heuristic = SearchClient.set_heuristic_strategy(args, initial_state)
             frontier = SearchClient.set_frontier_strategy(args, initial_state, heuristic)
+            with open("plans/plan.pkl", "wb") as f:
+                pickle.dump(plan, file=f)
             for ip, joint_action in enumerate(plan):
                 states[ip + 1] = states[ip].result(joint_action)
                 my_message = None
-                # TODO: Make ComplexDijkstra work with this
+                
                 my_message = (
                     str(heuristic.f(states[ip + 1]))
                     if isinstance(heuristic, HeuristicComplexDijkstra)
@@ -135,10 +142,75 @@ class SearchClient:
                 )
                 server_messages.readline()
 
+    def execute_and_print_hardcoded_plan(initial_state, frontier, heuristic, server_messages):
+        
+        def load_pickle_files(directory):
+            data_dict = {}
+            # List all files in the directory
+            for filename in os.listdir(directory):
+                if filename.startswith("plan_") and filename.endswith(".pkl"):
+                    # Extract the number X from the filename "plan_X.pkl"
+                    number = int(filename.split('_')[1].split('.')[0])
+                    # Construct the full path to the file
+                    file_path = os.path.join(directory, filename)
+                    # Load the pickle file
+                    with open(file_path, 'rb') as file:
+                        data_dict[number] = pickle.load(file)
+                        if isinstance(data_dict[number] , list):
+                            data_dict[number]:list[Action] = [el[0] for el in data_dict[number]]
+                            for el in data_dict[number]:
+                                el.agt = number
+
+            return data_dict
+        def merge_dict_arrays(data_dict):
+            # Find the maximum length of any array in the dictionary
+            max_length = max(len(lst) for lst in data_dict.values())
+
+            # Extend each array to the maximum length using its key for the fill value
+            extended_arrays = []
+            for key, lst in data_dict.items():
+                # Create new list with extended part filled with Action(key)
+                extended_list = lst + [Action(key)] * (max_length - len(lst))
+                extended_arrays.append(extended_list)
+            
+            # Now use zip (not zip_longest since all arrays are of equal length)
+            return list(zip(*extended_arrays))
+        print("Starting {}.".format(frontier.get_name()), file=sys.stderr, flush=True)
+        sub_plans = load_pickle_files("./plans")
+        plan = merge_dict_arrays(sub_plans)
+        print(
+            "Found solution of length {}.".format(len(plan)),
+            file=sys.stderr,
+            flush=True,
+        )
+        states: list[State] = [None] * (len(plan) + 1)
+        states[0] = initial_state
+        heuristic = SearchClient.set_heuristic_strategy(args, initial_state)
+        frontier = SearchClient.set_frontier_strategy(args, initial_state, heuristic)
+        for ip, joint_action in enumerate(plan):
+            states[ip + 1] = states[ip].result(joint_action)
+            my_message = None
+            my_message = (
+                str(heuristic.f(states[ip + 1]))
+                if isinstance(heuristic, HeuristicComplexDijkstra)
+                else None
+            )
+            print(
+                "|".join(
+                    a.get_name()
+                    + "@"
+                    + (my_message if my_message is not None else a.get_name())
+                    for a in joint_action
+                ),
+                flush=True,
+            )
+            server_messages.readline()
+
     @staticmethod
     def main(args) -> None:
         initial_state, heuristic, frontier = SearchClient.initialize_and_configure(args)
         SearchClient.execute_and_print_plan(initial_state, frontier, heuristic, sys.stdin)
+        # SearchClient.execute_and_print_hardcoded_plan(initial_state, frontier, heuristic, sys.stdin)
 
 
 debug = False
