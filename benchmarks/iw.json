@@ -46,5 +46,13 @@
         "Generated": 301,
         "Solution length": 18,
         "Time": 1.0859747000504285
+    },
+    "brAIn": {
+        "Passed": true,
+        "Expanded": 425,
+        "Frontier": 66,
+        "Generated": 491,
+        "Solution length": 75,
+        "Time": 11.981209955993108
     }
 }
