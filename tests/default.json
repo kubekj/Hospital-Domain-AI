@@ -81,11 +81,11 @@
     },
     "AgentWayz": {
         "Passed": true,
-        "Expanded": 130,
-        "Frontier": 307,
-        "Generated": 437,
-        "Solution length": 69,
-        "Time": 38.552364800008945
+        "Expanded": 545,
+        "Frontier": 344,
+        "Generated": 889,
+        "Solution length": 71,
+        "Time": 146.9132602000027
     },
     "MAPFreorder": {
         "Passed": true,
