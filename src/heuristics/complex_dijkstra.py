@@ -36,7 +36,7 @@ class HeuristicComplexDijkstra(Heuristic):
             agent_loc = initial_state.agent_locations[agent]
             sorted_boxes = sorted(
                         agent_boxes,
-                        key=lambda b: self.distance[initial_state.box_locations[b]][agent_loc.row][
+                        key=lambda b: self.distances[initial_state.box_locations[b]][agent_loc.row][
                             agent_loc.col
                         ],
                     )
@@ -123,7 +123,7 @@ class HeuristicComplexDijkstra(Heuristic):
                 self.name_choke_points(move[0], move[1], id)
 
     def create_all_dijkstra_mappings(self, state: State):
-        self.distance:dict[Pos, list[list[int|float]]] = {}
+        self.distances:dict[Pos, list[list[int|float]]] = {}
         for agent, loc in self.agent_goal_positions.items():
             self.getDistances(state=state, position=loc)
 
@@ -145,7 +145,7 @@ class HeuristicComplexDijkstra(Heuristic):
             for agent in agent_boxes:
                 agent_loc = state.agent_locations[agent]
                 for box in [box for box_name in State.agent_box_dict[agent] for box in State.boxes[box_name]]:
-                    agent_boxes[agent].append((box, self.distance[state.box_locations[box]][agent_loc.row][agent_loc.col]))
+                    agent_boxes[agent].append((box, self.distances[state.box_locations[box]][agent_loc.row][agent_loc.col]))
 
             # Sort each agent's list of boxes by distance
             for agent in agent_boxes:
@@ -217,11 +217,11 @@ class HeuristicComplexDijkstra(Heuristic):
         return boxgoal_assigned_to_box
 
     def getDistances(self, state: State, position: Pos):
-        if position not in self.distance:
-            self.distance[position] = HeuristicSimpleDijkstra.create_mapping(
+        if position not in self.distances:
+            self.distances[position] = HeuristicSimpleDijkstra.create_mapping(
                     state, position.row, position.col, len(Location.walls), len(Location.walls[0])
                 )
-        return self.distance[position]
+        return self.distances[position]
 
 def getPriority(i: int) -> float:
     return 2**(i+1)
