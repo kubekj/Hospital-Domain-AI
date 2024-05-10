@@ -1,4 +1,4 @@
-from itertools import combinations
+from itertools import chain, combinations
 import sys
 
 from src.frontiers.best_first import FrontierBestFirst
@@ -41,7 +41,7 @@ class FrontierIW(FrontierBestFirst):
         :return: True if there's a novel combination, False otherwise.
         """
         # Generate all combinations of size i from the elements
-        new_combinations = set(frozenset(comb) for comb in combinations(elements, self.width))
+        new_combinations = set(frozenset(comb) for comb in combinations(chain(*elements), self.width))
 
         # Check if there's any combination that we have not seen before
         novel = not new_combinations.issubset(self.known_combinations)

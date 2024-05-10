@@ -157,7 +157,7 @@ class SearchClient:
                     with open(file_path, 'rb') as file:
                         data_dict[number] = pickle.load(file)
                         if isinstance(data_dict[number] , list):
-                            data_dict[number]:list[Action] = [el[0] for el in data_dict[number]]
+                            data_dict[number] = [el[0] for el in data_dict[number]]
                             for el in data_dict[number]:
                                 el.agt = number
 

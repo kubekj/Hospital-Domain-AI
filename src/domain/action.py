@@ -9,10 +9,10 @@ class Action:
     def __repr__(self) -> str:
         return f"Action({self.agt})"
 
-    def check_preconditions(self, literals: set[Atom]):
+    def check_preconditions(self, literals: LiteralList):
         return True
 
-    def apply_effects(self, literals: set[Atom], skip_check = False):
+    def apply_effects(self, literals: LiteralList, skip_check = False):
         return literals
 
     def get_name(self):
@@ -30,7 +30,7 @@ class Move(Action):
         tr,tc = self.agtto
         return f"Move({self.agt}, {(fr,fc)}, {(tr,tc)})"
 
-    def check_preconditions(self, literals: set[Atom]):
+    def check_preconditions(self, literals: LiteralList):
         """
         Check if the preconditions of the Move action are satisfied in the given state.
         Preconditions:
@@ -39,13 +39,13 @@ class Move(Action):
         - Free(agtto)
         """
         return (
-            encode_agent(self.agtfrom, self.agt) in literals
+            encode_agent(self.agtfrom, self.agt) in literals[AtomType.AGENT_AT]
             and eval_neighbour(self.agtfrom, self.agtto)
             and eval_free(self.agtto, literals)
             # and Free(self.agtto) in literals
         )
 
-    def apply_effects(self, literals: set[Atom], skip_check = False):
+    def apply_effects(self, literals: LiteralList, skip_check = False):
         """
         Apply the effects of the Move action to the given state.
         Effects:
@@ -59,9 +59,9 @@ class Move(Action):
             new = encode_agent(self.agtto, self.agt)
 
             # ~AgentAt(agt,agtfrom)
-            literals.remove(old)
+            literals[AtomType.AGENT_AT].remove(old)
             # AgentAt(agt,agtto)
-            literals.add(new)
+            literals[AtomType.AGENT_AT].add(new)
             # ~Free(agtto)
             # Free(agtfrom)
             return literals
@@ -106,7 +106,7 @@ class Push(Action):
         btr,btc = self.boxto
         return f"Push({self.agt}, {(afr,afc)}, {chr(self.box[0] + ord("A")),self.box[1]}, {(bfr,bfc)}, {(btr,btc)})"
 
-    def check_preconditions(self, literals: set[Atom]):
+    def check_preconditions(self, literals: LiteralList):
         """
         Check if the preconditions of the Move action are satisfied in the given state.
         Preconditions:
@@ -117,15 +117,15 @@ class Push(Action):
         - Free(agtto)
         """
         return (
-            encode_agent(self.agtfrom, self.agt) in literals #Agent_at
-            and encode_box(self.boxfrom, self.box) in literals #Box_at
+            encode_agent(self.agtfrom, self.agt) in literals[AtomType.AGENT_AT] #Agent_at
+            and encode_box(self.boxfrom, self.box) in literals[AtomType.BOX_AT] #Box_at
             and eval_neighbour(self.agtfrom, self.boxfrom)
             and eval_neighbour(self.boxfrom, self.boxto)
             and eval_free(self.boxto, literals)
             and self.agtfrom != self.boxto
         )
 
-    def apply_effects(self, literals: set[Atom], skip_check = False):
+    def apply_effects(self, literals: LiteralList, skip_check = False):
         """
         Apply the effects of the Move action to the given state.
         Effects:
@@ -141,13 +141,13 @@ class Push(Action):
             boxto = encode_box(self.boxto, self.box)
 
             # ~AgentAt(agt,agtfrom)
-            literals.remove(agtgfrom)
+            literals[AtomType.AGENT_AT].remove(agtgfrom)
             # AgentAt(agt,boxfrom)
-            literals.add(agtgto)
+            literals[AtomType.AGENT_AT].add(agtgto)
             # ~BoxAt(box,boxfrom)
-            literals.remove(boxfrom)
+            literals[AtomType.BOX_AT].remove(boxfrom)
             # BoxAt(box,boxto)
-            literals.add(boxto)
+            literals[AtomType.BOX_AT].add(boxto)
             return literals
         else:
             raise Exception("Preconditions not satisfied for the Move action.")
@@ -203,7 +203,7 @@ class Pull(Action):
         bfr,bfc = self.boxfrom
         return f"Pull({self.agt}, {(afr,afc)}, {(atr,atc)}, {chr(self.box[0] + ord("A")),self.box[1]}, {(bfr,bfc)})"
 
-    def check_preconditions(self, literals: set[Atom]):
+    def check_preconditions(self, literals: LiteralList):
         """
         Check if the preconditions of the Move action are satisfied in the given state.
         Preconditions:
@@ -214,15 +214,15 @@ class Pull(Action):
         - Free(agtto)
         """
         return (
-            encode_agent(self.agtfrom, self.agt) in literals #Agent_at
+            encode_agent(self.agtfrom, self.agt) in literals[AtomType.AGENT_AT] #Agent_at
             and eval_neighbour(self.agtfrom, self.agtto)
             and eval_neighbour(self.agtfrom, self.boxfrom)
-            and encode_box(self.boxfrom, self.box) in literals #Box_at
+            and encode_box(self.boxfrom, self.box) in literals[AtomType.BOX_AT] #Box_at
             and eval_free(self.agtto, literals)
             and self.agtto != self.agtfrom
         )
 
-    def apply_effects(self, literals: set[Atom], skip_check = False):
+    def apply_effects(self, literals: LiteralList, skip_check = False):
         """
         Apply the effects of the Move action to the given state.
         Effects:
@@ -240,13 +240,13 @@ class Pull(Action):
             boxto = encode_box(self.agtfrom, self.box)
 
             # ~AgentAt(agt,agtfrom)
-            literals.remove(agtfrom)
+            literals[AtomType.AGENT_AT].remove(agtfrom)
             # AgentAt(agt,agtto)
-            literals.add(agtto)
+            literals[AtomType.AGENT_AT].add(agtto)
             # ~BoxAt(box,boxfrom)
-            literals.remove(boxfrom)
+            literals[AtomType.BOX_AT].remove(boxfrom)
             # BoxAt(box,boxto)
-            literals.add(boxto)
+            literals[AtomType.BOX_AT].add(boxto)
             return literals
         else:
             raise Exception("Preconditions not satisfied for the Move action.")

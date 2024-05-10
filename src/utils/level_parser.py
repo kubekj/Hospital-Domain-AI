@@ -1,5 +1,6 @@
 from typing import Tuple
-from src.domain.atom import Box, encode_agent, Location, Atom, encode_box
+from src.domain.atom import encode_agent, Location, encode_box, AtomType
+from src.domain.domain_types import LiteralList_new, Box, LiteralList
 from src.utils.color import Color
 
 class Parser:
@@ -26,11 +27,11 @@ class Parser:
         return agent_colors, box_colors, boxes
 
     @staticmethod
-    def populate_literals(literals: list[Atom], line, row: int, walls: list[list[bool]] = None, agent_box_dict: dict[int, list[int]] = None, boxes_dict: dict[int, list[Tuple[int,int]]] = None):
+    def populate_literals(literals: LiteralList, line, row: int, walls: list[list[bool]] = None, agent_box_dict: dict[int, list[int]] = None, boxes_dict: dict[int, list[Box]] = None):
         for col, c in enumerate(line):
             if "0" <= c <= "9":
                 agent = ord(c) - ord("0")
-                literals += [encode_agent((row, col), agent)]
+                literals[AtomType.AGENT_AT].add(encode_agent((row, col), agent))
             elif "A" <= c <= "Z":
                 box = ord(c) - ord("A")
                 if walls != None:
@@ -42,14 +43,14 @@ class Parser:
                     boxes_dict[box] = []
                 new_boxgoal = (box, len(boxes_dict[box]))
                 boxes_dict[box].append(new_boxgoal)
-                literals += [encode_box((row, col), new_boxgoal)]  # Treat as a movable box
+                literals[AtomType.BOX_AT].add(encode_box((row, col), new_boxgoal))  # Treat as a movable box
             elif walls != None and (c == "+" or c == "\n"):
                 walls[row][col] = True
         return
 
     @staticmethod
     def read_level(server_messages, agent_box_dict: dict[int, list[int]]):
-        literals: list[Atom] = []
+        literals: LiteralList = LiteralList_new()
         num_rows = 0
         num_cols = 0
         level_lines = []
@@ -74,7 +75,7 @@ class Parser:
 
     @staticmethod
     def read_goal_state(server_messages):
-        goal_literals: list[Atom] = []
+        goal_literals: LiteralList = LiteralList_new()
         goal_boxes: dict[int, list[Box]] = {}
         line = server_messages.readline()
         row = 0
