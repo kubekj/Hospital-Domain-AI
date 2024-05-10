@@ -70,7 +70,7 @@ class HeuristicComplexDijkstra(Heuristic):
                     box_distance = 0
                     # Distance from the agent to the box
                     if not isBoxClose(agent_loc, box_loc):
-                        box_distance += self.distance[box_loc][
+                        box_distance += self.getDistances(state,box_loc)[
                                 agent_loc.row
                             ][agent_loc.col] - 1 
                     # Distance from the box to its goal

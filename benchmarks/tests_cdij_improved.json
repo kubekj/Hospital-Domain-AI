@@ -1,0 +1,10 @@
+{
+    "AgentWayz": {
+        "Passed": true,
+        "Expanded": 545,
+        "Frontier": 344,
+        "Generated": 889,
+        "Solution length": 71,
+        "Time": 59.61040519998642
+    }
+}
