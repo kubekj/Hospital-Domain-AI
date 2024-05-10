@@ -124,7 +124,7 @@ class State:
             if done:
                 break
 
-        State._RNG.shuffle(expanded_states)
+        # State._RNG.shuffle(expanded_states)
         return expanded_states
 
     @staticmethod

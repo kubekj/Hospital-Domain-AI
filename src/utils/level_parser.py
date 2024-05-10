@@ -2,6 +2,7 @@ from typing import Tuple
 from src.domain.atom import Box, encode_agent, Location, Atom, encode_box
 from src.utils.color import Color
 
+
 class Parser:
     @staticmethod
     def read_colors(server_messages):
@@ -26,7 +27,14 @@ class Parser:
         return agent_colors, box_colors, boxes
 
     @staticmethod
-    def populate_literals(literals: list[Atom], line, row: int, walls: list[list[bool]] = None, agent_box_dict: dict[int, list[int]] = None, boxes_dict: dict[int, list[Tuple[int,int]]] = None):
+    def populate_literals(
+        literals: list[Atom],
+        line,
+        row: int,
+        walls: list[list[bool]] = None,
+        agent_box_dict: dict[int, list[int]] = None,
+        boxes_dict: dict[int, list[Tuple[int, int]]] = None,
+    ):
         for col, c in enumerate(line):
             if "0" <= c <= "9":
                 agent = ord(c) - ord("0")
@@ -34,15 +42,21 @@ class Parser:
             elif "A" <= c <= "Z":
                 box = ord(c) - ord("A")
                 if walls != None:
-                    box_is_movable = any(box in boxes for boxes in agent_box_dict.values())
+                    box_is_movable = any(
+                        box in boxes for boxes in agent_box_dict.values()
+                    )
                     if not box_is_movable:
-                        walls[row][col] = True  # Treat as a wall if no agent can move this box
-                        continue # Don't include the box
+                        walls[row][
+                            col
+                        ] = True  # Treat as a wall if no agent can move this box
+                        continue  # Don't include the box
                 if box not in boxes_dict:
                     boxes_dict[box] = []
                 new_boxgoal = (box, len(boxes_dict[box]))
                 boxes_dict[box].append(new_boxgoal)
-                literals += [encode_box((row, col), new_boxgoal)]  # Treat as a movable box
+                literals += [
+                    encode_box((row, col), new_boxgoal)
+                ]  # Treat as a movable box
             elif walls != None and (c == "+" or c == "\n"):
                 walls[row][col] = True
         return
@@ -55,9 +69,11 @@ class Parser:
         level_lines = []
         line = server_messages.readline()
         while not line.startswith("#"):
-            #extra trimming
-            last_plus_index = line.rfind('+') # Finding the last index of '+'
-            line = line[:last_plus_index + 1] # Slicing the string to keep everything up to the last '+'
+            # extra trimming
+            last_plus_index = line.rfind("+")  # Finding the last index of '+'
+            line = line[
+                : last_plus_index + 1
+            ]  # Slicing the string to keep everything up to the last '+'
             level_lines.append(line)
             num_cols = max(num_cols, len(line))
             num_rows += 1
@@ -87,11 +103,7 @@ class Parser:
     @staticmethod
     def create_agent_box_dict(agent_colors, box_colors):
         return {
-            i: [
-                j
-                for j, b in enumerate(box_colors)
-                if b is not None and b == a
-            ]
+            i: [j for j, b in enumerate(box_colors) if b is not None and b == a]
             for i, a in enumerate(agent_colors)
             if a is not None
         }

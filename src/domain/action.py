@@ -104,7 +104,7 @@ class Push(Action):
         afr,afc = self.agtfrom
         bfr,bfc = self.boxfrom
         btr,btc = self.boxto
-        return f"Push({self.agt}, {(afr,afc)}, {chr(self.box[0] + ord("A")),self.box[1]}, {(bfr,bfc)}, {(btr,btc)})"
+        return f"Push({self.agt}, {(afr,afc)}, {chr(self.box[0] + ord('A')),self.box[1]}, {(bfr,bfc)}, {(btr,btc)})"
 
     def check_preconditions(self, literals: set[Atom]):
         """
@@ -201,7 +201,7 @@ class Pull(Action):
         atr,atc = self.agtto
         afr,afc = self.agtfrom
         bfr,bfc = self.boxfrom
-        return f"Pull({self.agt}, {(afr,afc)}, {(atr,atc)}, {chr(self.box[0] + ord("A")),self.box[1]}, {(bfr,bfc)})"
+        return f"Pull({self.agt}, {(afr,afc)}, {(atr,atc)}, {chr(self.box[0] + ord('A')),self.box[1]}, {(bfr,bfc)})"
 
     def check_preconditions(self, literals: set[Atom]):
         """
