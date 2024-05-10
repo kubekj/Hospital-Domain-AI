@@ -56,6 +56,7 @@ class HeuristicComplexDijkstra(Heuristic):
                                                         state.box_locations[box].col,
                                                         len(Location.walls),
                                                         len(Location.walls[0])))
+                state.recalculateDistanceOfBox[agt] = None
 
         for agent, agent_loc in state.agent_locations.items():
             try:
