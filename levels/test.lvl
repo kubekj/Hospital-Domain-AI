@@ -3,15 +3,15 @@ hospital
 #levelname
 test
 #colors
-blue: 0,A
+blue: 0,A,B
 #initial
 +++++++++++++
-+A     0    +
++B     0 A  +
 +++++++++++++
           +++
 #goal
 +++++++++++++
-+        A  +
++    B     A+
 +++++++++++++
           +++
 #end

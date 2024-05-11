@@ -21,6 +21,7 @@ from src.utils.info import handle_debug
 
 import pickle
 
+
 class SearchClient:
     @staticmethod
     def parse_level(server_messages) -> State:
@@ -119,13 +120,15 @@ class SearchClient:
             states: list[State] = [None] * (len(plan) + 1)
             states[0] = initial_state
             heuristic = SearchClient.set_heuristic_strategy(args, initial_state)
-            frontier = SearchClient.set_frontier_strategy(args, initial_state, heuristic)
+            frontier = SearchClient.set_frontier_strategy(
+                args, initial_state, heuristic
+            )
             with open("plans/plan.pkl", "wb") as f:
                 pickle.dump(plan, file=f)
             for ip, joint_action in enumerate(plan):
                 states[ip + 1] = states[ip].result(joint_action)
                 my_message = None
-                
+
                 my_message = (
                     str(heuristic.f(states[ip + 1]))
                     if isinstance(heuristic, HeuristicComplexDijkstra)
@@ -142,26 +145,31 @@ class SearchClient:
                 )
                 server_messages.readline()
 
-    def execute_and_print_hardcoded_plan(initial_state, frontier, heuristic, server_messages):
-        
+    def execute_and_print_hardcoded_plan(
+        initial_state, frontier, heuristic, server_messages
+    ):
+
         def load_pickle_files(directory):
             data_dict = {}
             # List all files in the directory
             for filename in os.listdir(directory):
                 if filename.startswith("plan_") and filename.endswith(".pkl"):
                     # Extract the number X from the filename "plan_X.pkl"
-                    number = int(filename.split('_')[1].split('.')[0])
+                    number = int(filename.split("_")[1].split(".")[0])
                     # Construct the full path to the file
                     file_path = os.path.join(directory, filename)
                     # Load the pickle file
-                    with open(file_path, 'rb') as file:
+                    with open(file_path, "rb") as file:
                         data_dict[number] = pickle.load(file)
-                        if isinstance(data_dict[number] , list):
-                            data_dict[number]:list[Action] = [el[0] for el in data_dict[number]]
+                        if isinstance(data_dict[number], list):
+                            data_dict[number]: list[Action] = [
+                                el[0] for el in data_dict[number]
+                            ]
                             for el in data_dict[number]:
                                 el.agt = number
 
             return data_dict
+
         def merge_dict_arrays(data_dict):
             # Find the maximum length of any array in the dictionary
             max_length = max(len(lst) for lst in data_dict.values())
@@ -172,9 +180,10 @@ class SearchClient:
                 # Create new list with extended part filled with Action(key)
                 extended_list = lst + [Action(key)] * (max_length - len(lst))
                 extended_arrays.append(extended_list)
-            
+
             # Now use zip (not zip_longest since all arrays are of equal length)
             return list(zip(*extended_arrays))
+
         print("Starting {}.".format(frontier.get_name()), file=sys.stderr, flush=True)
         sub_plans = load_pickle_files("./plans")
         plan = merge_dict_arrays(sub_plans)
@@ -209,14 +218,14 @@ class SearchClient:
     @staticmethod
     def main(args) -> None:
         initial_state, heuristic, frontier = SearchClient.initialize_and_configure(args)
-        SearchClient.execute_and_print_plan(initial_state, frontier, heuristic, sys.stdin)
+        SearchClient.execute_and_print_plan(
+            initial_state, frontier, heuristic, sys.stdin
+        )
         # SearchClient.execute_and_print_hardcoded_plan(initial_state, frontier, heuristic, sys.stdin)
 
 
-debug = False
 fail_info = True
 if __name__ == "__main__":
-    handle_debug(debug)
 
     # Program arguments.
     parser = argparse.ArgumentParser(
@@ -237,7 +246,7 @@ if __name__ == "__main__":
         type=str,
         default="default",
         help="Name the file where the information will be stored.",
-        required=False
+        required=False,
     )
 
     parser.add_argument(
@@ -246,14 +255,21 @@ if __name__ == "__main__":
         type=str,
         default="./tests",
         help="Name the folder the files with the information will be stored.",
-        required=False
+        required=False,
+    )
+
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        default=False,
+        help="Enable debugging.",
     )
 
     parser.add_argument(
         "--profile",
         action="store_true",
         default=False,
-        help="Enable profiling with cProfile."
+        help="Enable profiling with cProfile.",
     )
 
     strategy_group = parser.add_mutually_exclusive_group()
@@ -310,10 +326,12 @@ if __name__ == "__main__":
 
     # Set max memory usage allowed (soft limit).
     memory.max_usage = args.max_memory
-
+    if args.debug:
+        handle_debug(True)
     if args.profile:
         import cProfile
         import pstats
+
         profiler = cProfile.Profile()
         profiler.enable()
 
@@ -322,5 +340,5 @@ if __name__ == "__main__":
 
     if args.profile:
         profiler.disable()
-        stats = pstats.Stats(profiler).sort_stats('cumulative')
-        stats.dump_stats('profile.prof')
+        stats = pstats.Stats(profiler).sort_stats("cumulative")
+        stats.dump_stats("profile.prof")
