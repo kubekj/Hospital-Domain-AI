@@ -65,8 +65,8 @@ class HeuristicComplexDijkstra(Heuristic):
             b
             for b_name in State.agent_box_dict[agent]
             for b in State.boxes[b_name]
-            if b_name in self.box_goal_positions
-            and self.box_goal_positions[self.box_goal_assigned_to_box[b][0]]
+            if b in self.box_goal_positions
+            and self.box_goal_positions[self.box_goal_assigned_to_box[b]]
             != state.box_locations[b]
         ]
 
@@ -95,7 +95,7 @@ class HeuristicComplexDijkstra(Heuristic):
                 self.get_distances(state, box_loc)[agent_loc.row][agent_loc.col] - 1
             )
         box_distance += self.get_distances(
-            state, self.box_goal_positions[self.box_goal_assigned_to_box[box][0]]
+            state, self.box_goal_positions[self.box_goal_assigned_to_box[box]]
         )[box_loc.row][box_loc.col]
         return box_distance
 

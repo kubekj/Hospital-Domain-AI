@@ -94,5 +94,13 @@
         "Generated": 7504,
         "Solution length": 42,
         "Time": 16.3206759999739
+    },
+    "test": {
+        "Passed": true,
+        "Expanded": 77,
+        "Frontier": 10,
+        "Generated": 87,
+        "Solution length": 13,
+        "Time": 0.01692289998754859
     }
 }
