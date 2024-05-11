@@ -4,25 +4,30 @@
     },
     "RoboMatic": {
         "Passed": true,
-        "Expanded": 17,
-        "Frontier": 647,
-        "Generated": 664,
-        "Solution length": 16,
-        "Time": 0.6351339000393637
+        "Expanded": 137,
+        "Frontier": 9,
+        "Generated": 146,
+        "Solution length": 13,
+        "Time": 0.3724035420018481
     },
     "Tryhard": {
-        "Passed": false
+        "Passed": true,
+        "Expanded": 44547,
+        "Frontier": 9093,
+        "Generated": 53640,
+        "Solution length": 31,
+        "Time": 143.09491137499936
     },
     "AIMASqln": {
         "Passed": false
     },
     "Sixty": {
         "Passed": true,
-        "Expanded": 1373,
-        "Frontier": 1401,
-        "Generated": 2774,
-        "Solution length": 33,
-        "Time": 6.20287899998948
+        "Expanded": 4327,
+        "Frontier": 1538,
+        "Generated": 5865,
+        "Solution length": 24,
+        "Time": 1.9303521670008195
     },
     "NHL": {
         "Passed": false
@@ -35,5 +40,21 @@
     },
     "Wallies": {
         "Passed": false
+    },
+    "minotaur": {
+        "Passed": true,
+        "Expanded": 105,
+        "Frontier": 101,
+        "Generated": 206,
+        "Solution length": 35,
+        "Time": 12.197052583000186
+    },
+    "TreOTres": {
+        "Passed": true,
+        "Expanded": 6683,
+        "Frontier": 256,
+        "Generated": 6939,
+        "Solution length": 42,
+        "Time": 2.4789533330003906
     }
 }
