@@ -24,6 +24,8 @@ class Move(Action):
         super().__init__(agt)
         self.agtfrom = agtfrom
         self.agtto = agtto
+        self.agt_old = encode_agent(agtfrom, agt)        
+        self.agt_new = encode_agent(agtto, agt)
 
     def __repr__(self) -> str:
         fr,fc = self.agtfrom
@@ -39,7 +41,7 @@ class Move(Action):
         - Free(agtto)
         """
         return (
-            encode_agent(self.agtfrom, self.agt) in literals[AtomType.AGENT_AT]
+            self.agt_old in literals[AtomType.AGENT_AT]
             and eval_neighbour(self.agtfrom, self.agtto)
             and eval_free(self.agtto, literals)
             # and Free(self.agtto) in literals
@@ -55,13 +57,10 @@ class Move(Action):
         - Not Free(agtto)
         """
         if skip_check or self.check_preconditions(literals):
-            old = encode_agent(self.agtfrom, self.agt)
-            new = encode_agent(self.agtto, self.agt)
-
             # ~AgentAt(agt,agtfrom)
-            literals[AtomType.AGENT_AT].remove(old)
+            literals[AtomType.AGENT_AT].remove(self.agt_old)
             # AgentAt(agt,agtto)
-            literals[AtomType.AGENT_AT].add(new)
+            literals[AtomType.AGENT_AT].add(self.agt_new)
             # ~Free(agtto)
             # Free(agtfrom)
             return literals
@@ -99,6 +98,10 @@ class Push(Action):
         self.agtfrom = agtfrom
         self.boxfrom = boxfrom
         self.boxto = boxto
+        self.agt_old = encode_agent(agtfrom, agt)        
+        self.agt_new = encode_agent(boxfrom, agt)        
+        self.box_old = encode_box(boxfrom, box)        
+        self.box_new = encode_box(boxto, box)
 
     def __repr__(self) -> str:
         afr,afc = self.agtfrom
@@ -117,8 +120,8 @@ class Push(Action):
         - Free(agtto)
         """
         return (
-            encode_agent(self.agtfrom, self.agt) in literals[AtomType.AGENT_AT] #Agent_at
-            and encode_box(self.boxfrom, self.box) in literals[AtomType.BOX_AT] #Box_at
+            self.agt_old in literals[AtomType.AGENT_AT] #Agent_at
+            and self.box_old in literals[AtomType.BOX_AT] #Box_at
             and eval_neighbour(self.agtfrom, self.boxfrom)
             and eval_neighbour(self.boxfrom, self.boxto)
             and eval_free(self.boxto, literals)
@@ -135,19 +138,14 @@ class Push(Action):
         - Not Free(boxfrom)
         """
         if skip_check or self.check_preconditions(literals):
-            agtgfrom = encode_agent(self.agtfrom, self.agt)
-            agtgto = encode_agent(self.boxfrom, self.agt)
-            boxfrom = encode_box(self.boxfrom, self.box)
-            boxto = encode_box(self.boxto, self.box)
-
             # ~AgentAt(agt,agtfrom)
-            literals[AtomType.AGENT_AT].remove(agtgfrom)
+            literals[AtomType.AGENT_AT].remove(self.agt_old)
             # AgentAt(agt,boxfrom)
-            literals[AtomType.AGENT_AT].add(agtgto)
+            literals[AtomType.AGENT_AT].add(self.agt_new)
             # ~BoxAt(box,boxfrom)
-            literals[AtomType.BOX_AT].remove(boxfrom)
+            literals[AtomType.BOX_AT].remove(self.box_old)
             # BoxAt(box,boxto)
-            literals[AtomType.BOX_AT].add(boxto)
+            literals[AtomType.BOX_AT].add(self.box_new)
             return literals
         else:
             raise Exception("Preconditions not satisfied for the Move action.")
@@ -196,6 +194,10 @@ class Pull(Action):
         self.agtto = agtto
         self.agtfrom = agtfrom
         self.boxfrom = boxfrom
+        self.agt_old = encode_agent(agtfrom, agt)        
+        self.agt_new = encode_agent(agtto, agt)        
+        self.box_old = encode_box(boxfrom, box)        
+        self.box_new = encode_box(agtfrom, box)
 
     def __repr__(self) -> str:
         atr,atc = self.agtto
@@ -214,10 +216,10 @@ class Pull(Action):
         - Free(agtto)
         """
         return (
-            encode_agent(self.agtfrom, self.agt) in literals[AtomType.AGENT_AT] #Agent_at
+            self.agt_old in literals[AtomType.AGENT_AT] #Agent_at
+            and self.box_old in literals[AtomType.BOX_AT] #Box_at
             and eval_neighbour(self.agtfrom, self.agtto)
             and eval_neighbour(self.agtfrom, self.boxfrom)
-            and encode_box(self.boxfrom, self.box) in literals[AtomType.BOX_AT] #Box_at
             and eval_free(self.agtto, literals)
             and self.agtto != self.agtfrom
         )
@@ -234,19 +236,14 @@ class Pull(Action):
         - Not Free(agtto)
         """
         if skip_check or self.check_preconditions(literals):
-            agtto = encode_agent(self.agtto, self.agt)
-            agtfrom = encode_agent(self.agtfrom, self.agt)
-            boxfrom = encode_box(self.boxfrom, self.box)
-            boxto = encode_box(self.agtfrom, self.box)
-
             # ~AgentAt(agt,agtfrom)
-            literals[AtomType.AGENT_AT].remove(agtfrom)
+            literals[AtomType.AGENT_AT].remove(self.agt_old)
             # AgentAt(agt,agtto)
-            literals[AtomType.AGENT_AT].add(agtto)
+            literals[AtomType.AGENT_AT].add(self.agt_new)
             # ~BoxAt(box,boxfrom)
-            literals[AtomType.BOX_AT].remove(boxfrom)
+            literals[AtomType.BOX_AT].remove(self.box_old)
             # BoxAt(box,boxto)
-            literals[AtomType.BOX_AT].add(boxto)
+            literals[AtomType.BOX_AT].add(self.box_new)
             return literals
         else:
             raise Exception("Preconditions not satisfied for the Move action.")

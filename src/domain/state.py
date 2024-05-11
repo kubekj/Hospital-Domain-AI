@@ -78,10 +78,11 @@ class State:
         for agent, action in enumerate(joint_action):
             if calc_results: 
                 copy_literals = action.apply_effects(copy_literals)
+            
             if isinstance(action, Move) and copy_lastMovedBox[agent] is not None:
                 copy_recalculateDistanceOfBox[agent] = copy_lastMovedBox[agent]
                 copy_lastMovedBox[agent] = None
-            if isinstance(action, Push) or isinstance(action, Pull):
+            elif getattr(action, 'box', None) is not None:
                 copy_lastMovedBox[agent] = action.box
             
         copy_state = State(copy_literals)
@@ -146,44 +147,45 @@ class State:
     def get_applicable_actions(self, agent: int) -> Action:
         agtfrom = self.agent_locations[agent]
         possibilities = []
-        possible_actions = [Action, Move, Push, Pull]
-
         agtfrom_neighbours = Location.get_neighbours(agtfrom)
-        for action in possible_actions:
-            if action is Move:
-                for agtto in agtfrom_neighbours:
-                    action = Move(agent, agtfrom, agtto)
+
+        # Move:
+        for agtto in agtfrom_neighbours:
+            action = Move(agent, agtfrom, agtto)
+            if self.is_applicable(action, self.literals):
+                possibilities.append(action)
+
+        # Push:
+        for boxfrom in agtfrom_neighbours:
+            boxes = [
+                box
+                for c in State.agent_box_dict[agent]
+                for box in State.boxes[c]
+                if encode_box(boxfrom, box) in self.literals[AtomType.BOX_AT]
+            ]
+            boxfrom_neighbours = Location.get_neighbours(boxfrom)
+            for box in boxes:
+                for boxto in boxfrom_neighbours:
+                    action = Push(agent, agtfrom, box, boxfrom, boxto)
                     if self.is_applicable(action, self.literals):
                         possibilities.append(action)
-            elif action is Push:
-                for boxfrom in agtfrom_neighbours:
-                    boxes = [
-                        box
-                        for c in State.agent_box_dict[agent]
-                        for box in State.boxes[c]
-                        if encode_box(boxfrom, box) in self.literals[AtomType.BOX_AT]
-                    ]
-                    boxfrom_neighbours = Location.get_neighbours(boxfrom)
-                    for box in boxes:
-                        for boxto in boxfrom_neighbours:
-                            action = Push(agent, agtfrom, box, boxfrom, boxto)
-                            if self.is_applicable(action, self.literals):
-                                possibilities.append(action)
-            elif action is Pull:
-                for boxfrom in agtfrom_neighbours:
-                    boxes = [
-                        box
-                        for c in State.agent_box_dict[agent]
-                        for box in State.boxes[c]
-                        if encode_box(boxfrom, box) in self.literals[AtomType.BOX_AT]
-                    ]
-                    for box in boxes:
-                        for agtto in agtfrom_neighbours:
-                            action = Pull(agent, agtfrom, agtto, box, boxfrom)
-                            if self.is_applicable(action, self.literals):
-                                possibilities.append(action)
-            elif action is Action:
-                possibilities.append(Action(agent))
+
+        # Pull:
+        for boxfrom in agtfrom_neighbours:
+            boxes = [
+                box
+                for c in State.agent_box_dict[agent]
+                for box in State.boxes[c]
+                if encode_box(boxfrom, box) in self.literals[AtomType.BOX_AT]
+            ]
+            for box in boxes:
+                for agtto in agtfrom_neighbours:
+                    action = Pull(agent, agtfrom, agtto, box, boxfrom)
+                    if self.is_applicable(action, self.literals):
+                        possibilities.append(action)
+
+        # Action:
+        possibilities.append(Action(agent))
 
         return possibilities
 
@@ -227,7 +229,7 @@ class State:
             return True
 
         if isinstance(other, State):
-            return self.literals[0] == other.literals[0] & self.literals[1] == other.literals[1]
+            return self.literals[0] == other.literals[0] and self.literals[1] == other.literals[1]
 
         return False
 

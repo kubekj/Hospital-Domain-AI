@@ -1,0 +1,25 @@
+#domain
+hospital
+#levelname
+IW_test
+#colors
+blue: 0, A
+#initial
+++++++++
++0A    +
++ A    +
++ A    +
++ A    +
++ A    +
++ A    +
+++++++++
+#goal
+++++++++
++     A+
++     A+
++     A+
++     A+
++     A+
++     A+
+++++++++
+#end

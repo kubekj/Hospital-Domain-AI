@@ -2,6 +2,7 @@ from typing import Tuple
 import numpy as np
 import src.domain.atom_type as AtomType
 from src.domain.domain_types import *
+from functools import cache
 
 class Location:
     all_neighbours: np.ndarray  # Use a 3D numpy array to store neighbour positions.
@@ -48,9 +49,6 @@ class Location:
         Location.walls = np.array(walls, dtype=bool)
         Location.calculate_neighbours()
 
-def encode_pos(row: int, col: int):
-    return (col << 18) | (row << 2)
-
 
 def encode_agent(loc: Tuple[int, int], agt) -> Atom:
     return encode_atom(AtomType.AGENT_AT, loc[0], loc[1], agt)
@@ -65,18 +63,18 @@ def encode_atom_pos(
 ) -> Atom:
     return encode_atom(atom_type, loc.row, loc.col, atom_label, box_extra_id)
 
-
+@cache
 def encode_atom(
-    atom_type: AtomType, row: int, col: int, atom_label: int = 0, box_extra_id: int = 0
+    atom_type: int, row: int, col: int, atom_label: int = 0, box_extra_id: int = 0
 ) -> Atom:
     """
     Encode an atom into a 64-bit integer.
-        Extra Data: 26 bits at bits 42-63
-        Box_ex ID:  4 bits at bits 38-41
-        atom label: 4 bits at bits 34-37
-        Column:     16 bits at bits 18-33
-        Row:        16 bits at bits 2-17
-        Atom Type:  2 bits at bits 0-1
+        Extra Data: 26 bits at bits 50-63
+        Atom Type:  2 bits at bits  48-49
+        Box_ex ID:  8 bits at bits  40-47
+        atom label: 8 bits at bits  32-39
+        Column:     16 bits at bits 16-31
+        Row:        16 bits at bits 0-15
 
     :param atom_type: AtomType, the type of the atom.
     :param row: int, the row index.
@@ -85,28 +83,31 @@ def encode_atom(
     :return: int, encoded 64-bit integer representing the atom.
     """
     return (
-        (box_extra_id << 42)
-        | (atom_label << 34)
-        | (col << 18)
-        | (row << 2)
-        | atom_type
+        (atom_type << 48)
+        | (box_extra_id << 40)
+        | (atom_label << 32)
+        | (col << 16)
+        | row
     )
 
+def encode_pos(row: int, col: int):
+    return (col << 16) | row
 
 def get_atom_type(encoded: Atom) -> int:
-    return encoded & 0x3
+    return encoded >> 48 & 0b11
 
+@cache
 def get_atom_location(encoded: Atom) -> tuple[int, int]:
-    row = (encoded >> 2) & 0xFFFF
-    col = (encoded >> 18) & 0xFFFF
+    row = encoded & 0xFFFF
+    col = (encoded >> 16) & 0xFFFF
     return row, col
 
 def get_atom_id(encoded: Atom) -> int:
-    return (encoded >> 34) & 0xFF
+    return (encoded >> 32) & 0xFF
 
 
 def get_box_extra_id(encoded: Atom) -> int:
-    return (encoded >> 42) & 0xFF
+    return (encoded >> 40) & 0xFF
 
 
 def get_box(encoded: Atom) -> Box:
@@ -129,6 +130,7 @@ def atom_repr(encoded: Atom) -> str:
     )
     return f"{atom_name}({atom_id}, Loc({row},{col}))"
 
+@cache
 def eval_neighbour(loc1: PosIn, loc2: PosIn) -> bool:
     row1, col1 = loc1
     row2, col2 = loc2
@@ -141,7 +143,7 @@ def eval_neighbour(loc1: PosIn, loc2: PosIn) -> bool:
 
 def eval_free(loc: PosIn, literals: LiteralList):
     loc_int = encode_pos(*loc)
-    x_at_locations = {lit & 0x3FFFF_FFFC for lit_type in literals for lit in lit_type}
+    x_at_locations = {lit & 0xFFFF_FFFF for lit_type in literals for lit in lit_type}
     return loc_int not in x_at_locations
     ## try, propaly wont work because of the type agent != box
     # return not literals[encoded]
