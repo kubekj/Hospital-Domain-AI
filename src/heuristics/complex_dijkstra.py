@@ -173,7 +173,7 @@ class HeuristicComplexDijkstra(Heuristic):
         for agent in agent_boxes:
             agent_loc = state.agent_locations[agent]
             agent_boxes[agent] = [
-                (box, self.calculate_distance(state, box, agent_loc))
+                (box, self.get_distances(state, agent_loc))
                 for box in self.get_agent_boxes(agent)
             ]
             agent_boxes[agent].sort(key=lambda x: x[1])
@@ -205,9 +205,6 @@ class HeuristicComplexDijkstra(Heuristic):
             for box_name in State.agent_box_dict[agent]
             for box in State.boxes[box_name]
         ]
-
-    def calculate_distance(self, state, box, agent_loc):
-        return self.distances[state.box_locations[box]][agent_loc[0]][agent_loc[1]]
 
     @staticmethod
     def get_eligible_agents(agent_boxes):
@@ -243,9 +240,9 @@ class HeuristicComplexDijkstra(Heuristic):
             goal_boxes[box_goal] = self.get_sorted_boxes_for_goal(state, box_goal)
         return goal_boxes
 
-    def get_sorted_boxes_for_goal(self, state: State, box_goal):
+    def get_sorted_boxes_for_goal(self, state: State, box_goal: Box):
         boxes_for_goal = [
-            (box, self.calculate_distance(state, box, box_goal))
+            (box, self.get_distances(state, self.box_goal_positions[box_goal]))
             for box in State.boxes[box_goal[0]]
         ]
         boxes_for_goal.sort(key=lambda x: x[1])
