@@ -95,6 +95,14 @@
         "Solution length": 42,
         "Time": 16.3206759999739
     },
+    "test-level-1": {
+        "Passed": true,
+        "Expanded": 19600,
+        "Frontier": 105,
+        "Generated": 19705,
+        "Solution length": 49,
+        "Time": 17.781595667001966
+    },
     "test": {
         "Passed": true,
         "Expanded": 77,
