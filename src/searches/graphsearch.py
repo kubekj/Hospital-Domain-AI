@@ -1,9 +1,12 @@
+from itertools import chain
 import json
 import os
 import os.path
 import sys
 import time
 
+from src.domain.atom import atom_repr, get_atom_location
+from src.domain.domain_types import Atom
 from src.frontiers.best_first import FrontierBestFirst
 from src.frontiers.frontier import Frontier
 from src.frontiers.iw import FrontierIW
@@ -17,8 +20,33 @@ from src.utils.info import Info
 start_time = time.perf_counter()
 saved_once = True
 
+def sort_by_y(x: Atom):
+    return get_atom_location(x)[0]
 
-def graph_search(initial_state: State, frontier: FrontierIW):
+def SIW(initial_state: State, frontier: FrontierIW):
+    current_state = initial_state
+    n_expl, n_front = 0, 0
+    
+    # goals = [sorted(a, key=sort_by_y) for a in initial_state.goal_literals]
+
+    size = len(initial_state.goal_literals[0]) + len(initial_state.goal_literals[1])
+    for i in range(1, size +1):
+        # State.goal_literals = (goals[0][:i], goals[1][:i])
+        print("#", frontier.size(), [atom_repr(a) for a in list(chain(*initial_state.goal_literals))[:i]])
+        state, explored, new_frontier = graph_search(current_state, frontier, i)
+        if not state: return None
+        current_state = state
+        n_expl += len(explored)
+        n_front += new_frontier.size()
+
+    print("#", n_expl, n_front, n_expl + n_front)
+
+    plan = current_state.extract_plan()
+    save_run_information(n_expl, n_front, plan)
+    return plan
+
+
+def graph_search(initial_state: State, frontier: FrontierIW, g: int | None = None):
     if not saved_once:
         save_run_information(None, None, None, {"Passed": False})
 
@@ -28,7 +56,7 @@ def graph_search(initial_state: State, frontier: FrontierIW):
 
     while True:
         iterations += 1
-        log_search_status(iterations, explored, frontier)
+        # log_search_status(iterations, explored, frontier)
         # print("#"+str(iterations),file=sys.stderr,flush=True,)
 
         if frontier.is_empty():
@@ -44,7 +72,9 @@ def graph_search(initial_state: State, frontier: FrontierIW):
         state = frontier.pop()
         explored.add(state)
 
-        if state.is_goal_state():
+        if state.is_goal_state(g):
+            if g is not None: 
+                return state, explored, frontier
             plan = state.extract_plan()
             save_run_information(explored, frontier, plan)
             return plan
@@ -101,7 +131,7 @@ def print_search_status(explored: set[State], frontier):
 
 
 def save_run_information(
-    explored: set[State], frontier, plan: list[list[Action]], information=None
+    explored: set[State] | int, frontier: Frontier | int, plan: list[list[Action]], information=None
 ):
     """
     This function saves the information about the current run of the search algorithm.
@@ -132,12 +162,14 @@ def save_run_information(
     all_data = deserialize_from_json_file(file_path)
 
     # If no additional information is provided, create a default dictionary.
+    n_expl = explored if isinstance(explored, int) else len(explored)
+    n_front = frontier if isinstance(frontier, int) else frontier.size()
     if information is None:
         information = {
             "Passed": True,
-            "Expanded": len(explored),
-            "Frontier": frontier.size(),
-            "Generated": len(explored) + frontier.size(),
+            "Expanded": n_expl,
+            "Frontier": n_front,
+            "Generated": n_expl + n_front,
             "Solution length": len(plan),
             "Time": elapsed_time,
         }

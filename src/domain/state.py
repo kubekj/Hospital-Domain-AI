@@ -14,7 +14,7 @@ class State:
     agent_colors = []
     box_colors = []
     agent_box_dict = {}
-    goal_literals: LiteralList = LiteralList_new()
+    goal_literals: GoalLiteralList = LiteralList_new()
 
     def __init__(self, literals: LiteralList):
         self.literals: LiteralList = literals
@@ -94,8 +94,8 @@ class State:
 
         return copy_state
 
-    def is_goal_state(self) -> bool:
-        return all(goal in self.literals[0] or goal in self.literals[1] for atom_type in self.goal_literals for goal in atom_type)
+    def is_goal_state(self, g: int = None) -> bool:
+        return all(goal in self.literals[0] or goal in self.literals[1] for atom_type in self.goal_literals for goal in atom_type[:g])
         # for atom_type in self.goal_literals:
         #     for goal in atom_type:
         #         if not (goal in self.literals[0] or goal in self.literals[1]):

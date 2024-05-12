@@ -6,5 +6,6 @@ Box = Tuple[int, int]
 Pos = NamedTuple("Pos", [("row", int), ("col", int)])
 PosIn = Pos | Tuple[int, int]
 LiteralList = Tuple[set[Atom]]
+GoalLiteralList = Tuple[list[Atom]]
 
 def LiteralList_new(): return (set(), set())

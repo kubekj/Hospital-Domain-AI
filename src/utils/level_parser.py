@@ -87,7 +87,7 @@ class Parser:
 
     @staticmethod
     def read_goal_state(server_messages):
-        goal_literals: LiteralList = LiteralList_new()
+        goal_literals = LiteralList_new()
         goal_boxes: dict[int, list[Box]] = {}
         line = server_messages.readline()
         row = 0
@@ -95,6 +95,7 @@ class Parser:
             Parser.populate_literals(goal_literals, line, row, boxes_dict=goal_boxes)
             row += 1
             line = server_messages.readline()
+        goal_literals = (list(goal_literals[0]), list(goal_literals[1]))
         return goal_literals, goal_boxes
 
     @staticmethod

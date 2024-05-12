@@ -15,7 +15,7 @@ from src.heuristics.manhattan import HeuristicManhattan
 from src.heuristics.simple import HeuristicSimple
 from src.heuristics.simple_dijkstra import HeuristicSimpleDijkstra
 from src.heuristics.wastar import HeuristicWeightedAStar
-from src.searches.graphsearch import Info, graph_search
+from src.searches.graphsearch import SIW, Info, graph_search
 from src.utils import memory
 from src.utils.info import handle_debug
 
@@ -105,7 +105,10 @@ class SearchClient:
     @staticmethod
     def execute_and_print_plan(initial_state, frontier, heuristic, server_messages):
         print("Starting {}.".format(frontier.get_name()), file=sys.stderr, flush=True)
-        plan = graph_search(initial_state, frontier)
+        if args.siw:
+            plan = SIW(initial_state, frontier)
+        else: 
+            plan = graph_search(initial_state, frontier)
 
         if plan is None:
             print("Unable to solve level.", file=sys.stderr, flush=True)
@@ -251,6 +254,13 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--profile",
+        action="store_true",
+        default=False,
+        help="Enable profiling with cProfile."
+    )
+
+    parser.add_argument(
+        "--siw",
         action="store_true",
         default=False,
         help="Enable profiling with cProfile."
