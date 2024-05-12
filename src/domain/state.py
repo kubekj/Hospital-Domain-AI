@@ -1,6 +1,6 @@
 import random
 
-from src.domain.atom import Atom, Box, Location, AtomType, Pos, atoms_by_type, atom_repr, encode_box, get_box_dict
+from src.domain.atom import IGNORE_BITS_MASK, Atom, Box, Location, AtomType, Pos, atoms_by_type, atom_repr, encode_box, get_box_dict
 from src.utils.color import Color
 from src.domain.action import Action, Move, Pull, Push
 
@@ -80,12 +80,10 @@ class State:
         return copy_state
 
     def is_goal_state(self) -> bool:
-        # b = [a in self.literals for a in self.goal_literals]
-        # if any(b):
-        #     print("#", [atom_repr(a) for a in self.goal_literals])
-        #     print("#", b)
+        # Remove unique box_id as only the color matters
+        masked_literals = {literal & IGNORE_BITS_MASK for literal in self.literals}
         for goal in self.goal_literals:
-            if goal not in self.literals:
+            if goal not in masked_literals:
                 return False
         return True
 

@@ -7,7 +7,7 @@ Box = Tuple[int, int]
 # Box = NamedTuple('Box', [('name', int), ('id', int)])
 Pos = NamedTuple("Pos", [("row", int), ("col", int)])
 # Pos = tuple[int, int]
-
+IGNORE_BITS_MASK = ~(0xFFFF << 42)
 
 class Location:
     all_neighbours: np.ndarray  # Use a 3D numpy array to store neighbour positions.
