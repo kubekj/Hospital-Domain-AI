@@ -161,7 +161,7 @@ class SearchClient:
                 server_messages.readline()
 
     @staticmethod
-    def recursive_splitting(sub_levels: List[LevelData]) -> List[LevelData]:
+    def iterative_splitting(sub_levels: List[LevelData]) -> List[LevelData]:
         to_process = sub_levels.copy()
         final_levels = []
 
@@ -184,7 +184,7 @@ class SearchClient:
         leveldata:LevelData = SearchClient.parse_level(server_messages)
         sub_levels: List[LevelData] = leveldata.segment_regions()
 
-        sub_levels = SearchClient.recursive_splitting(sub_levels)
+        sub_levels = SearchClient.iterative_splitting(sub_levels)
         # print("total-splitting: " + str(len(sub_levels)))
         print("total-splitting: " + str(len(sub_levels)), file=sys.stderr, flush=True)
 
