@@ -160,11 +160,33 @@ class SearchClient:
                 )
                 server_messages.readline()
 
+    @staticmethod
+    def recursive_splitting(sub_levels: List[LevelData]) -> List[LevelData]:
+        to_process = sub_levels.copy()
+        final_levels = []
+
+        while to_process:
+            current_level = to_process.pop(0)
+            current_level.convert_dead_boxes_to_walls()
+            new_levels = current_level.segment_regions()
+
+            if len(new_levels) == 1:
+                # No new segments were created, add to final levels
+                final_levels.append(current_level)
+            else:
+                # New segments were created, add them back to processing list
+                to_process.extend(new_levels)
+
+        return final_levels
 
     def SplitSearch(args, server_messages):
         #create all leveldatas
         leveldata:LevelData = SearchClient.parse_level(server_messages)
         sub_levels: List[LevelData] = leveldata.segment_regions()
+
+        sub_levels = SearchClient.recursive_splitting(sub_levels)
+        # print("total-splitting: " + str(len(sub_levels)))
+        print("total-splitting: " + str(len(sub_levels)), file=sys.stderr, flush=True)
 
         #do everything and create all plans from a-z, loop for all leveldatas
         #planCreationLoop
