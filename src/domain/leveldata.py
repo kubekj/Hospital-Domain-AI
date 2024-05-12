@@ -18,6 +18,8 @@ class LevelData:
         self.goal = goal if goal else []
 
         self.goals_list = {}
+        self.agent_mapping = {}
+
 
     def add_color(self, color, items):
         self.colors[color] = items
@@ -211,3 +213,35 @@ class LevelData:
 
         return new_levels
     # endregion flood fill
+
+    # region agent-normalizing
+    def normalize_agent_identifiers(self):
+        """
+        Renumber agents in self.colors, self.initial, and self.goal from 0 upwards based on their existing order,
+        ensuring the agents are in the lowest possible numerical order.
+        """
+        agent_map = {}
+        next_id = 0
+
+        # Extract all digits from self.colors and create a new sorted mapping starting from 0
+        for items in self.colors.values():
+            for item in items:
+                if item.isdigit() and item not in agent_map:
+                    agent_map[item] = str(next_id)
+                    next_id += 1
+
+        # Update the agents in self.colors with new identifiers
+        for color, items in self.colors.items():
+            self.colors[color] = [agent_map[item] if item in agent_map else item for item in items]
+
+        # Update agents in self.initial
+        for i, row in enumerate(self.initial):
+            self.initial[i] = [agent_map[cell] if cell in agent_map else cell for cell in row]
+
+        # Update agents in self.goal
+        for i, row in enumerate(self.goal):
+            self.goal[i] = [agent_map[cell] if cell in agent_map else cell for cell in row]
+
+        # Save the mapping for potential use by search algorithms to reverse the map if needed
+        self.agent_mapping = agent_map
+    # endregion agent-normalizing

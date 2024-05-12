@@ -6,6 +6,7 @@ from src.domain.leveldata import LevelData
 
 from src.domain.action import Action
 from src.domain.leveldata import LevelData
+from src.domain.state import State
 
 class Combiner:
     @staticmethod
@@ -40,3 +41,33 @@ class Combiner:
 
         return combined_plans
 
+    @staticmethod
+    def revert_plan_identifiers_listofactions(level_data, plan):
+        """
+        Reverts agent identifiers in a given plan using the agent_mapping from a LevelData object.
+
+        :param level_data: LevelData object containing agent_mapping for identifier conversion.
+        :param plan: List of actions (e.g., [Move(), Push(), Pull()...]) with updated agent identifiers.
+        :return: Modified plan with original agent identifiers.
+        """
+        if not hasattr(level_data, 'agent_mapping'):
+            raise AttributeError("LevelData object does not have an agent_mapping attribute")
+
+        # Create a reverse mapping from the new ID to the original ID
+        reverse_mapping = {new_id: old_id for old_id, new_id in level_data.agent_mapping.items()}
+
+        # Helper function to revert agent IDs in actions
+        def revert_agent_id(action):
+            original_id = reverse_mapping.get(str(action.agt), action.agt)
+            action.agt = int(original_id)
+            return action
+
+        # Process each action in the plan to revert agent IDs
+        reverted_plan = []
+        for action_list in plan:
+            reverted_actions = []
+            for action in action_list:
+                reverted_actions.append(revert_agent_id(action))
+            reverted_plan.append(reverted_actions)
+
+        return reverted_plan
