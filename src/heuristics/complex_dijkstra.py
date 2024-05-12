@@ -243,7 +243,7 @@ class HeuristicComplexDijkstra(Heuristic):
     def get_sorted_boxes_for_goal(self, state: State, box_goal: Box):
         boxes_for_goal = [
             (box, self.get_distances(state, self.box_goal_positions[box_goal])[state.box_locations[box].row][state.box_locations[box].col])
-            for box in State.boxes[box_goal[0]]
+            for box in State.boxes[box_goal[0]] if box_goal in self.box_goal_positions #HACK: introduced key-check
         ]
         boxes_for_goal.sort(key=lambda x: x[1])
         return boxes_for_goal
