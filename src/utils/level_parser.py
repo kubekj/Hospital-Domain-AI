@@ -1,18 +1,17 @@
 from typing import Tuple
-from src.domain.atom import encode_agent, Location, encode_box, AtomType
+from src.domain.atom import get_goal_dict, encode_agent, Location, encode_box, AtomType
 from src.domain.domain_types import LiteralList_new, Box, LiteralList
 from src.utils.color import Color
-
+from src.domain.leveldata import LevelData
 
 class Parser:
     @staticmethod
-    def read_colors(server_messages):
-        server_messages.readline()  # colors
+    def read_colors(leveldata: LevelData):
         agent_colors = [None] * 10
         box_colors = [None] * 26
         boxes = {}
-        line = server_messages.readline()
-        while not line.startswith("#"):
+        lines = leveldata.string_colors
+        for line in lines:
             split = line.split(":")
             color = Color.from_string(split[0].strip())
             entities = [e.strip() for e in split[1].split(",")]
@@ -24,7 +23,6 @@ class Parser:
                         boxes[e] = []
                     boxes[e].append((e, len(boxes[e])))
                     box_colors[ord(e) - ord("A")] = color
-            line = server_messages.readline()
         return agent_colors, box_colors, boxes
 
     @staticmethod
@@ -61,20 +59,16 @@ class Parser:
         return
 
     @staticmethod
-    def read_level(server_messages, agent_box_dict: dict[int, list[int]]):
+    def read_level(leveldata: LevelData, agent_box_dict: dict[int, list[int]]):
         literals: LiteralList = LiteralList_new()
         num_rows = 0
         num_cols = 0
         level_lines = []
-        line = server_messages.readline()
-        while not line.startswith("#"):
-            # extra trimming
-            last_plus_index = line.rfind("+")  # Finding the last index of '+'
-            line = line[:last_plus_index + 1]  # Slicing the string to keep everything up to the last '+'
+        lines = leveldata.string_initial
+        for line in lines:
             level_lines.append(line)
             num_cols = max(num_cols, len(line))
             num_rows += 1
-            line = server_messages.readline()
 
         walls = [[False] * num_cols for _ in range(num_rows)]
         boxes: dict[int, list[Box]] = {}
@@ -86,16 +80,16 @@ class Parser:
         return literals, num_rows, num_cols, walls, boxes
 
     @staticmethod
-    def read_goal_state(server_messages):
+    def read_goal_state(leveldata: LevelData):
         goal_literals = LiteralList_new()
         goal_boxes: dict[int, list[Box]] = {}
-        line = server_messages.readline()
+        lines = leveldata.string_goal        
         row = 0
-        while not line.startswith("#"):
+        for line in lines:
             Parser.populate_literals(goal_literals, line, row, boxes_dict=goal_boxes)
             row += 1
-            line = server_messages.readline()
-        goal_literals = (list(goal_literals[0]), list(goal_literals[1]))
+        # Remove unique box_id as only the color matters
+        goal_literals = (list(get_goal_dict(goal_literals[0])), list(get_goal_dict(goal_literals[1])))
         return goal_literals, goal_boxes
 
     @staticmethod

@@ -1,0 +1,38 @@
+#domain
+hospital
+#levelname
+TeamLARM
+#colors
+blue: 0, 6, A
+cyan: 1, B
+green: 2, C, E, F
+purple: 3, 7, D
+red: 4
+grey: 5, X, Y
+#initial
++++++++++++
++ 3C   D47+
+++++XAX++++
+++++   ++++
++0 +   +5X+
++ A+ 6 + Y+
+++++   ++++
+ +++X X+++++
+ +1A   B2  +
+ ++++E++++++
+    +F+
+    +++
+#goal
++++++++++++
++ B4   A3 +
+++++ A ++++
+++++   ++++
++  + 7 +  +
++ 0+ 6 + X+
+++++   ++++
+ +++   +++++
+ +1D   C2EF+
+ ++++ ++++++
+    + +
+    +++
+#end

@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-from src.domain.atom import Location, AtomType, atoms_by_type, Pos, Atom
+from src.domain.atom import Box, Location, AtomType, atoms_by_type, Pos, Atom, get_box_dict
 from src.domain.state import State
 
 # Goal count as a default heuristic
@@ -17,7 +17,7 @@ class Heuristic(metaclass=ABCMeta):
     FIRST_ERROR = False
 
     def __init__(self, initial_state: 'State'):
-        self.box_goal_positions = extract_goal_positions(AtomType.BOX_AT, initial_state)
+        self.box_goal_positions: dict[Box, Pos] = get_box_dict(initial_state.goal_literals, AtomType.BOX_AT)
         self.agent_goal_positions = extract_goal_positions(AtomType.AGENT_AT, initial_state)
         self.num_rows = len(Location.walls)
         self.num_cols = len(Location.walls[0])

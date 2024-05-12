@@ -4,6 +4,8 @@ import src.domain.atom_type as AtomType
 from src.domain.domain_types import *
 from functools import cache
 
+IGNORE_BITS_MASK = ~(0xFFF << 40)
+
 class Location:
     all_neighbours: np.ndarray  # Use a 3D numpy array to store neighbour positions.
     walls: np.ndarray
@@ -69,9 +71,9 @@ def encode_atom(
 ) -> Atom:
     """
     Encode an atom into a 64-bit integer.
-        Extra Data: 26 bits at bits 50-63
-        Atom Type:  2 bits at bits  48-49
-        Box_ex ID:  8 bits at bits  40-47
+        Extra Data: 10 bits at bits 54-63
+        Atom Type:  2 bits at bits  52-53
+        Box_ex ID:  12 bits at bits 40-51
         atom label: 8 bits at bits  32-39
         Column:     16 bits at bits 16-31
         Row:        16 bits at bits 0-15
@@ -83,7 +85,7 @@ def encode_atom(
     :return: int, encoded 64-bit integer representing the atom.
     """
     return (
-        (atom_type << 48)
+        (atom_type << 52)
         | (box_extra_id << 40)
         | (atom_label << 32)
         | (col << 16)
@@ -94,7 +96,7 @@ def encode_pos(row: int, col: int):
     return (col << 16) | row
 
 def get_atom_type(encoded: Atom) -> int:
-    return encoded >> 48 & 0b11
+    return encoded >> 52 & 0b11
 
 @cache
 def get_atom_location(encoded: Atom) -> tuple[int, int]:
@@ -107,7 +109,7 @@ def get_atom_id(encoded: Atom) -> int:
 
 
 def get_box_extra_id(encoded: Atom) -> int:
-    return (encoded >> 40) & 0xFF
+    return (encoded >> 40) & 0xFFF
 
 
 def get_box(encoded: Atom) -> Box:
@@ -153,3 +155,6 @@ def atoms_by_type(literals: LiteralList, kind: AtomType) -> dict[int, Pos]:
 
 def get_box_dict(literals: LiteralList, kind: AtomType) -> dict[Box, Pos]:
     return {get_box(lit): Pos(*get_atom_location(lit)) for lit in literals[kind]}
+
+def get_goal_dict(literals: set[Atom]):
+    return {lit & IGNORE_BITS_MASK for lit in literals}
