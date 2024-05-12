@@ -1,6 +1,6 @@
 import random
 
-from src.domain.atom import IGNORE_BITS_MASK, Atom, Box, Location, AtomType, Pos, atoms_by_type, atom_repr, encode_box, get_box_dict
+from src.domain.atom import get_goal_dict, Atom, Box, Location, AtomType, Pos, atoms_by_type, atom_repr, encode_box, get_box_dict
 from src.utils.color import Color
 from src.domain.action import Action, Move, Pull, Push
 
@@ -81,7 +81,7 @@ class State:
 
     def is_goal_state(self) -> bool:
         # Remove unique box_id as only the color matters
-        masked_literals = {literal & IGNORE_BITS_MASK for literal in self.literals}
+        masked_literals = get_goal_dict(self.literals)
         for goal in self.goal_literals:
             if goal not in masked_literals:
                 return False

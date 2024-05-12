@@ -1,5 +1,5 @@
 from typing import Tuple
-from src.domain.atom import IGNORE_BITS_MASK, Box, encode_agent, Location, Atom, encode_box
+from src.domain.atom import get_goal_dict, Box, encode_agent, Location, Atom, encode_box
 from src.utils.color import Color
 from src.domain.leveldata import LevelData
 
@@ -90,7 +90,7 @@ class Parser:
             Parser.populate_literals(goal_literals, line, row, boxes_dict=goal_boxes)
             row += 1
         # Remove unique box_id as only the color matters
-        goal_literals = {goal & IGNORE_BITS_MASK for goal in goal_literals}
+        goal_literals = get_goal_dict(goal_literals)
         return goal_literals, goal_boxes
 
     @staticmethod
