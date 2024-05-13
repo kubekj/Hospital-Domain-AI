@@ -134,8 +134,8 @@ def decode_atom(encoded: Atom) -> Tuple[AtomType, int, int, int]:
     atom_type = get_atom_type(encoded)
     row, col = get_atom_location(encoded)
     atom_id = get_atom_id(encoded)
-    # extra = (encoded >> 38) & 0x3FFFFFF
-    return atom_type, row, col, atom_id  # , extra
+    extra_id = get_box_extra_id(encoded)
+    return atom_type, row, col, atom_id , extra_id
 
 
 def atom_repr(encoded: Atom) -> str:

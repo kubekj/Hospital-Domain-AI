@@ -168,12 +168,13 @@ class HeuristicComplexDijkstra(Heuristic):
     def order_boxes(self, state: State) -> dict[Box, int]:
         paths = {}
         box_order = {}
-        for box_name, loc in self.box_goal_positions.items():
+        for box_goal, loc in self.box_goal_positions.items():
+            box = find_key_by_value(self.box_goal_assigned_to_box, box_goal)
             # Get shortest path from each goal to box
-            paths[box_name] = self.get_path(
+            paths[box_goal] = self.get_path(
                 self.create_mapping(state, loc.row, loc.col, len(Location.walls), len(Location.walls[0]), penalize_goals=True),
-                state.box_locations[box_name].row,
-                state.box_locations[box_name].col,
+                state.box_locations[self.box_goal_assigned_to_box[box]].row,
+                state.box_locations[self.box_goal_assigned_to_box[box]].col,
             )
         # For each goal, check whether the position of that goal lies in the shortest path between all other boxes and their goals
         goals = [(loc.row, loc.col) for box, loc in self.box_goal_positions.items()]
@@ -406,3 +407,9 @@ def is_box_close(agent_loc: Pos, box_loc: Pos):
     return (abs(agent_loc.row - box_loc.row) == 1 and agent_loc.col == box_loc.col) or (
         abs(agent_loc.col - box_loc.col) == 1 and agent_loc.row == box_loc.row
     )
+
+def find_key_by_value(dictionary: dict, value):
+    for key, val in dictionary.items():
+        if val == value:
+            return key
+    return None

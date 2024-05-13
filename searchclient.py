@@ -67,7 +67,7 @@ class SearchClient:
             return HeuristicSimple(initial_state)
 
     @staticmethod
-    def set_frontier_strategy(args, initial_state: State, heuristic, initialWidth=1):
+    def set_frontier_strategy(args, initial_state: State, heuristic, initialWidth=3):
         if args.bfs:
             return FrontierBFS()
         elif args.dfs:
@@ -237,14 +237,14 @@ class SearchClient:
         with open("plans/plan.pkl", "wb") as f:
             pickle.dump(plan, file=f)
         for ip, joint_action in enumerate(plan):
-            # states[ip + 1] = states[ip].result(joint_action)
+            states[ip + 1] = states[ip].result(joint_action)
             my_message = None
             
-            # my_message = (
-            #     # str(heuristic.f(states[ip + 1]))
-            #     # if isinstance(heuristic, HeuristicComplexDijkstra)
-            #     # else None
-            # )
+            my_message = (
+                str(heuristic.f(states[ip + 1]))
+                if isinstance(heuristic, HeuristicComplexDijkstra)
+                else None
+            )
             print(
                 "|".join(
                     a.get_name()
