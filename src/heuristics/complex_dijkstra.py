@@ -25,7 +25,6 @@ class HeuristicComplexDijkstra(Heuristic):
         self.box_goal_assigned_to_box = self.assign_boxes_to_goals(initial_state)
         self.agent_assigned_to_box = {agent: [box for box in boxes if box in self.box_goal_assigned_to_box] for (agent,boxes) in self.agent_assigned_to_box.items()}
         self.box_priority = self.calculate_box_priority(initial_state)
-        print('#', self.box_priority)
 
     def setup_choke_points(self):
         for row, row_walls in enumerate(Location.walls):
@@ -49,7 +48,6 @@ class HeuristicComplexDijkstra(Heuristic):
                     t[1].col
                 ]
             )
-        print('#', {box_tup[0]: to_sort(box_tup) for box_tup in flattenBoxes})
         sorted_boxes = sorted(
             flattenBoxes,
             key=to_sort,
@@ -171,11 +169,10 @@ class HeuristicComplexDijkstra(Heuristic):
         for box_name, loc in self.box_goal_positions.items():
             # Get shortest path from each goal to box
             paths[box_name] = self.get_path(
-                self.create_mapping(state, loc.row, loc.col, len(Location.walls), len(Location.walls[0]), penalize_box_goals=True),
+                self.create_mapping(state, loc.row, loc.col, len(Location.walls), len(Location.walls[0]), penalize_goals=True),
                 state.box_locations[box_name].row,
                 state.box_locations[box_name].col,
             )
-        print('#', paths[(0,0)])
         # For each goal, check whether the position of that goal lies in the shortest path between all other boxes and their goals
         goals = [(loc.row, loc.col) for box, loc in self.box_goal_positions.items()]
         for box, path in paths.items():
@@ -330,7 +327,7 @@ class HeuristicComplexDijkstra(Heuristic):
         return self.distances[position]
     
     def create_mapping(
-            self, state: State, row, col, num_rows, num_cols, take_boxes_into_account=False, penalize_box_goals = False
+            self, state: State, row, col, num_rows, num_cols, take_boxes_into_account=False, penalize_goals = False
     ) -> list[list[int | float]]:
         """
         Return a map of the shape [num_rows, num_cols] with every cell filled with the distance to the cell (row, col),
@@ -374,8 +371,8 @@ class HeuristicComplexDijkstra(Heuristic):
                     and not my_is_free(next_row, next_col)
                 ):
                     to_add = 1
-                    if penalize_box_goals:
-                        if Pos(next_row, next_col) in self.box_goal_positions.values():
+                    if penalize_goals:
+                        if Pos(next_row, next_col) in self.box_goal_positions.values() or Pos(next_row, next_col) in self.agent_goal_positions.values():
                             to_add = 2500
                     new_distance = (
                         current_distance + to_add
