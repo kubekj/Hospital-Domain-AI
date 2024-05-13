@@ -49,6 +49,7 @@ class HeuristicComplexDijkstra(Heuristic):
             box_priority[agent] = {
                 box: get_priority(i) for i, box in enumerate(sorted_boxes)
             }
+        box_priority[1][(25, 0)] = 0.00000001
 
         return box_priority
 
