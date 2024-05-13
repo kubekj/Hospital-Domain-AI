@@ -22,6 +22,7 @@ class HeuristicComplexDijkstra(Heuristic):
         self.setup_choke_points()
         self.agent_assigned_to_box = self.assign_boxes_to_agents(initial_state)
         self.box_goal_assigned_to_box = self.assign_boxes_to_goals(initial_state)
+        self.agent_assigned_to_box = {agent: [box for box in boxes if box in self.box_goal_assigned_to_box] for (agent,boxes) in self.agent_assigned_to_box.items()}
         self.box_priority = self.calculate_box_priority(initial_state)
 
     def setup_choke_points(self):
@@ -92,9 +93,7 @@ class HeuristicComplexDijkstra(Heuristic):
         if agent in self.agent_goal_positions:
             total_distance += self.get_distances(
                 state, self.agent_goal_positions[agent]
-            )[agent_loc.row][agent_loc.col] * get_priority(
-                len(self.agent_assigned_to_box[agent])
-            )
+            )[agent_loc.row][agent_loc.col] * 0.000000005
         return total_distance
 
     def calculate_box_distance(self, agent_loc, box_loc, state, box):
