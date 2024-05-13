@@ -113,10 +113,10 @@
     },
     "Tahini": {
         "Passed": true,
-        "Expanded": 76,
-        "Frontier": 235,
-        "Generated": 311,
-        "Solution length": 74,
-        "Time": 1.4631522870040499
+        "Expanded": 160,
+        "Frontier": 548,
+        "Generated": 708,
+        "Solution length": 126,
+        "Time": 0.07916610001120716
     }
 }
