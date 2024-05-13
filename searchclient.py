@@ -52,7 +52,7 @@ class SearchClient:
             return HeuristicSimple(initial_state)
 
     @staticmethod
-    def set_frontier_strategy(args, initial_state: State, heuristic, initialWidth=4):
+    def set_frontier_strategy(args, initial_state: State, heuristic, initialWidth=3):
         if args.bfs:
             return FrontierBFS()
         elif args.dfs:

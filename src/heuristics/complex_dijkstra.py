@@ -12,7 +12,6 @@ class HeuristicComplexDijkstra(Heuristic):
     def __init__(self, initial_state: State):
         super().__init__(initial_state)
         self.distances = None
-        self.paths = {}
         self.box_order = {}
         self.create_all_dijkstra_mappings(initial_state)
         self.choke_point_detection = [
@@ -24,6 +23,7 @@ class HeuristicComplexDijkstra(Heuristic):
         self.box_goal_assigned_to_box = self.assign_boxes_to_goals(initial_state)
         self.agent_assigned_to_box = {agent: [box for box in boxes if box in self.box_goal_assigned_to_box] for (agent,boxes) in self.agent_assigned_to_box.items()}
         self.box_priority = self.calculate_box_priority(initial_state)
+        print('#', self.box_priority)
 
     def setup_choke_points(self):
         for row, row_walls in enumerate(Location.walls):
@@ -32,25 +32,30 @@ class HeuristicComplexDijkstra(Heuristic):
                     self.name_choke_points(row, col, 0)
                     return
 
-    def calculate_box_priority(self, initial_state):
+    def calculate_box_priority(self, initial_state: State)-> dict[Box, float]:
         box_priority = {}
-        self.order_boxes(initial_state)
+        self.box_order = self.order_boxes(initial_state)
+        flattenBoxes: list[tuple[Box, Pos]] = []
         for agent, agent_boxes in self.agent_assigned_to_box.items():
             agent_loc = initial_state.agent_locations[agent]
-            sorted_boxes = sorted(
-                agent_boxes,
-                key=lambda b: (  # First sorting criterion: order from box_order
-                    -self.box_order[b],
-                    self.distances[initial_state.box_locations[b]][agent_loc.row][
-                        agent_loc.col
-                    ],  # Second sorting criterion: distance
-                ),
-            )
+            flattenBoxes += [(box,agent_loc) for box in agent_boxes]
 
-            box_priority[agent] = {
-                box: get_priority(i) for i, box in enumerate(sorted_boxes)
-            }
-        box_priority[1][(25, 0)] = 0.00000001
+        def to_sort(t: tuple[Box, Pos]) -> Tuple[int, int]:
+            return (
+                -self.box_order[t[0]],
+                self.distances[initial_state.box_locations[t[0]]][t[1].row][
+                    t[1].col
+                ]
+            )
+        print('#', {box_tup[0]: to_sort(box_tup) for box_tup in flattenBoxes})
+        sorted_boxes = sorted(
+            flattenBoxes,
+            key=to_sort,
+        )
+
+        box_priority = {
+            box_tup[0]: get_priority(i) for i, box_tup in enumerate(sorted_boxes)
+        }
 
         return box_priority
 
@@ -88,12 +93,14 @@ class HeuristicComplexDijkstra(Heuristic):
                 box_distance = self.calculate_box_distance(
                     agent_loc, box_loc, state, box
                 )
-                total_distance += box_distance * self.box_priority[agent][box]
+                total_distance += box_distance * self.box_priority[box]
 
         if agent in self.agent_goal_positions:
             total_distance += self.get_distances(
                 state, self.agent_goal_positions[agent]
-            )[agent_loc.row][agent_loc.col] * 0.000000005
+            )[agent_loc.row][agent_loc.col] * get_priority(
+                len(self.box_priority)
+            )
         return total_distance
 
     def calculate_box_distance(self, agent_loc, box_loc, state, box):
@@ -156,20 +163,23 @@ class HeuristicComplexDijkstra(Heuristic):
         for idx, (box, loc) in enumerate(state.box_locations.items()):
             self.get_distances(state=state, position=loc)
 
-    def order_boxes(self, state: State):
+    def order_boxes(self, state: State) -> dict[Box, int]:
+        paths = {}
+        box_order = {}
         for box_name, loc in self.box_goal_positions.items():
             # Get shortest path from each goal to box
-            self.paths[box_name] = self.get_path(
+            paths[box_name] = self.get_path(
                 self.distances[loc],
                 state.box_locations[box_name].row,
                 state.box_locations[box_name].col,
             )
         # For each goal, check whether the position of that goal lies in the shortest path between all other boxes and their goals
         goals = [(loc.row, loc.col) for box, loc in self.box_goal_positions.items()]
-        for box, path in self.paths.items():
+        for box, path in paths.items():
             # Looks whether any of the goals intersect
-            self.box_order[box] = len(set(path).intersection(set(goals)))
+            box_order[box] = len(set(path).intersection(set(goals)))
             # FOr each agent we update the box_priority
+        return box_order
 
     def assign_boxes_to_agents(self, state: State) -> dict[int, list[Box]]:
         agent_assigned_to_box = self.initialize_agent_box_dict()
