@@ -1,5 +1,7 @@
+import heapq
+import math
 from typing import Tuple
-from src.domain.atom import Atom, Box, Location, AtomType, Pos, atoms_by_type
+from src.domain.atom import Atom, Box, Location, AtomType, Pos, atoms_by_type, eval_free
 from src.domain.state import State
 from src.heuristics.heuristic import Heuristic
 from src.heuristics.manhattan import HeuristicManhattan
@@ -169,10 +171,11 @@ class HeuristicComplexDijkstra(Heuristic):
         for box_name, loc in self.box_goal_positions.items():
             # Get shortest path from each goal to box
             paths[box_name] = self.get_path(
-                self.distances[loc],
+                self.create_mapping(state, loc.row, loc.col, len(Location.walls), len(Location.walls[0]), penalize_box_goals=True),
                 state.box_locations[box_name].row,
                 state.box_locations[box_name].col,
             )
+        print('#', paths[(0,0)])
         # For each goal, check whether the position of that goal lies in the shortest path between all other boxes and their goals
         goals = [(loc.row, loc.col) for box, loc in self.box_goal_positions.items()]
         for box, path in paths.items():
@@ -317,7 +320,7 @@ class HeuristicComplexDijkstra(Heuristic):
 
     def get_distances(self, state: State, position: Pos):
         if position not in self.distances:
-            self.distances[position] = HeuristicSimpleDijkstra.create_mapping(
+            self.distances[position] = self.create_mapping(
                 state,
                 position.row,
                 position.col,
@@ -325,6 +328,64 @@ class HeuristicComplexDijkstra(Heuristic):
                 len(Location.walls[0]),
             )
         return self.distances[position]
+    
+    def create_mapping(
+            self, state: State, row, col, num_rows, num_cols, take_boxes_into_account=False, penalize_box_goals = False
+    ) -> list[list[int | float]]:
+        """
+        Return a map of the shape [num_rows, num_cols] with every cell filled with the distance to the cell (row, col),
+        calculated with the Dijkstra algorithm. If a cell (i,j) is a wall, which we know by State.walls[i][j] == true, then
+        the distance will be math.inf
+        """
+        distances: list[list[int | float]] = [
+            [math.inf] * num_cols for _ in range(num_rows)
+        ]
+
+        def my_is_free(row, col):
+            if take_boxes_into_account:
+                return eval_free(
+                    Location.all_locations(row, col), state.literals
+                )  # FIXME Broke?
+            else:
+                return Location.walls[row][col]
+
+        # Check if the initial position is a wall
+        if my_is_free(row, col):
+            return distances  # If the starting cell is a wall, return the distances as initialized
+
+        distances[row][col] = 0  # Distance to itself is 0
+
+        # Priority queue: (distance, (row, col))
+        queue = [(0, (row, col))]
+
+        # Directions for up, down, left, right movements
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+
+        while queue:
+            current_distance, (current_row, current_col) = heapq.heappop(queue)
+
+            for d_row, d_col in directions:
+                next_row, next_col = current_row + d_row, current_col + d_col
+
+                # Check boundaries and walls
+                if (
+                    0 <= next_row < num_rows
+                    and 0 <= next_col < num_cols
+                    and not my_is_free(next_row, next_col)
+                ):
+                    to_add = 1
+                    if penalize_box_goals:
+                        if Pos(next_row, next_col) in self.box_goal_positions.values():
+                            to_add = 2500
+                    new_distance = (
+                        current_distance + to_add
+                    )  # Distance to adjacent cells is always 1 more
+                    if new_distance < distances[next_row][next_col]:
+                        distances[next_row][next_col] = new_distance
+                        heapq.heappush(queue, (new_distance, (next_row, next_col)))
+
+        return distances
+
 
 
 def get_priority(i: int) -> float:

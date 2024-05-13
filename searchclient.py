@@ -52,7 +52,7 @@ class SearchClient:
             return HeuristicSimple(initial_state)
 
     @staticmethod
-    def set_frontier_strategy(args, initial_state: State, heuristic, initialWidth=3):
+    def set_frontier_strategy(args, initial_state: State, heuristic, initialWidth=1):
         if args.bfs:
             return FrontierBFS()
         elif args.dfs:
@@ -122,10 +122,10 @@ class SearchClient:
             )
             states: list[State] = [None] * (len(plan) + 1)
             states[0] = initial_state
-            heuristic = SearchClient.set_heuristic_strategy(args, initial_state)
-            frontier = SearchClient.set_frontier_strategy(
-                args, initial_state, heuristic
-            )
+            # heuristic = SearchClient.set_heuristic_strategy(args, initial_state)
+            # frontier = SearchClient.set_frontier_strategy(
+            #     args, initial_state, heuristic
+            # )
             with open("plans/plan.pkl", "wb") as f:
                 pickle.dump(plan, file=f)
             for ip, joint_action in enumerate(plan):
