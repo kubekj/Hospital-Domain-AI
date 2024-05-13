@@ -19,13 +19,15 @@ class HeuristicSimpleDijkstra(Heuristic):
                 initial_state, loc.row, loc.col, self.num_rows, self.num_cols
             )
 
-    def h(self, state: 'State') -> 'int':
+    def h(self, state: "State") -> "int":
         total_distance = 0
         for agent_index, agent_loc in state.agent_locations.items():
             agent = agent_index
             try:
                 if agent in self.distances_from_agent_goals:
-                    total_distance += self.distances_from_agent_goals[agent][agent_loc.row][agent_loc.col]
+                    total_distance += self.distances_from_agent_goals[agent][
+                        agent_loc.row
+                    ][agent_loc.col]
             except Exception as ex:
                 print(Info.level_name)
                 print(ex)
@@ -33,24 +35,30 @@ class HeuristicSimpleDijkstra(Heuristic):
                 break
         return total_distance
 
-    def f(self, state: 'State') -> 'int':
+    def f(self, state: "State") -> "int":
         return self.h(state)
 
     def __repr__(self):
         return "Dijkstra heuristic"
 
     @staticmethod
-    def create_mapping(state: State, row, col, num_rows, num_cols, take_boxes_into_account=False) -> list[list[int | float]]:
+    def create_mapping(
+        state: State, row, col, num_rows, num_cols, take_boxes_into_account=False
+    ) -> list[list[int | float]]:
         """
         Return a map of the shape [num_rows, num_cols] with every cell filled with the distance to the cell (row, col),
         calculated with the Dijkstra algorithm. If a cell (i,j) is a wall, which we know by State.walls[i][j] == true, then
         the distance will be math.inf
         """
-        distances:list[list[int | float]] = [[math.inf] * num_cols for _ in range(num_rows)]
+        distances: list[list[int | float]] = [
+            [math.inf] * num_cols for _ in range(num_rows)
+        ]
 
         def my_is_free(row, col):
             if take_boxes_into_account:
-                return eval_free(Location.all_locations(row, col), state.literals) #FIXME Broke?
+                return eval_free(
+                    Location.all_locations(row, col), state.literals
+                )  # FIXME Broke?
             else:
                 return Location.walls[row][col]
 
@@ -74,11 +82,13 @@ class HeuristicSimpleDijkstra(Heuristic):
 
                 # Check boundaries and walls
                 if (
-                        0 <= next_row < num_rows
-                        and 0 <= next_col < num_cols
-                        and not my_is_free(next_row, next_col)
+                    0 <= next_row < num_rows
+                    and 0 <= next_col < num_cols
+                    and not my_is_free(next_row, next_col)
                 ):
-                    new_distance = current_distance + 1  # Distance to adjacent cells is always 1 more
+                    new_distance = (
+                        current_distance + 1
+                    )  # Distance to adjacent cells is always 1 more
                     if new_distance < distances[next_row][next_col]:
                         distances[next_row][next_col] = new_distance
                         heapq.heappush(queue, (new_distance, (next_row, next_col)))

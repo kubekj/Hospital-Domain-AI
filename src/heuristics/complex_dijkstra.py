@@ -12,6 +12,8 @@ class HeuristicComplexDijkstra(Heuristic):
     def __init__(self, initial_state: State):
         super().__init__(initial_state)
         self.distances = None
+        self.paths = {}
+        self.box_order = {}
         self.create_all_dijkstra_mappings(initial_state)
         self.choke_point_detection = [
             [None] * self.num_cols for _ in range(self.num_rows)
@@ -31,17 +33,23 @@ class HeuristicComplexDijkstra(Heuristic):
 
     def calculate_box_priority(self, initial_state):
         box_priority = {}
+        self.order_boxes(initial_state)
         for agent, agent_boxes in self.agent_assigned_to_box.items():
             agent_loc = initial_state.agent_locations[agent]
             sorted_boxes = sorted(
                 agent_boxes,
-                key=lambda b: self.distances[initial_state.box_locations[b]][
-                    agent_loc.row
-                ][agent_loc.col],
+                key=lambda b: (  # First sorting criterion: order from box_order
+                    -self.box_order[b],
+                    self.distances[initial_state.box_locations[b]][agent_loc.row][
+                        agent_loc.col
+                    ],  # Second sorting criterion: distance
+                ),
             )
+
             box_priority[agent] = {
                 box: get_priority(i) for i, box in enumerate(sorted_boxes)
             }
+
         return box_priority
 
     def h(self, state: State) -> float | int:
@@ -100,7 +108,7 @@ class HeuristicComplexDijkstra(Heuristic):
         return box_distance
 
     def f(self, state: State) -> float | int:
-        return state.g + self.h(state)
+        return self.h(state)
 
     def __repr__(self):
         return "Dijkstra heuristic"
@@ -145,8 +153,23 @@ class HeuristicComplexDijkstra(Heuristic):
         for box_name, loc in self.box_goal_positions.items():
             self.get_distances(state=state, position=loc)
 
-        for box, loc in state.box_locations.items():
+        for idx, (box, loc) in enumerate(state.box_locations.items()):
             self.get_distances(state=state, position=loc)
+
+    def order_boxes(self, state: State):
+        for box_name, loc in self.box_goal_positions.items():
+            # Get shortest path from each goal to box
+            self.paths[box_name] = self.get_path(
+                self.distances[loc],
+                state.box_locations[box_name].row,
+                state.box_locations[box_name].col,
+            )
+        # For each goal, check whether the position of that goal lies in the shortest path between all other boxes and their goals
+        goals = [(loc.row, loc.col) for box, loc in self.box_goal_positions.items()]
+        for box, path in self.paths.items():
+            # Looks whether any of the goals intersect
+            self.box_order[box] = len(set(path).intersection(set(goals)))
+            # FOr each agent we update the box_priority
 
     def assign_boxes_to_agents(self, state: State) -> dict[int, list[Box]]:
         agent_assigned_to_box = self.initialize_agent_box_dict()
@@ -254,6 +277,33 @@ class HeuristicComplexDijkstra(Heuristic):
             goal_boxes[box_goal] = [
                 (b, t) for (b, t) in goal_boxes[box_goal] if b != new_box
             ]
+
+    def get_path(self, distances, start_row, start_col):
+        # Directions for movement: up, down, left, right
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        num_rows = len(distances)
+        num_cols = len(distances[0])
+
+        path = []
+        current_row, current_col = start_row, start_col
+
+        # Add the start position to the path
+        path.append((current_row, current_col))
+
+        # Continue until we find the cell with distance 0
+        while distances[current_row][current_col] != 0:
+            for d_row, d_col in directions:
+                next_row, next_col = current_row + d_row, current_col + d_col
+                if 0 <= next_row < num_rows and 0 <= next_col < num_cols:
+                    # Check if next cell has a smaller distance and is not inf
+                    if (
+                        distances[next_row][next_col]
+                        < distances[current_row][current_col]
+                    ):
+                        current_row, current_col = next_row, next_col
+                        path.append((current_row, current_col))
+                        break
+        return path
 
     def get_distances(self, state: State, position: Pos):
         if position not in self.distances:
