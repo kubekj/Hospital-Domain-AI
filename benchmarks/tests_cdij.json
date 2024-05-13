@@ -1,24 +1,13 @@
 {
-    "AgentWayz": {
-        "Passed": false
-    },
     "RoboMatic": {
         "Passed": true,
-        "Expanded": 137,
-        "Frontier": 9,
-        "Generated": 146,
+        "Expanded": 5141,
+        "Frontier": 2267,
+        "Generated": 7408,
         "Solution length": 13,
-        "Time": 0.3724035420018481
+        "Time": 13.35966208299942
     },
     "Tryhard": {
-        "Passed": true,
-        "Expanded": 44547,
-        "Frontier": 9093,
-        "Generated": 53640,
-        "Solution length": 31,
-        "Time": 143.09491137499936
-    },
-    "AIMASqln": {
         "Passed": false
     },
     "Sixty": {
@@ -27,19 +16,7 @@
         "Frontier": 1538,
         "Generated": 5865,
         "Solution length": 24,
-        "Time": 1.9303521670008195
-    },
-    "NHL": {
-        "Passed": false
-    },
-    "FastCipka": {
-        "Passed": false
-    },
-    "cbsSolve": {
-        "Passed": false
-    },
-    "Wallies": {
-        "Passed": false
+        "Time": 2.1928174999993644
     },
     "minotaur": {
         "Passed": true,
@@ -55,6 +32,6 @@
         "Frontier": 256,
         "Generated": 6939,
         "Solution length": 42,
-        "Time": 2.4789533330003906
+        "Time": 2.776644249999663
     }
 }

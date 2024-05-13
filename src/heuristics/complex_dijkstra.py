@@ -44,7 +44,7 @@ class HeuristicComplexDijkstra(Heuristic):
         def to_sort(t: tuple[Box, Pos]) -> Tuple[int, int]:
             return (
                 -self.box_order[t[0]],
-                self.distances[initial_state.box_locations[t[0]]][t[1].row][
+                self.get_distances(initial_state, initial_state.box_locations[t[0]])[t[1].row][
                     t[1].col
                 ]
             )
@@ -71,7 +71,7 @@ class HeuristicComplexDijkstra(Heuristic):
             boxes_not_in_goal = self.get_boxes_not_in_goal(agent, state)
             total_distance += self.calculate_total_distance(
                 agent, agent_loc, boxes_not_in_goal, state
-            )
+            ) 
 
         return total_distance
 
@@ -80,7 +80,9 @@ class HeuristicComplexDijkstra(Heuristic):
             b
             for b_name in State.agent_box_dict[agent]
             for b in State.boxes[b_name]
-            if b in self.box_goal_positions
+            if 
+            b in self.box_goal_assigned_to_box
+            and self.box_goal_assigned_to_box[b] in self.box_goal_positions
             and self.box_goal_positions[self.box_goal_assigned_to_box[b]]
             != state.box_locations[b]
         ]
@@ -206,7 +208,7 @@ class HeuristicComplexDijkstra(Heuristic):
         for agent in agent_boxes:
             agent_loc = state.agent_locations[agent]
             agent_boxes[agent] = [
-                (box, self.get_distances(state, agent_loc))
+                (box, self.get_distances(state, agent_loc)[state.box_locations[box].row][state.box_locations[box].col])
                 for box in self.get_agent_boxes(agent)
             ]
             agent_boxes[agent].sort(key=lambda x: x[1])
@@ -275,8 +277,8 @@ class HeuristicComplexDijkstra(Heuristic):
 
     def get_sorted_boxes_for_goal(self, state: State, box_goal: Box):
         boxes_for_goal = [
-            (box, self.get_distances(state, self.box_goal_positions[box_goal]))
-            for box in State.boxes[box_goal[0]]
+            (box, self.get_distances(state, self.box_goal_positions[box_goal])[state.box_locations[box].row][state.box_locations[box].col])
+            for box in State.boxes[box_goal[0]] if box_goal in self.box_goal_positions #HACK: introduced key-check
         ]
         boxes_for_goal.sort(key=lambda x: x[1])
         return boxes_for_goal

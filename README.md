@@ -69,6 +69,11 @@ java -jar ./server.jar -l ./levels/test3.lvl -c "python searchclient.py -iw -c_d
 
 java -jar ./server.jar -l ./complevels -c "python searchclient.py -iw -c_dij --test-name tests_cdij_improved --test-folder ./benchmarks" -t 300
 
+<<<<<<< HEAD
 java -jar ./server.jar -l ./complevels/SoftBoys.lvl -c "python searchclient.py -iw -c_dij" -g
+=======
+java -jar ./server.jar -l ./complevels/AgentWayz.lvl -c "python searchclient.py -iw -c_dij" -g
+java -jar ./server.jar -l ./levels/test.lvl -c "python searchclient.py -iw -c_dij" -g
+>>>>>>> dijkstraSplit
 ```
 

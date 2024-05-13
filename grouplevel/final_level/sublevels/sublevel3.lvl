@@ -1,0 +1,19 @@
+#domain
+hospital
+#levelname
+sublevel3
+#colors
+green: 0, A, B
+#initial
+++++++++++++++++++
++A   B      B    +
++    B      B    +
++    B      B   0+
+++++++++++++++++++
+#goal
+++++++++++++++++++
++0   B      B    +
++    B      B    +
++    B      B   A+
+++++++++++++++++++
+#end

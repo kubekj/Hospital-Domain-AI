@@ -1,11 +1,11 @@
 {
     "SACrunch": {
         "Passed": true,
-        "Expanded": 988,
-        "Frontier": 130,
-        "Generated": 1118,
-        "Solution length": 45,
-        "Time": 0.42135180000332184
+        "Expanded": 21900,
+        "Frontier": 3027,
+        "Generated": 24927,
+        "Solution length": 43,
+        "Time": 8.670968399999765
     },
     "test3": {
         "Passed": true,
@@ -89,22 +89,127 @@
     },
     "MAPFreorder": {
         "Passed": true,
-        "Expanded": 6253,
-        "Frontier": 1251,
-        "Generated": 7504,
-        "Solution length": 42,
-        "Time": 16.3206759999739
+        "Expanded": 17747,
+        "Frontier": 3127,
+        "Generated": 20874,
+        "Solution length": 28,
+        "Time": 66.50283039999977
     },
-    "test-level-1": {
+    "BFSfriendly-1": {
         "Passed": true,
-        "Expanded": 19600,
-        "Frontier": 105,
-        "Generated": 19705,
-        "Solution length": 49,
-        "Time": 17.781595667001966
+        "Expanded": 3,
+        "Frontier": 1,
+        "Generated": 4,
+        "Solution length": 2,
+        "Time": 0.009005599975353107
+    },
+    "BFSfriendly-2": {
+        "Passed": true,
+        "Expanded": 3,
+        "Frontier": 1,
+        "Generated": 4,
+        "Solution length": 2,
+        "Time": 0.008035400009248406
+    },
+    "BFSfriendly-3": {
+        "Passed": true,
+        "Expanded": 3,
+        "Frontier": 1,
+        "Generated": 4,
+        "Solution length": 2,
+        "Time": 0.007095900014974177
+    },
+    "BFSfriendly-4": {
+        "Passed": true,
+        "Expanded": 3,
+        "Frontier": 1,
+        "Generated": 4,
+        "Solution length": 2,
+        "Time": 0.007970300008310005
+    },
+    "BFSfriendly-5": {
+        "Passed": true,
+        "Expanded": 3,
+        "Frontier": 1,
+        "Generated": 4,
+        "Solution length": 2,
+        "Time": 0.008995800017146394
+    },
+    "MAPF00": {
+        "Passed": true,
+        "Expanded": 46,
+        "Frontier": 2,
+        "Generated": 48,
+        "Solution length": 14,
+        "Time": 0.014376700011780486
+    },
+    "MAPF01": {
+        "Passed": true,
+        "Expanded": 73,
+        "Frontier": 8,
+        "Generated": 81,
+        "Solution length": 15,
+        "Time": 0.027991499984636903
+    },
+    "MAPF02": {
+        "Passed": true,
+        "Expanded": 139,
+        "Frontier": 2,
+        "Generated": 141,
+        "Solution length": 14,
+        "Time": 0.45995619997847825
+    },
+    "MAPF02B": {
+        "Passed": true,
+        "Expanded": 124,
+        "Frontier": 7,
+        "Generated": 131,
+        "Solution length": 14,
+        "Time": 0.054758100013714284
+    },
+    "MAPF02C": {
+        "Passed": true,
+        "Expanded": 78,
+        "Frontier": 16,
+        "Generated": 94,
+        "Solution length": 15,
+        "Time": 0.13171189999980015
+    },
+    "MAPF03": {
+        "Passed": true,
+        "Expanded": 179,
+        "Frontier": 4,
+        "Generated": 183,
+        "Solution length": 14,
+        "Time": 2.0812055999999757
+    },
+    "MAPF03B": {
+        "Passed": true,
+        "Expanded": 164,
+        "Frontier": 6,
+        "Generated": 170,
+        "Solution length": 14,
+        "Time": 0.06472030000008999
+    },
+    "MAPF03C": {
+        "Passed": true,
+        "Expanded": 37,
+        "Frontier": 47,
+        "Generated": 84,
+        "Solution length": 16,
+        "Time": 0.3047139000000243
+    },
+    "SAFirefly": {
+        "Passed": true,
+        "Expanded": 7812,
+        "Frontier": 793,
+        "Generated": 8605,
+        "Solution length": 60,
+        "Time": 2.023788699999386
     },
     "test": {
         "Passed": true,
+<<<<<<< HEAD
         "Expanded": 1694,
         "Frontier": 1623,
         "Generated": 3317,
@@ -118,5 +223,20 @@
         "Generated": 18849,
         "Solution length": 538,
         "Time": 15.625680200057104
+=======
+        "Expanded": 18,
+        "Frontier": 0,
+        "Generated": 18,
+        "Solution length": 13,
+        "Time": 0.013133100000231934
+    },
+    "test2": {
+        "Passed": true,
+        "Expanded": 7,
+        "Frontier": 2,
+        "Generated": 9,
+        "Solution length": 3,
+        "Time": 0.009028399999806425
+>>>>>>> dijkstraSplit
     }
 }

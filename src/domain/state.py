@@ -1,6 +1,6 @@
 import random
 
-from src.domain.atom import Atom, Box, Location, AtomType, Pos, atoms_by_type, atom_repr, encode_box, get_box_dict
+from src.domain.atom import get_goal_dict, Atom, Box, Location, AtomType, Pos, atoms_by_type, atom_repr, encode_box, get_box_dict
 from src.utils.color import Color
 from src.domain.action import Action, Move, Pull, Push
 
@@ -28,14 +28,14 @@ class State:
         self.recalculateDistanceOfBox: list[Box] = [None] * len(self.agent_locations)
 
     @staticmethod
-    def make_initial_state(server_messages):
-        agent_colors, box_colors, boxes = Parser.read_colors(server_messages)
+    def make_initial_state(leveldata):
+        agent_colors, box_colors, boxes = Parser.read_colors(leveldata)
 
         State.agent_colors:list[str] = [a for a in agent_colors if a is not None]
         State.box_colors:list[str] =  [a for a in box_colors if a is not None] 
         State.agent_box_dict = Parser.create_agent_box_dict(agent_colors, box_colors)
 
-        literals, num_rows, num_cols, walls, boxes_dict = Parser.read_level(server_messages, State.agent_box_dict)
+        literals, num_rows, num_cols, walls, boxes_dict = Parser.read_level(leveldata, State.agent_box_dict)
         agent_locations: dict[Atom, Pos] = atoms_by_type(literals, AtomType.AGENT_AT)
         # Prune agents for which color is defined but are not in the map
         for agent in list(State.agent_box_dict.keys()):
@@ -46,7 +46,7 @@ class State:
             for box in State.agent_box_dict[agent]:
                 if box not in boxes_dict:
                     State.agent_box_dict[agent].remove(box)
-        goal_literals, goal_boxes_dict = Parser.read_goal_state(server_messages)
+        goal_literals, goal_boxes_dict = Parser.read_goal_state(leveldata)
         State.boxes = boxes_dict
         State.boxgoals = goal_boxes_dict
 
@@ -80,12 +80,10 @@ class State:
         return copy_state
 
     def is_goal_state(self) -> bool:
-        # b = [a in self.literals for a in self.goal_literals]
-        # if any(b):
-        #     print("#", [atom_repr(a) for a in self.goal_literals])
-        #     print("#", b)
+        # Remove unique box_id as only the color matters
+        masked_literals = get_goal_dict(self.literals)
         for goal in self.goal_literals:
-            if goal not in self.literals:
+            if goal not in masked_literals:
                 return False
         return True
 

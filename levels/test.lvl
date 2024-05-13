@@ -3,9 +3,10 @@ hospital
 #levelname
 test
 #colors
-blue: 0,A,B
+blue: 0,Z,Y
 #initial
 +++++++++++++
+<<<<<<< HEAD
 +     +     +
 +B 0A       +
 +     +     +
@@ -16,4 +17,16 @@ blue: 0,A,B
 +  0  A    B+
 +     +     +
 +++++++++++++    
+=======
++Z  Y  0 Z  +
++           +
++++++++++++++
+          +++
+#goal
++++++++++++++
++      Y   Z+
++           +
++++++++++++++
+          +++
+>>>>>>> dijkstraSplit
 #end

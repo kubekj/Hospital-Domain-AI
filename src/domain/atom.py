@@ -7,7 +7,7 @@ Box = Tuple[int, int]
 # Box = NamedTuple('Box', [('name', int), ('id', int)])
 Pos = NamedTuple("Pos", [("row", int), ("col", int)])
 # Pos = tuple[int, int]
-
+IGNORE_BITS_MASK = ~(0xFFF << 42)
 
 class Location:
     all_neighbours: np.ndarray  # Use a 3D numpy array to store neighbour positions.
@@ -87,9 +87,9 @@ def encode_atom(
 ) -> Atom:
     """
     Encode an atom into a 64-bit integer.
-        Extra Data: 26 bits at bits 42-63
-        Box_ex ID:  4 bits at bits 38-41
-        atom label: 4 bits at bits 34-37
+        Extra Data: 10 bits at bits 54-63
+        Box_ex ID:  12 bits at bits 42-54
+        atom label: 8 bits at bits 34-41
         Column:     16 bits at bits 18-33
         Row:        16 bits at bits 2-17
         Atom Type:  2 bits at bits 0-1
@@ -123,7 +123,7 @@ def get_atom_id(encoded: int) -> int:
 
 
 def get_box_extra_id(encoded: int) -> int:
-    return (encoded >> 42) & 0xFF
+    return (encoded >> 42) & 0xFFF
 
 
 def get_box(encoded: int) -> Box:
@@ -177,3 +177,7 @@ def get_box_dict(literals: set[Atom], kind: AtomType) -> dict[Box, Pos]:
     kind_value = kind.value
     filtered_literals = filter(lambda x: get_atom_type(x) == kind_value, literals)
     return {get_box(lit): Pos(*get_atom_location(lit)) for lit in filtered_literals}
+
+
+def get_goal_dict(literals: set[Atom]):
+    return {lit & IGNORE_BITS_MASK for lit in literals}
