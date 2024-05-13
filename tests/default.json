@@ -1,18 +1,42 @@
 {
     "Tahini": {
         "Passed": true,
-        "Expanded": 2105,
-        "Frontier": 18096,
-        "Generated": 20201,
-        "Solution length": 476,
-        "Time": 6.193974600057118
+        "Expanded": 6063,
+        "Frontier": 27758,
+        "Generated": 33821,
+        "Solution length": 462,
+        "Time": 19.34320869197836
     },
     "test": {
         "Passed": true,
-        "Expanded": 14,
-        "Frontier": 22,
-        "Generated": 36,
-        "Solution length": 13,
-        "Time": 0.00827919994480908
+        "Expanded": 52,
+        "Frontier": 70,
+        "Generated": 122,
+        "Solution length": 9,
+        "Time": 1.0503713990328833
+    },
+    "SACrunch": {
+        "Passed": true,
+        "Expanded": 49,
+        "Frontier": 67,
+        "Generated": 116,
+        "Solution length": 45,
+        "Time": 1.316120394039899
+    },
+    "Sixty": {
+        "Passed": true,
+        "Expanded": 26,
+        "Frontier": 341,
+        "Generated": 367,
+        "Solution length": 24,
+        "Time": 1.2658876740024425
+    },
+    "MAPFreorder": {
+        "Passed": true,
+        "Expanded": 6885,
+        "Frontier": 939,
+        "Generated": 7824,
+        "Solution length": 35,
+        "Time": 18.585710141051095
     }
 }

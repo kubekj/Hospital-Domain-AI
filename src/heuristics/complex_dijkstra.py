@@ -23,7 +23,10 @@ class HeuristicComplexDijkstra(Heuristic):
         self.setup_choke_points()
         self.agent_assigned_to_box = self.assign_boxes_to_agents(initial_state)
         self.box_goal_assigned_to_box = self.assign_boxes_to_goals(initial_state)
-        self.agent_assigned_to_box = {agent: [box for box in boxes if box in self.box_goal_assigned_to_box] for (agent,boxes) in self.agent_assigned_to_box.items()}
+        self.agent_assigned_to_box = {
+            agent: [box for box in boxes if box in self.box_goal_assigned_to_box]
+            for (agent, boxes) in self.agent_assigned_to_box.items()
+        }
         self.box_priority = self.calculate_box_priority(initial_state)
 
     def setup_choke_points(self):
@@ -33,21 +36,22 @@ class HeuristicComplexDijkstra(Heuristic):
                     self.name_choke_points(row, col, 0)
                     return
 
-    def calculate_box_priority(self, initial_state: State)-> dict[Box, float]:
+    def calculate_box_priority(self, initial_state: State) -> dict[Box, float]:
         box_priority = {}
         self.box_order = self.order_boxes(initial_state)
         flattenBoxes: list[tuple[Box, Pos]] = []
         for agent, agent_boxes in self.agent_assigned_to_box.items():
             agent_loc = initial_state.agent_locations[agent]
-            flattenBoxes += [(box,agent_loc) for box in agent_boxes]
+            flattenBoxes += [(box, agent_loc) for box in agent_boxes]
 
         def to_sort(t: tuple[Box, Pos]) -> Tuple[int, int]:
             return (
                 -self.box_order[t[0]],
-                self.get_distances(initial_state, initial_state.box_locations[t[0]])[t[1].row][
-                    t[1].col
-                ]
+                self.get_distances(initial_state, initial_state.box_locations[t[0]])[
+                    t[1].row
+                ][t[1].col],
             )
+
         sorted_boxes = sorted(
             flattenBoxes,
             key=to_sort,
@@ -56,6 +60,7 @@ class HeuristicComplexDijkstra(Heuristic):
         box_priority = {
             box_tup[0]: get_priority(i) for i, box_tup in enumerate(sorted_boxes)
         }
+        print(box_priority)
 
         return box_priority
 
@@ -71,7 +76,7 @@ class HeuristicComplexDijkstra(Heuristic):
             boxes_not_in_goal = self.get_boxes_not_in_goal(agent, state)
             total_distance += self.calculate_total_distance(
                 agent, agent_loc, boxes_not_in_goal, state
-            ) 
+            )
 
         return total_distance
 
@@ -80,8 +85,7 @@ class HeuristicComplexDijkstra(Heuristic):
             b
             for b_name in State.agent_box_dict[agent]
             for b in State.boxes[b_name]
-            if 
-            b in self.box_goal_assigned_to_box
+            if b in self.box_goal_assigned_to_box
             and self.box_goal_assigned_to_box[b] in self.box_goal_positions
             and self.box_goal_positions[self.box_goal_assigned_to_box[b]]
             != state.box_locations[b]
@@ -100,9 +104,7 @@ class HeuristicComplexDijkstra(Heuristic):
         if agent in self.agent_goal_positions:
             total_distance += self.get_distances(
                 state, self.agent_goal_positions[agent]
-            )[agent_loc.row][agent_loc.col] * get_priority(
-                len(self.box_priority)
-            )
+            )[agent_loc.row][agent_loc.col] * get_priority(len(self.box_priority))
         return total_distance
 
     def calculate_box_distance(self, agent_loc, box_loc, state, box):
@@ -172,7 +174,14 @@ class HeuristicComplexDijkstra(Heuristic):
             box = find_key_by_value(self.box_goal_assigned_to_box, box_goal)
             # Get shortest path from each goal to box
             paths[box_goal] = self.get_path(
-                self.create_mapping(state, loc.row, loc.col, len(Location.walls), len(Location.walls[0]), penalize_goals=True),
+                self.create_mapping(
+                    state,
+                    loc.row,
+                    loc.col,
+                    len(Location.walls),
+                    len(Location.walls[0]),
+                    penalize_goals=True,
+                ),
                 state.box_locations[self.box_goal_assigned_to_box[box]].row,
                 state.box_locations[self.box_goal_assigned_to_box[box]].col,
             )
@@ -182,6 +191,7 @@ class HeuristicComplexDijkstra(Heuristic):
             # Looks whether any of the goals intersect
             box_order[box] = len(set(path).intersection(set(goals)))
             # FOr each agent we update the box_priority
+            print(box_order)
         return box_order
 
     def assign_boxes_to_agents(self, state: State) -> dict[int, list[Box]]:
@@ -209,10 +219,16 @@ class HeuristicComplexDijkstra(Heuristic):
         for agent in agent_boxes:
             agent_loc = state.agent_locations[agent]
             agent_boxes[agent] = [
-                (box, self.get_distances(state, agent_loc)[state.box_locations[box].row][state.box_locations[box].col])
+                (
+                    box,
+                    self.get_distances(state, agent_loc)[state.box_locations[box].row][
+                        state.box_locations[box].col
+                    ],
+                )
                 for box in self.get_agent_boxes(agent)
             ]
             agent_boxes[agent].sort(key=lambda x: x[1])
+        print(agent_boxes)
         return agent_boxes
 
     @staticmethod
@@ -278,8 +294,14 @@ class HeuristicComplexDijkstra(Heuristic):
 
     def get_sorted_boxes_for_goal(self, state: State, box_goal: Box):
         boxes_for_goal = [
-            (box, self.get_distances(state, self.box_goal_positions[box_goal])[state.box_locations[box].row][state.box_locations[box].col])
-            for box in State.boxes[box_goal[0]] if box_goal in self.box_goal_positions #HACK: introduced key-check
+            (
+                box,
+                self.get_distances(state, self.box_goal_positions[box_goal])[
+                    state.box_locations[box].row
+                ][state.box_locations[box].col],
+            )
+            for box in State.boxes[box_goal[0]]
+            if box_goal in self.box_goal_positions  # HACK: introduced key-check
         ]
         boxes_for_goal.sort(key=lambda x: x[1])
         return boxes_for_goal
@@ -328,9 +350,16 @@ class HeuristicComplexDijkstra(Heuristic):
                 len(Location.walls[0]),
             )
         return self.distances[position]
-    
+
     def create_mapping(
-            self, state: State, row, col, num_rows, num_cols, take_boxes_into_account=False, penalize_goals = False
+        self,
+        state: State,
+        row,
+        col,
+        num_rows,
+        num_cols,
+        take_boxes_into_account=False,
+        penalize_goals=False,
     ) -> list[list[int | float]]:
         """
         Return a map of the shape [num_rows, num_cols] with every cell filled with the distance to the cell (row, col),
@@ -375,8 +404,12 @@ class HeuristicComplexDijkstra(Heuristic):
                 ):
                     to_add = 1
                     if penalize_goals:
-                        if Pos(next_row, next_col) in self.box_goal_positions.values() or Pos(next_row, next_col) in self.agent_goal_positions.values():
-                            to_add = 2500
+                        if (
+                            Pos(next_row, next_col) in self.box_goal_positions.values()
+                            or Pos(next_row, next_col)
+                            in self.agent_goal_positions.values()
+                        ):
+                            to_add = 2
                     new_distance = (
                         current_distance + to_add
                     )  # Distance to adjacent cells is always 1 more
@@ -385,7 +418,6 @@ class HeuristicComplexDijkstra(Heuristic):
                         heapq.heappush(queue, (new_distance, (next_row, next_col)))
 
         return distances
-
 
 
 def get_priority(i: int) -> float:
@@ -407,6 +439,7 @@ def is_box_close(agent_loc: Pos, box_loc: Pos):
     return (abs(agent_loc.row - box_loc.row) == 1 and agent_loc.col == box_loc.col) or (
         abs(agent_loc.col - box_loc.col) == 1 and agent_loc.row == box_loc.row
     )
+
 
 def find_key_by_value(dictionary: dict, value):
     for key, val in dictionary.items():
