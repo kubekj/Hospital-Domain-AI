@@ -1,7 +1,6 @@
 from itertools import combinations
-import sys
 
-from src.frontiers.best_first import FrontierBestFirst
+from src.frontiers.baseline.best_first import FrontierBestFirst
 from src.heuristics.heuristic import Heuristic
 from src.domain.state import State
 

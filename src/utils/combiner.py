@@ -1,12 +1,9 @@
 
 from typing import Dict, List
-from src.domain.action import Action
-from src.domain.leveldata import LevelData
-
 
 from src.domain.action import Action
 from src.domain.leveldata import LevelData
-from src.domain.state import State
+
 
 class Combiner:
     @staticmethod

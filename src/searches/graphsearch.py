@@ -4,8 +4,7 @@ import os.path
 import sys
 import time
 
-from src.frontiers.best_first import FrontierBestFirst
-from src.frontiers.frontier import Frontier
+from src.frontiers.baseline.best_first import FrontierBestFirst
 from src.frontiers.iw import FrontierIW
 
 from src.domain.state import State
@@ -49,7 +48,6 @@ def graph_search(initial_state: State, frontier: FrontierIW):
             save_run_information(explored, frontier, plan)
             return plan
 
-        # Assuming expanded_states is obtained from some state.get_expanded_states() method
         expanded_states = state.get_expanded_states()
         # if c >18 and c<23: print("#Expanded states:", state)
 
@@ -59,7 +57,6 @@ def graph_search(initial_state: State, frontier: FrontierIW):
             expanded_states = [s for _, s in sorted_states]
             # if c >19 and c<23: print("#Current state:", state)
             # if c >19 and c<23: print("#Expanded states:\n#", "\n#".join(str(a) for a in sorted_states),"\n#")
-
 
         for expanded_state in expanded_states:
             if not frontier.contains(expanded_state) and expanded_state not in explored:
@@ -101,9 +98,7 @@ def print_search_status(explored: set[State], frontier):
     )
 
 
-def save_run_information(
-    explored: set[State], frontier, plan: list[list[Action]], information=None
-):
+def save_run_information(explored: set[State], frontier, plan: list[list[Action]], information=None):
     """
     This function saves the information about the current run of the search algorithm.
 
@@ -121,18 +116,14 @@ def save_run_information(
     elapsed_time = time.perf_counter() - start_time
     folder_path = Info.test_folder
 
-    # Check if the folder for saving the run information exists. If not, create it.
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
         print(f"Folder '{folder_path}' created.")
 
-    # The file path for saving the run information.
     file_path = os.path.join(folder_path, Info.test_name + ".json")
 
-    # Deserialize the existing data from the file.
     all_data = deserialize_from_json_file(file_path)
 
-    # If no additional information is provided, create a default dictionary.
     if information is None:
         information = {
             "Passed": True,
@@ -143,42 +134,23 @@ def save_run_information(
             "Time": elapsed_time,
         }
 
-    # Add the information about the current run to the existing data.
     all_data[Info.level_name] = information
-
-    # Serialize the updated data back to the file.
     serialize_to_json_file(all_data, file_path)
 
 
 def serialize_to_json_file(data, file_path: str):
-    """
-    Serializes the given data to a JSON file.
-
-    :param data: The Python data structure to serialize.
-    :param file_path: The path of the file where to save the JSON data.
-    """
     try:
         with open(file_path, "w") as json_file:
-            json.dump(
-                data, json_file, indent=4
-            )  # Pretty printing with 4 spaces indentation
-        # print(f"Data successfully serialized to {file_path}")
+            json.dump(data, json_file, indent=4)  # Pretty printing with 4 spaces indentation
     except Exception as e:
         print(f"An error occurred during serialization: {e}")
         pass
 
 
 def deserialize_from_json_file(file_path: str):
-    """
-    Deserializes JSON data from a file into a Python object.
-
-    :param file_path: The path of the JSON file to read.
-    :return: The deserialized Python object.
-    """
     try:
         with open(file_path, "r") as json_file:
             data = json.load(json_file)
-        # print(f"Data successfully deserialized from {file_path}")
         return dict(data)
     except FileNotFoundError:
         print(f"File not found: {file_path}")

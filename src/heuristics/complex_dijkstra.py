@@ -22,9 +22,30 @@ class HeuristicComplexDijkstra(Heuristic):
         self.choke_point_count = {}
         self.setup_choke_points()
         self.agent_assigned_to_box = self.assign_boxes_to_agents(initial_state)
-        # Dictionary box:key -> box_goal:value
         self.box_goal_assigned_to_box = self.assign_boxes_to_goals(initial_state)
         self.box_priority = self.calculate_box_priority(initial_state)
+
+    def h(self, state: State) -> float | int:
+        total_distance = 0
+
+        for agent, box in enumerate(state.recalculateDistanceOfBox):
+            if box is not None:
+                self.get_distances(state, state.box_locations[box])
+                state.recalculateDistanceOfBox[agent] = None
+
+        for agent, agent_loc in state.agent_locations.items():
+            boxes_not_in_goal = self.get_boxes_not_in_goal(agent, state)
+            total_distance += self.calculate_total_distance(
+                agent, agent_loc, boxes_not_in_goal, state
+            )
+
+        return total_distance
+
+    def f(self, state: State) -> float | int:
+        return self.h(state)
+
+    def __repr__(self):
+        return "Custom Uniform-Cost Search Heuristic"
 
     def setup_choke_points(self):
         for row, row_walls in enumerate(Location.walls):
@@ -57,22 +78,6 @@ class HeuristicComplexDijkstra(Heuristic):
         }
 
         return box_priority
-
-    def h(self, state: State) -> float | int:
-        total_distance = 0
-
-        for agent, box in enumerate(state.recalculateDistanceOfBox):
-            if box is not None:
-                self.get_distances(state, state.box_locations[box])
-                state.recalculateDistanceOfBox[agent] = None
-
-        for agent, agent_loc in state.agent_locations.items():
-            boxes_not_in_goal = self.get_boxes_not_in_goal(agent, state)
-            total_distance += self.calculate_total_distance(
-                agent, agent_loc, boxes_not_in_goal, state
-            )
-
-        return total_distance
 
     def get_boxes_not_in_goal(self, agent, state):
         return [
@@ -111,12 +116,6 @@ class HeuristicComplexDijkstra(Heuristic):
             state, self.box_goal_positions[self.box_goal_assigned_to_box[box]]
         )[box_loc.row][box_loc.col]
         return box_distance
-
-    def f(self, state: State) -> float | int:
-        return self.h(state)
-
-    def __repr__(self):
-        return "Dijkstra heuristic"
 
     def name_choke_points(self, row, col, id):
         if Location.walls[row][col]:
