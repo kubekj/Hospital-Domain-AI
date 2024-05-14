@@ -45,7 +45,7 @@
         "Frontier": 4392,
         "Generated": 4417,
         "Solution length": 24,
-        "Time": 3.4989888749987585
+        "Time": 2.226161458005663
     },
     "GThirty": {
         "Passed": true,
@@ -53,7 +53,7 @@
         "Frontier": 23862,
         "Generated": 24141,
         "Solution length": 64,
-        "Time": 131.98831887499546
+        "Time": 98.68746199998714
     },
     "hashCrack": {
         "Passed": true,
@@ -61,7 +61,7 @@
         "Frontier": 10320,
         "Generated": 13864,
         "Solution length": 51,
-        "Time": 3.479004500011797
+        "Time": 3.9199675830022898
     },
     "JustPanic": {
         "Passed": true,
@@ -69,7 +69,7 @@
         "Frontier": 0,
         "Generated": 2,
         "Solution length": 1,
-        "Time": 0.007817500008968636
+        "Time": 0.012309957994148135
     },
     "mishmash": {
         "Passed": true,
@@ -85,7 +85,7 @@
         "Frontier": 32,
         "Generated": 36,
         "Solution length": 3,
-        "Time": 48.211322667004424
+        "Time": 37.291880832999595
     },
     "Colada": {
         "Passed": true,
@@ -93,15 +93,15 @@
         "Frontier": 8693,
         "Generated": 11734,
         "Solution length": 48,
-        "Time": 7.962738791000447
+        "Time": 4.79927137499908
     },
     "corridors": {
         "Passed": true,
-        "Expanded": 286,
-        "Frontier": 16296,
-        "Generated": 16582,
-        "Solution length": 285,
-        "Time": 7.2968632920092205
+        "Expanded": 214,
+        "Frontier": 4135,
+        "Generated": 4349,
+        "Solution length": 213,
+        "Time": 178.22388099999807
     },
     "BOSSMAn": {
         "Passed": false

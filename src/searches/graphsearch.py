@@ -19,7 +19,6 @@ SAVED_ONCE = True
 
 
 def graph_search(initial_state: State, frontier: FrontierIW):
-    global SAVED_ONCE
     if not SAVED_ONCE:
         save_run_information(None, None, None, {"Passed": False})
 
