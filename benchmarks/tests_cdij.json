@@ -33,5 +33,29 @@
         "Generated": 6939,
         "Solution length": 42,
         "Time": 2.776644249999663
+    },
+    "Tahini": {
+        "Passed": true,
+        "Expanded": 6009,
+        "Frontier": 27778,
+        "Generated": 33787,
+        "Solution length": 487,
+        "Time": 6.0354331669950625
+    },
+    "TCPpp": {
+        "Passed": true,
+        "Expanded": 31,
+        "Frontier": 165,
+        "Generated": 196,
+        "Solution length": 30,
+        "Time": 0.06045375000394415
+    },
+    "mishmash": {
+        "Passed": true,
+        "Expanded": 65,
+        "Frontier": 321,
+        "Generated": 386,
+        "Solution length": 25,
+        "Time": 0.4287287920014933
     }
 }

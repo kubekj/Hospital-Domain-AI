@@ -1,0 +1,121 @@
+{
+    "Sixty": {
+        "Passed": true,
+        "Expanded": 26,
+        "Frontier": 341,
+        "Generated": 367,
+        "Solution length": 24,
+        "Time": 0.011117334011942148
+    },
+    "RoboMatic": {
+        "Passed": true,
+        "Expanded": 14,
+        "Frontier": 826,
+        "Generated": 840,
+        "Solution length": 13,
+        "Time": 0.04017224999552127
+    },
+    "Tryhard": {
+        "Passed": true,
+        "Expanded": 68,
+        "Frontier": 3625,
+        "Generated": 3693,
+        "Solution length": 52,
+        "Time": 0.2653512499964563
+    },
+    "FastCipka": {
+        "Passed": true,
+        "Expanded": 12667,
+        "Frontier": 121412,
+        "Generated": 134079,
+        "Solution length": 204,
+        "Time": 27.49079975001223
+    },
+    "Damnation": {
+        "Passed": true,
+        "Expanded": 59,
+        "Frontier": 17686,
+        "Generated": 17745,
+        "Solution length": 42,
+        "Time": 16.16767195898865
+    },
+    "Wallies": {
+        "Passed": true,
+        "Expanded": 25,
+        "Frontier": 4392,
+        "Generated": 4417,
+        "Solution length": 24,
+        "Time": 3.4989888749987585
+    },
+    "GThirty": {
+        "Passed": true,
+        "Expanded": 279,
+        "Frontier": 23862,
+        "Generated": 24141,
+        "Solution length": 64,
+        "Time": 131.98831887499546
+    },
+    "hashCrack": {
+        "Passed": true,
+        "Expanded": 3544,
+        "Frontier": 10320,
+        "Generated": 13864,
+        "Solution length": 51,
+        "Time": 3.479004500011797
+    },
+    "JustPanic": {
+        "Passed": true,
+        "Expanded": 2,
+        "Frontier": 0,
+        "Generated": 2,
+        "Solution length": 1,
+        "Time": 0.007817500008968636
+    },
+    "mishmash": {
+        "Passed": true,
+        "Expanded": 65,
+        "Frontier": 321,
+        "Generated": 386,
+        "Solution length": 25,
+        "Time": 0.12198741700558458
+    },
+    "CINNAMON": {
+        "Passed": true,
+        "Expanded": 4,
+        "Frontier": 32,
+        "Generated": 36,
+        "Solution length": 3,
+        "Time": 48.211322667004424
+    },
+    "Colada": {
+        "Passed": true,
+        "Expanded": 3041,
+        "Frontier": 8693,
+        "Generated": 11734,
+        "Solution length": 48,
+        "Time": 7.962738791000447
+    },
+    "corridors": {
+        "Passed": true,
+        "Expanded": 286,
+        "Frontier": 16296,
+        "Generated": 16582,
+        "Solution length": 285,
+        "Time": 7.2968632920092205
+    },
+    "BOSSMAn": {
+        "Passed": false
+    },
+    "Kebabs": {
+        "Passed": false
+    },
+    "NHL": {
+        "Passed": false
+    },
+    "GPTease": {
+        "Passed": false
+    },
+    "Croissant": {
+        "Passed": false
+    }
+}

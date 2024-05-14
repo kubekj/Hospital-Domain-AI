@@ -46,7 +46,7 @@ class Location:
     @staticmethod
     def get_neighbours(loc: Pos) -> list[Pos]:
         row, col = loc
-        return Location.all_neighbours[row, col]
+        return list[Pos](Location.all_neighbours[row, col])
 
     @staticmethod
     def calculate_all_neighbours(walls: list[list[bool]]):

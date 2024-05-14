@@ -191,6 +191,7 @@ class SearchClient:
 
         sub_levels = SearchClient.iterative_splitting(sub_levels)
         # print("total-splitting: " + str(len(sub_levels)))
+        SearchClient.split_count = len(sub_levels)
         print("total-splitting: " + str(len(sub_levels)), file=sys.stderr, flush=True)
 
         #do everything and create all plans from a-z, loop for all leveldatas
@@ -236,15 +237,15 @@ class SearchClient:
         frontier = SearchClient.set_frontier_strategy(args, initial_state, heuristic)
         with open("plans/plan.pkl", "wb") as f:
             pickle.dump(plan, file=f)
-        for ip, joint_action in enumerate(plan):
-            states[ip + 1] = states[ip].result(joint_action)
+        for ip, joint_action in enumerate(plan):            
             my_message = None
-            
-            my_message = (
-                str(heuristic.f(states[ip + 1]))
-                if isinstance(heuristic, HeuristicComplexDijkstra)
-                else None
-            )
+            if SearchClient.split_count <= 1:
+                states[ip + 1] = states[ip].result(joint_action)
+                my_message = (
+                    str(heuristic.f(states[ip + 1]))
+                    if isinstance(heuristic, HeuristicComplexDijkstra)
+                    else None
+                )
             print(
                 "|".join(
                     a.get_name()
