@@ -1,14 +1,14 @@
 from abc import ABCMeta, abstractmethod
 
-from src.domain.atom import Location, AtomType, atoms_by_type, get_atom_type, get_atom_id, Pos
+from src.domain.atom import Box, Location, AtomType, atoms_by_type, get_atom_type, Pos, Atom, get_box_dict
 from src.domain.state import State
 
 # Goal count as a default heuristic
-def extract_goal_positions(atom_type: AtomType, initial_state: State) -> dict[int, Pos]:
+def extract_goal_positions(atom_type: AtomType, initial_state: State) -> dict[Atom, Pos]:
     return atoms_by_type(initial_state.goal_literals, atom_type)
 
 
-def count_goals_not_met(state: State, goal_positions: dict[int, Pos], atom_type: AtomType):
+def count_goals_not_met(state: State, goal_positions: dict[Atom, Pos], atom_type: AtomType):
     return sum(1 for item, goal_loc in goal_positions.items()
                if any(get_atom_type(lit) == atom_type and lit.loc != goal_loc
                     for lit in state.literals))
@@ -18,7 +18,7 @@ class Heuristic(metaclass=ABCMeta):
     FIRST_ERROR = False
 
     def __init__(self, initial_state: 'State'):
-        self.box_goal_positions = extract_goal_positions(AtomType.BOX_AT, initial_state)
+        self.box_goal_positions: dict[Box, Pos] = get_box_dict(initial_state.goal_literals, AtomType.BOX_AT)
         self.agent_goal_positions = extract_goal_positions(AtomType.AGENT_AT, initial_state)
         self.num_rows = len(Location.walls)
         self.num_cols = len(Location.walls[0])
@@ -28,7 +28,7 @@ class Heuristic(metaclass=ABCMeta):
             count_goals_not_met(state, self.box_goal_positions, AtomType.BOX_AT)
 
     @abstractmethod
-    def f(self, state: "State") -> "int":
+    def f(self, state: "State") -> "int|float":
         pass
 
     @abstractmethod

@@ -11,7 +11,7 @@ class FrontierIW(FrontierBestFirst):
         super().__init__(heuristic)
         self.width = width
         self.known_combinations = set()
-        print(f"Initialized frontier with width {self.width}")
+        print(f"#Initialized frontier with width {self.width}")
 
     def add(self, state: "State"):
         if self.is_novel_combination(state.literals):

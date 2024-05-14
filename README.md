@@ -63,6 +63,17 @@ java -jar ./server.jar -l ./complevels/Tryhard.lvl -c "python searchclient.py -i
 
 Without saving the tests:
 ```bash
-java -jar ./server.jar -l ./levels/SACrunch.lvl -c "python searchclient.py -iw -c_dij" -g
+java -jar ./server.jar -l ./levels/MAPFreorder3.lvl -c "python searchclient.py -iw -c_dij" -g
+java -jar ./server.jar -l ./complevels/AgentWayz.lvl -c "python searchclient.py -iw -c_dij" -g
+java -jar ./server.jar -l ./levels/test3.lvl -c "python searchclient.py -iw -c_dij --profile" -g
+
+java -jar ./server.jar -l ./complevels -c "python searchclient.py -iw -c_dij --test-name tests_cdij_improved --test-folder ./benchmarks" -t 300
+
+<<<<<<< HEAD
+java -jar ./server.jar -l ./complevels/SoftBoys.lvl -c "python searchclient.py -iw -c_dij" -g
+=======
+java -jar ./server.jar -l ./complevels/AgentWayz.lvl -c "python searchclient.py -iw -c_dij" -g
+java -jar ./server.jar -l ./levels/test.lvl -c "python searchclient.py -iw -c_dij" -g
+>>>>>>> dijkstraSplit
 ```
 

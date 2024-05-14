@@ -15,18 +15,22 @@ from src.utils import memory
 from src.utils.info import Info
 
 start_time = time.perf_counter()
-saved_once = True
+SAVED_ONCE = True
 
 
 def graph_search(initial_state: State, frontier: FrontierIW):
-    if not saved_once:
+    if not SAVED_ONCE:
         save_run_information(None, None, None, {"Passed": False})
 
-    # iterations = 0
+    iterations = 0
     frontier.add(initial_state)
     explored = set()
 
     while True:
+        iterations += 1
+        log_search_status(iterations, explored, frontier)
+        # print("#"+str(iterations),file=sys.stderr,flush=True,)
+
         if frontier.is_empty():
             if isinstance(frontier, FrontierIW):
                 frontier = FrontierIW(frontier.heuristic, frontier.width + 1)
@@ -69,6 +73,7 @@ def log_search_status(iterations, explored: set[State], frontier):
 
     if memory.get_usage() > memory.max_usage:
         print_search_status(explored, frontier)
+        # TODO: Reset frontier after memory limit is reached, go to next width for IW
         print("Maximum memory usage exceeded.", file=sys.stderr, flush=True)
         return None
 

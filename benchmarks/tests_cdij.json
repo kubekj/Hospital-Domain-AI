@@ -1,39 +1,154 @@
 {
-    "AgentWayz": {
-        "Passed": false
+    "Sixty": {
+        "Passed": true,
+        "Expanded": 26,
+        "Frontier": 341,
+        "Generated": 367,
+        "Solution length": 24,
+        "Time": 0.013819125000736676
     },
     "RoboMatic": {
         "Passed": true,
-        "Expanded": 17,
-        "Frontier": 647,
-        "Generated": 664,
-        "Solution length": 16,
-        "Time": 0.6351339000393637
+        "Expanded": 14,
+        "Frontier": 826,
+        "Generated": 840,
+        "Solution length": 13,
+        "Time": 0.06276091700419784
     },
     "Tryhard": {
-        "Passed": false
-    },
-    "AIMASqln": {
-        "Passed": false
-    },
-    "Sixty": {
         "Passed": true,
-        "Expanded": 1373,
-        "Frontier": 1401,
-        "Generated": 2774,
-        "Solution length": 33,
-        "Time": 6.20287899998948
-    },
-    "NHL": {
-        "Passed": false
+        "Expanded": 68,
+        "Frontier": 3625,
+        "Generated": 3693,
+        "Solution length": 52,
+        "Time": 0.23521454200090375
     },
     "FastCipka": {
-        "Passed": false
+        "Passed": true,
+        "Expanded": 12667,
+        "Frontier": 121412,
+        "Generated": 134079,
+        "Solution length": 204,
+        "Time": 19.318069582994212
     },
-    "cbsSolve": {
-        "Passed": false
+    "Damnation": {
+        "Passed": true,
+        "Expanded": 59,
+        "Frontier": 17686,
+        "Generated": 17745,
+        "Solution length": 42,
+        "Time": 13.906887208999251
     },
     "Wallies": {
-        "Passed": false
+        "Passed": true,
+        "Expanded": 25,
+        "Frontier": 4392,
+        "Generated": 4417,
+        "Solution length": 24,
+        "Time": 2.062920166994445
+    },
+    "CINNAMON": {
+        "Passed": true,
+        "Expanded": 4,
+        "Frontier": 32,
+        "Generated": 36,
+        "Solution length": 3,
+        "Time": 36.50102233400685
+    },
+    "Colada": {
+        "Passed": true,
+        "Expanded": 3041,
+        "Frontier": 8693,
+        "Generated": 11734,
+        "Solution length": 48,
+        "Time": 5.346289167006034
+    },
+    "corridors": {
+        "Passed": true,
+        "Expanded": 286,
+        "Frontier": 16296,
+        "Generated": 16582,
+        "Solution length": 285,
+        "Time": 6.025792583008297
+    },
+    "Persian": {
+        "Passed": true,
+        "Expanded": 113,
+        "Frontier": 32090,
+        "Generated": 32203,
+        "Solution length": 112,
+        "Time": 12.035031874998822
+    },
+    "GThirty": {
+        "Passed": true,
+        "Expanded": 279,
+        "Frontier": 23862,
+        "Generated": 24141,
+        "Solution length": 64,
+        "Time": 102.99848637499963
+    },
+    "hashCrack": {
+        "Passed": true,
+        "Expanded": 3544,
+        "Frontier": 10320,
+        "Generated": 13864,
+        "Solution length": 51,
+        "Time": 3.3596017910022056
+    },
+    "JustPanic": {
+        "Passed": true,
+        "Expanded": 2,
+        "Frontier": 0,
+        "Generated": 2,
+        "Solution length": 1,
+        "Time": 0.05238462499983143
+    },
+    "mishmash": {
+        "Passed": true,
+        "Expanded": 65,
+        "Frontier": 321,
+        "Generated": 386,
+        "Solution length": 25,
+        "Time": 0.17165045900037512
+    },
+    "NoOp": {
+        "Passed": true,
+        "Expanded": 7,
+        "Frontier": 9,
+        "Generated": 16,
+        "Solution length": 6,
+        "Time": 0.05958008300513029
+    },
+    "Tahini": {
+        "Passed": true,
+        "Expanded": 6009,
+        "Frontier": 27778,
+        "Generated": 33787,
+        "Solution length": 487,
+        "Time": 5.915331791999051
+    },
+    "TCPpp": {
+        "Passed": true,
+        "Expanded": 31,
+        "Frontier": 165,
+        "Generated": 196,
+        "Solution length": 30,
+        "Time": 0.04082841699710116
+    },
+    "OMNY": {
+        "Passed": true,
+        "Expanded": 132,
+        "Frontier": 1322,
+        "Generated": 1454,
+        "Solution length": 38,
+        "Time": 0.1941625840117922
+    },
+    "TreOTres": {
+        "Passed": true,
+        "Expanded": 65,
+        "Frontier": 402,
+        "Generated": 467,
+        "Solution length": 50,
+        "Time": 0.02948383400507737
     }
 }

@@ -1,0 +1,28 @@
+#domain
+hospital
+#levelname
+Kebabs
+#colors
+green: 0, A, C
+brown: 1, B, D
+orange: 2, E, F
+pink: X
+#initial
++++++++++++++++++++++
++            10XXXX +
++       X XXXXXXXXX +
++ XX XX X     XX2XX +
++  XDXC X     XX    +
++   X   XXXXX XX XXX+
++B X X AX     XX  FE+
++++++++++++++++++++++    
+#goal
++++++++++++++++++++++
++                  F+
++                  E+
++                   +
++                   +
++            1      +
++        ABCD0      +
++++++++++++++++++++++
+#end

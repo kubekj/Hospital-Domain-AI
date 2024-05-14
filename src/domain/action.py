@@ -39,7 +39,7 @@ class Move(Action):
         - Free(agtto)
         """
         return (
-            encode_atom_pos(AtomType.AGENT_AT, self.agtfrom, self.agt) in literals
+            encode_agent(self.agtfrom, self.agt) in literals
             and eval_neighbour(self.agtfrom, self.agtto)
             and eval_free(self.agtto, literals)
             # and Free(self.agtto) in literals
@@ -55,8 +55,8 @@ class Move(Action):
         - Not Free(agtto)
         """
         if skip_check or self.check_preconditions(literals):
-            old = encode_atom_pos(AtomType.AGENT_AT, self.agtfrom, self.agt)
-            new = encode_atom_pos(AtomType.AGENT_AT, self.agtto, self.agt)
+            old = encode_agent(self.agtfrom, self.agt)
+            new = encode_agent(self.agtto, self.agt)
 
             # ~AgentAt(agt,agtfrom)
             literals.remove(old)
@@ -92,7 +92,7 @@ class Move(Action):
 
 class Push(Action):
     def __init__(
-        self, agt: int, agtfrom: Pos, box: int, boxfrom: Pos, boxto: Pos
+        self, agt: int, agtfrom: Pos, box: Box, boxfrom: Pos, boxto: Pos
     ):
         super().__init__(agt)
         self.box = box
@@ -104,7 +104,7 @@ class Push(Action):
         afr,afc = self.agtfrom
         bfr,bfc = self.boxfrom
         btr,btc = self.boxto
-        return f"Push({self.agt}, {(afr,afc)}, {chr(self.box + ord("A"))}, {(bfr,bfc)}, {(btr,btc)})"
+        return f"Push({self.agt}, {(afr,afc)}, {chr(self.box[0] + ord('A')),self.box[1]}, {(bfr,bfc)}, {(btr,btc)})"
 
     def check_preconditions(self, literals: set[Atom]):
         """
@@ -117,8 +117,8 @@ class Push(Action):
         - Free(agtto)
         """
         return (
-            encode_atom_pos(AtomType.AGENT_AT, self.agtfrom, self.agt) in literals #Agent_at
-            and encode_atom_pos(AtomType.BOX_AT, self.boxfrom, self.box) in literals #Box_at
+            encode_agent(self.agtfrom, self.agt) in literals #Agent_at
+            and encode_box(self.boxfrom, self.box) in literals #Box_at
             and eval_neighbour(self.agtfrom, self.boxfrom)
             and eval_neighbour(self.boxfrom, self.boxto)
             and eval_free(self.boxto, literals)
@@ -135,10 +135,10 @@ class Push(Action):
         - Not Free(boxfrom)
         """
         if skip_check or self.check_preconditions(literals):
-            agtgfrom = encode_atom_pos(AtomType.AGENT_AT, self.agtfrom, self.agt)
-            agtgto = encode_atom_pos(AtomType.AGENT_AT, self.boxfrom, self.agt)
-            boxfrom = encode_atom_pos(AtomType.BOX_AT, self.boxfrom, self.box)
-            boxto = encode_atom_pos(AtomType.BOX_AT, self.boxto, self.box)
+            agtgfrom = encode_agent(self.agtfrom, self.agt)
+            agtgto = encode_agent(self.boxfrom, self.agt)
+            boxfrom = encode_box(self.boxfrom, self.box)
+            boxto = encode_box(self.boxto, self.box)
 
             # ~AgentAt(agt,agtfrom)
             literals.remove(agtgfrom)
@@ -189,7 +189,7 @@ class Push(Action):
 
 class Pull(Action):
     def __init__(
-        self, agt: int, agtfrom: Pos, agtto: Pos, box: int, boxfrom: Pos
+        self, agt: int, agtfrom: Pos, agtto: Pos, box: Box, boxfrom: Pos
     ):
         super().__init__(agt)
         self.box = box
@@ -201,7 +201,7 @@ class Pull(Action):
         atr,atc = self.agtto
         afr,afc = self.agtfrom
         bfr,bfc = self.boxfrom
-        return f"Pull({self.agt}, {(afr,afc)}, {(atr,atc)}, {chr(self.box + ord("A"))}, {(bfr,bfc)})"
+        return f"Pull({self.agt}, {(afr,afc)}, {(atr,atc)}, {chr(self.box[0] + ord('A')),self.box[1]}, {(bfr,bfc)})"
 
     def check_preconditions(self, literals: set[Atom]):
         """
@@ -214,10 +214,10 @@ class Pull(Action):
         - Free(agtto)
         """
         return (
-            encode_atom_pos(AtomType.AGENT_AT, self.agtfrom, self.agt) in literals #Agent_at
+            encode_agent(self.agtfrom, self.agt) in literals #Agent_at
             and eval_neighbour(self.agtfrom, self.agtto)
             and eval_neighbour(self.agtfrom, self.boxfrom)
-            and encode_atom_pos(AtomType.BOX_AT, self.boxfrom, self.box) in literals #Box_at
+            and encode_box(self.boxfrom, self.box) in literals #Box_at
             and eval_free(self.agtto, literals)
             and self.agtto != self.agtfrom
         )
@@ -234,10 +234,10 @@ class Pull(Action):
         - Not Free(agtto)
         """
         if skip_check or self.check_preconditions(literals):
-            agtto = encode_atom_pos(AtomType.AGENT_AT, self.agtto, self.agt)
-            agtfrom = encode_atom_pos(AtomType.AGENT_AT, self.agtfrom, self.agt)
-            boxfrom = encode_atom_pos(AtomType.BOX_AT, self.boxfrom, self.box)
-            boxto = encode_atom_pos(AtomType.BOX_AT, self.agtfrom, self.box)
+            agtto = encode_agent(self.agtto, self.agt)
+            agtfrom = encode_agent(self.agtfrom, self.agt)
+            boxfrom = encode_box(self.boxfrom, self.box)
+            boxto = encode_box(self.agtfrom, self.box)
 
             # ~AgentAt(agt,agtfrom)
             literals.remove(agtfrom)

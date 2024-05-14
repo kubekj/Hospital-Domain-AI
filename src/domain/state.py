@@ -1,6 +1,6 @@
 import random
 
-from src.domain.atom import Atom, Location, AtomType, atoms_by_type, encode_atom, encode_atom_pos, atom_repr
+from src.domain.atom import get_goal_dict, Atom, Box, Location, AtomType, Pos, atoms_by_type, atom_repr, encode_box, get_box_dict, decode_atom, atom_repr
 from src.utils.color import Color
 from src.domain.action import Action, Move, Pull, Push
 
@@ -17,26 +17,41 @@ class State:
 
     def __init__(self, literals):
         self.literals: set[Atom] = literals
-        self.agent_locations = atoms_by_type(self.literals, AtomType.AGENT_AT)
+        self.agent_locations: dict[Atom, Pos] = atoms_by_type(self.literals, AtomType.AGENT_AT)
+        self.box_locations: dict[Box, Pos] = get_box_dict(self.literals, AtomType.BOX_AT)
         self.parent = None
         self.joint_action = None
         self.g = 0
         self._hash = None
 
-        self.lastMovedBox = [None] * len(self.agent_locations)
-        self.recalculateDistanceOfBox = [None] * len(self.agent_locations)
+        self.lastMovedBox: list[Box] = [None] * len(self.agent_locations)
+        self.recalculateDistanceOfBox: list[Box] = [None] * len(self.agent_locations)
 
     @staticmethod
-    def make_initial_state(server_messages):
-        agent_colors, box_colors, boxes = Parser.read_colors(server_messages)
-        State.agent_box_dict = Parser.create_agent_box_dict(agent_colors, box_colors)
-        literals, num_rows, num_cols, walls = Parser.read_level(server_messages, State.agent_box_dict)
-        goal_literals = Parser.read_goal_state(server_messages)
+    def make_initial_state(leveldata):
+        agent_colors, box_colors, boxes = Parser.read_colors(leveldata)
 
-        State.agent_colors = agent_colors
-        State.box_colors = box_colors
+        State.agent_colors:list[str] = [a for a in agent_colors if a is not None]
+        State.box_colors:list[str] =  [a for a in box_colors if a is not None] 
+        State.agent_box_dict = Parser.create_agent_box_dict(agent_colors, box_colors)
+
+        literals, num_rows, num_cols, walls, boxes_dict = Parser.read_level(leveldata, State.agent_box_dict)
+        agent_locations: dict[Atom, Pos] = atoms_by_type(literals, AtomType.AGENT_AT)
+        # Prune agents for which color is defined but are not in the map
+        for agent in list(State.agent_box_dict.keys()):
+            if agent not in agent_locations:
+                State.agent_box_dict.pop(agent)
+        # Prune boxes for which color is defined but are not in the map
+        for agent in State.agent_box_dict:
+            for box in State.agent_box_dict[agent]:
+                if box not in boxes_dict:
+                    State.agent_box_dict[agent].remove(box)
+        goal_literals, goal_literals_to_check, goal_boxes_dict = Parser.read_goal_state(leveldata)
+        State.boxes = boxes_dict
+        State.boxgoals = goal_boxes_dict
+
         State.goal_literals = goal_literals
-        State.boxes = boxes
+        State.goal_literals_to_check = goal_literals_to_check
         return State(literals)
 
     def result(self, joint_action: list[Action], copy_literals: Optional[set[Atom]] = None) -> Self:
@@ -66,12 +81,10 @@ class State:
         return copy_state
 
     def is_goal_state(self) -> bool:
-        # b = [a in self.literals for a in self.goal_literals]
-        # if any(b):
-        #     print("#", [atom_repr(a) for a in self.goal_literals])
-        #     print("#", b)
-        for goal in self.goal_literals:
-            if goal not in self.literals:
+        # Remove unique box_id as only the color matters
+        masked_literals = get_goal_dict(self.literals)
+        for goal in self.goal_literals_to_check:
+            if goal not in masked_literals:
                 return False
         return True
 
@@ -110,7 +123,7 @@ class State:
             if done:
                 break
 
-        State._RNG.shuffle(expanded_states)
+        # State._RNG.shuffle(expanded_states)
         return expanded_states
 
     @staticmethod
@@ -132,9 +145,10 @@ class State:
             elif action is Push:
                 for boxfrom in agtfrom_neighbours:
                     boxes = [
-                        c
+                        box
                         for c in State.agent_box_dict[agent]
-                        if encode_atom_pos(AtomType.BOX_AT, boxfrom, c) in self.literals
+                        for box in State.boxes[c]
+                        if encode_box(boxfrom, box) in self.literals
                     ]
                     boxfrom_neighbours = Location.get_neighbours(boxfrom)
                     for box in boxes:
@@ -145,9 +159,10 @@ class State:
             elif action is Pull:
                 for boxfrom in agtfrom_neighbours:
                     boxes = [
-                        c
+                        box
                         for c in State.agent_box_dict[agent]
-                        if encode_atom_pos(AtomType.BOX_AT, boxfrom, c) in self.literals
+                        for box in State.boxes[c]
+                        if encode_box(boxfrom, box) in self.literals
                     ]
                     for box in boxes:
                         for agtto in agtfrom_neighbours:
