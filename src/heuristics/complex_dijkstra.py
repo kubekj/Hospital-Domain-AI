@@ -1,11 +1,13 @@
 import heapq
 import math
+import sys
 from typing import Tuple
 
 from src.domain.atom import Box, Location, Pos, eval_free
 from src.domain.state import State
 from src.heuristics.heuristic import Heuristic
 from src.utils.helpers import find_key_by_value
+sys.setrecursionlimit(100_000) # HACK: Upped limit to not die on WallE.lvl and YummAI.lvl during name_choke_points()
 
 NO_CHOKE_POINT = -1
 
