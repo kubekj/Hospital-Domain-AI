@@ -89,8 +89,8 @@ class Parser:
             Parser.populate_literals(goal_literals, line, row, boxes_dict=goal_boxes)
             row += 1
         # Remove unique box_id as only the color matters
-        goal_literals = (list(get_goal_dict(goal_literals[0])), list(get_goal_dict(goal_literals[1])))
-        return goal_literals, goal_boxes
+        goal_literals_to_check = (list(get_goal_dict(goal_literals[0])), list(get_goal_dict(goal_literals[1])))
+        return goal_literals, goal_literals_to_check, goal_boxes
 
     @staticmethod
     def create_agent_box_dict(agent_colors, box_colors):

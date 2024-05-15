@@ -12,10 +12,10 @@ setlocal enabledelayedexpansion
 
 set "STEPS_TO_ROOT=..\..\"
 set "JAR_PATH=%STEPS_TO_ROOT%server.jar"
-set "PYTHON_SCRIPT_PATH=python %STEPS_TO_ROOT%src\searches\graphsearch.py"
+set "PYTHON_SCRIPT_PATH=py %STEPS_TO_ROOT%src\searches\graphsearch.py"
 set "NIRCMD_PATH=nircmd.exe"
-set "SCREENSHOT_SAVE_PATH=%STEPS_TO_ROOT%complevels\images"
-set "LEVELS_PATH=%STEPS_TO_ROOT%complevels"
+set "SCREENSHOT_SAVE_PATH=%STEPS_TO_ROOT%complevels2024\images"
+set "LEVELS_PATH=%STEPS_TO_ROOT%complevels2024"
 @REM set "LEVELS_PATH=%STEPS_TO_ROOT%levels\custom"
 
 for %%F in ("!LEVELS_PATH!\*.lvl") do (
@@ -26,18 +26,18 @@ for %%F in ("!LEVELS_PATH!\*.lvl") do (
     !CMD!
     
     echo Waiting for the application to initialize...
-    timeout /t 2 /nobreak >nul
+    timeout /t 3 /nobreak >nul
 
     echo Maximizing the application window...
     !NIRCMD_PATH! win max title "MAvis"
     
-    timeout /t 1 /nobreak >nul
+    timeout /t 2 /nobreak >nul
 
     call :captureScreenshot "MAvis" "!FILENAME!"
     
     echo Closing the application...
     call :closeApplication "MAvis"
-    timeout /t 2 /nobreak >nul
+    timeout /t 3 /nobreak >nul
 )
 goto :eof
 

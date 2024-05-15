@@ -1,7 +1,7 @@
 from itertools import chain
 import random
 
-from src.domain.atom import get_goal_dict, Location, AtomType, atoms_by_type, atom_repr, encode_box, get_box_dict
+from src.domain.atom import get_goal_dict, Location, AtomType, atoms_by_type, atom_repr, encode_box, get_box_dict, decode_atom, atom_repr
 from src.domain.action import Action, Move, Pull, Push
 
 from typing import Optional, Self
@@ -60,11 +60,12 @@ class State:
             for box in State.agent_box_dict[agent]:
                 if box not in boxes_dict:
                     State.agent_box_dict[agent].remove(box)
-        goal_literals, goal_boxes_dict = Parser.read_goal_state(leveldata)
+        goal_literals, goal_literals_to_check, goal_boxes_dict = Parser.read_goal_state(leveldata)
         State.boxes = boxes_dict
         State.boxgoals = goal_boxes_dict
 
         State.goal_literals = goal_literals
+        State.goal_literals_to_check = goal_literals_to_check
         return State(literals)
 
     def result(self, joint_action: list[Action], copy_literals: Optional[LiteralList] = None) -> Self:
@@ -98,7 +99,7 @@ class State:
         # Remove unique box_id as only the color matters
         for goal_type in [AtomType.AGENT_AT, AtomType.BOX_AT]:
             masked_literals = get_goal_dict(self.literals[goal_type])
-            for goal in self.goal_literals[goal_type][:g]:
+            for goal in self.goal_literals_to_check[goal_type][:g]:
                 if goal not in masked_literals:
                     return False
         return True
