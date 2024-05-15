@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
-from src.domain.atom import Box, Location, AtomType, atoms_by_type, Pos, Atom, get_box_dict
+from src.domain.location import Location
+from src.domain.atom import Box, AtomType, atoms_by_type, Pos, Atom, get_box_dict
 from src.domain.state import State
 
 # Goal count as a default heuristic

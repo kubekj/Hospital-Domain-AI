@@ -1,7 +1,8 @@
 import heapq
 import math
 
-from src.domain.atom import Location, eval_free
+from src.domain.location import Location
+from src.domain.atom import eval_free
 from src.heuristics.heuristic import Heuristic
 from src.domain.state import State
 from src.utils.info import Info

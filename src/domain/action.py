@@ -17,14 +17,17 @@ class Action:
 
     def get_name(self):
         return "NoOp"
-
+    
+    def update_id(self, agt: int):
+        self.agt = agt
+        return self
 
 class Move(Action):
     def __init__(self, agt: int, agtfrom: Pos, agtto: Pos):
         super().__init__(agt)
         self.agtfrom = agtfrom
         self.agtto = agtto
-        self.agt_old = encode_agent(agtfrom, agt)        
+        self.agt_old = encode_agent(agtfrom, agt)
         self.agt_new = encode_agent(agtto, agt)
 
     def __repr__(self) -> str:
@@ -87,6 +90,12 @@ class Move(Action):
             return "NoOp"
         else:
             return f"Move({agentMove})"
+        
+    def update_id(self, agt: int):
+        self.agt = agt
+        self.agt_old = encode_agent(self.agtfrom, agt)
+        self.agt_new = encode_agent(self.agtto, agt)
+        return self
 
 
 class Push(Action):
@@ -98,9 +107,9 @@ class Push(Action):
         self.agtfrom = agtfrom
         self.boxfrom = boxfrom
         self.boxto = boxto
-        self.agt_old = encode_agent(agtfrom, agt)        
-        self.agt_new = encode_agent(boxfrom, agt)        
-        self.box_old = encode_box(boxfrom, box)        
+        self.agt_old = encode_agent(agtfrom, agt)
+        self.agt_new = encode_agent(boxfrom, agt)
+        self.box_old = encode_box(boxfrom, box)
         self.box_new = encode_box(boxto, box)
 
     def __repr__(self) -> str:
@@ -183,6 +192,11 @@ class Push(Action):
         else:
             return f"Push({agentMove},{boxMove})"
 
+    def update_id(self, agt: int):
+        self.agt = agt
+        self.agt_old = encode_agent(self.agtfrom, agt)
+        self.agt_new = encode_agent(self.boxfrom, agt)
+        return self
 
 
 class Pull(Action):
@@ -194,9 +208,9 @@ class Pull(Action):
         self.agtto = agtto
         self.agtfrom = agtfrom
         self.boxfrom = boxfrom
-        self.agt_old = encode_agent(agtfrom, agt)        
-        self.agt_new = encode_agent(agtto, agt)        
-        self.box_old = encode_box(boxfrom, box)        
+        self.agt_old = encode_agent(agtfrom, agt)
+        self.agt_new = encode_agent(agtto, agt)
+        self.box_old = encode_box(boxfrom, box)
         self.box_new = encode_box(agtfrom, box)
 
     def __repr__(self) -> str:
@@ -278,6 +292,12 @@ class Pull(Action):
             return "NoOp"
         else:
             return f"Pull({agentMove},{boxMove})"
+
+    def update_id(self, agt: int):
+        self.agt = agt
+        self.agt_old = encode_agent(self.agtfrom, agt)
+        self.agt_new = encode_agent(self.agtto, agt)
+        return self
 
 
 @unique

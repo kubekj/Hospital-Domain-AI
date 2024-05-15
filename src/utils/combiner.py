@@ -54,10 +54,9 @@ class Combiner:
         reverse_mapping = {new_id: old_id for old_id, new_id in level_data.agent_mapping.items()}
 
         # Helper function to revert agent IDs in actions
-        def revert_agent_id(action):
+        def revert_agent_id(action: Action):
             original_id = reverse_mapping.get(str(action.agt), action.agt)
-            action.agt = int(original_id)
-            return action
+            return action.update_id(int(original_id))
 
         # Process each action in the plan to revert agent IDs
         reverted_plan = []

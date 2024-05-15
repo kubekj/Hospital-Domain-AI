@@ -3,7 +3,8 @@ import math
 import sys
 from typing import Tuple
 
-from src.domain.atom import Box, Location, Pos, eval_free
+from src.domain.location import Location
+from src.domain.atom import Box, Pos, eval_free
 from src.domain.state import State
 from src.heuristics.heuristic import Heuristic
 from src.utils.helpers import find_key_by_value

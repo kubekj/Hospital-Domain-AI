@@ -1,5 +1,6 @@
 from typing import Tuple
-from src.domain.atom import get_goal_dict, encode_agent, Location, encode_box, AtomType
+from src.domain.location import Location
+from src.domain.atom import get_goal_dict, encode_agent, encode_box, AtomType
 from src.domain.domain_types import LiteralList_new, Box, LiteralList
 from src.utils.color import Color
 from src.domain.leveldata import LevelData

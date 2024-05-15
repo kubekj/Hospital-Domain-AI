@@ -1,7 +1,8 @@
 from itertools import chain
 import random
 
-from src.domain.atom import get_goal_dict, Location, AtomType, atoms_by_type, atom_repr, encode_box, get_box_dict, decode_atom, atom_repr
+from src.domain.location import Location
+from src.domain.atom import get_goal_dict, AtomType, atoms_by_type, atom_repr, encode_box, get_box_dict, atom_repr
 from src.domain.action import Action, Move, Pull, Push
 
 from typing import Optional, Self

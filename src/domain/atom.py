@@ -1,56 +1,9 @@
 from typing import Tuple
-import numpy as np
 import src.domain.atom_type as AtomType
 from src.domain.domain_types import *
 from functools import cache
 
 IGNORE_BITS_MASK = ~(0xFFF << 40)
-
-class Location:
-    all_neighbours: np.ndarray  # Use a 3D numpy array to store neighbour positions.
-    walls: np.ndarray
-
-    @staticmethod
-    def init_arrays(height: int, width: int):
-        Location.walls = np.zeros((height, width), dtype=bool)
-        Location.all_neighbours = np.empty((height, width), dtype=object)
-        for i in range(height):
-            for j in range(width):
-                Location.all_neighbours[i, j] = []
-
-    @staticmethod
-    def calculate_neighbours():
-        height, width = Location.walls.shape
-        for row in range(height):
-            for col in range(width):
-                if not Location.walls[row, col]:
-                    possibilities = [
-                        (row, col - 1),
-                        (row, col + 1),
-                        (row - 1, col),
-                        (row + 1, col),
-                    ]
-                    valid_neighbours = []
-                    for r, c in possibilities:
-                        if (
-                            0 <= r < height
-                            and 0 <= c < width
-                            and not Location.walls[r, c]
-                        ):
-                            valid_neighbours.append(Pos(r, c))
-                    Location.all_neighbours[row, col] = valid_neighbours
-
-    @staticmethod
-    def get_neighbours(loc: PosIn) -> list[Pos]:
-        row, col = loc
-        return list[Pos](Location.all_neighbours[row, col])
-
-    @staticmethod
-    def calculate_all_neighbours(walls: list[list[bool]]):
-        Location.init_arrays(len(walls), len(walls[0]))
-        Location.walls = np.array(walls, dtype=bool)
-        Location.calculate_neighbours()
-
 
 def encode_agent(loc: Tuple[int, int], agt) -> Atom:
     return encode_atom(AtomType.AGENT_AT, loc[0], loc[1], agt)
@@ -104,6 +57,7 @@ def get_atom_location(encoded: Atom) -> tuple[int, int]:
     col = (encoded >> 16) & 0xFFFF
     return row, col
 
+@cache
 def get_atom_id(encoded: Atom) -> int:
     return (encoded >> 32) & 0xFF
 
@@ -111,7 +65,7 @@ def get_atom_id(encoded: Atom) -> int:
 def get_box_extra_id(encoded: Atom) -> int:
     return (encoded >> 40) & 0xFFF
 
-
+@cache
 def get_box(encoded: Atom) -> Box:
     return get_atom_id(encoded), get_box_extra_id(encoded)
 
@@ -147,8 +101,6 @@ def eval_free(loc: PosIn, literals: LiteralList):
     loc_int = encode_pos(*loc)
     x_at_locations = {lit & 0xFFFF_FFFF for lit_type in literals for lit in lit_type}
     return loc_int not in x_at_locations
-    ## try, propaly wont work because of the type agent != box
-    # return not literals[encoded]
 
 def atoms_by_type(literals: LiteralList, kind: AtomType) -> dict[int, Pos]:
     return {get_atom_id(lit): Pos(*get_atom_location(lit)) for lit in literals[kind]}
