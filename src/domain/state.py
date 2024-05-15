@@ -19,7 +19,7 @@ class State:
     def __init__(self, literals: LiteralList):
         self.literals: LiteralList = literals
         self._agent_locations: dict[Atom, Pos] = None
-        self._box_locations: dict[Atom, Pos] = None
+        self._box_locations: dict[Box, Pos] = None
         self.parent = None
         self.joint_action = None
         self.g = 0
@@ -72,7 +72,7 @@ class State:
         calc_results = False
         if copy_literals is None:
             calc_results = True
-            copy_literals = [set(self.literals[0]), set(self.literals[1])]
+            copy_literals = (set(self.literals[0]), set(self.literals[1]))
 
         copy_recalculateDistanceOfBox = self.recalculateDistanceOfBox[:]
         copy_lastMovedBox = self.lastMovedBox[:]
@@ -195,7 +195,7 @@ class State:
         # This follows the following logic:
         # For all applicable actions ai and aj where the precondition of one is inconsistent with the
         # effect of the other, either CellCon ict(ai aj) or BoxCon ict(ai aj) holds.
-        literals = [set(self.literals[0]), set(self.literals[1])]
+        literals = (set(self.literals[0]), set(self.literals[1]))
 
         for agt, action in enumerate(joint_action):
             if self.is_applicable(action, literals):
