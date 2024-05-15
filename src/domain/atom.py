@@ -115,20 +115,20 @@ def get_box_extra_id(encoded: Atom) -> int:
 def get_box(encoded: Atom) -> Box:
     return get_atom_id(encoded), get_box_extra_id(encoded)
 
-def decode_atom(encoded: Atom) -> Tuple[int, int, int, int]:
+def decode_atom(encoded: Atom) -> Tuple[int, int, int, int, int]:
     atom_type = get_atom_type(encoded)
     row, col = get_atom_location(encoded)
     atom_id = get_atom_id(encoded)
     extra_id = get_box_extra_id(encoded)
-    return atom_type, row, col, atom_id , extra_id
+    return atom_type, row, col, atom_id, extra_id
 
 
 def atom_repr(encoded: Atom) -> str:
-    atom_type, row, col, atom_id = decode_atom(encoded)
+    atom_type, row, col, atom_id, extra_id = decode_atom(encoded)
     atom_id, atom_name = (
         (atom_id, "AGENT_AT")
         if atom_type == AtomType.AGENT_AT
-        else (f"'{chr(atom_id+ord('A'))}'", "BOX_AT")
+        else (f"'{chr(atom_id+ord('A')), extra_id}'", "BOX_AT")
     )
     return f"{atom_name}({atom_id}, Loc({row},{col}))"
 
