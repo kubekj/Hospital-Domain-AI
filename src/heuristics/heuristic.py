@@ -5,7 +5,7 @@ from src.domain.atom import Box, AtomType, atoms_by_type, Pos, Atom, get_box_dic
 from src.domain.state import State
 
 # Goal count as a default heuristic
-def extract_goal_positions(atom_type: AtomType, initial_state: State) -> dict[Atom, Pos]:
+def extract_goal_positions(atom_type: AtomType, initial_state: State) -> dict[int, Pos]:
     return atoms_by_type(initial_state.goal_literals, atom_type)
 
 

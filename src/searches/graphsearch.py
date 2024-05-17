@@ -27,12 +27,13 @@ def SIW(initial_state: State, frontier: FrontierIW):
     current_state = initial_state
     n_expl, n_front = 0, 0
     
-    # goals = [sorted(a, key=sort_by_y) for a in initial_state.goal_literals]
+    # goals = [sorted(a, key=sort_by_y) for a in initial_state.goal_literals_to_check]
 
-    size = len(initial_state.goal_literals[0]) + len(initial_state.goal_literals[1])
+    size = len(initial_state.goal_literals_to_check[0]) + len(initial_state.goal_literals_to_check[1])
     for i in range(1, size +1):
-        # State.goal_literals = (goals[0][:i], goals[1][:i])
-        print("#", frontier.size(), [atom_repr(a) for a in list(chain(*initial_state.goal_literals))[:i]])
+        # State.goal_literals_to_check = (goals[0][:i], goals[1][:i])
+        print("#", frontier.size(), [atom_repr(a) for a in list(initial_state.goal_literals_to_check[0])[:i]])
+        print("#", frontier.size(), [atom_repr(a) for a in list(initial_state.goal_literals_to_check[1])[:i]])
         state, explored, new_frontier = graph_search(current_state, frontier, i)
         if not state: return None
         current_state = state
@@ -80,14 +81,14 @@ def graph_search(initial_state: State, frontier: FrontierIW, g: int | None = Non
             return plan
 
         expanded_states = state.get_expanded_states()
-        # if c >18 and c<23: print("#Expanded states:", state)
 
         if isinstance(frontier, (FrontierIW, FrontierBestFirst)):
             heuristics = [frontier.heuristic.h(s) for s in expanded_states]
             sorted_states = sorted(zip(heuristics, expanded_states), key=lambda x: x[0])
-            expanded_states = [s for _, s in sorted_states]
-            # if c >19 and c<23: print("#Current state:", state)
-            # if c >19 and c<23: print("#Expanded states:\n#", "\n#".join(str(a) for a in sorted_states),"\n#")
+            
+            #WARNING: By discarding unlikely states, we can achieve a massive speedup in some levels, but it might be problamatic in cases where our heuristic performs badly.
+            cutoff_index = max(int(len(sorted_states) * 0.2), 10)
+            expanded_states = [s for _, s in sorted_states[:cutoff_index]]
 
         for expanded_state in expanded_states:
             if not frontier.contains(expanded_state) and expanded_state not in explored:

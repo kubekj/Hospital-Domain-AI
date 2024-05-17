@@ -33,20 +33,23 @@ class FrontierIW(FrontierBestFirst):
 
     def is_novel_combination(self, elements):
         """
-        Check if there's a new combination of elements of size i.
+        Check if there's a new combination of elements of size self.width.
 
         :param elements: A set of elements to check for novelty.
-        :param i: The size of the combinations to check.
         :return: True if there's a novel combination, False otherwise.
         """
-        # Generate all combinations of size i from the elements
-        new_combinations = set(frozenset(comb) for comb in combinations(chain(*elements), self.width))
+        seen = self.known_combinations
+        new_combinations = set()
 
-        # Check if there's any combination that we have not seen before
-        novel = not new_combinations.issubset(self.known_combinations)
-
-        # If there is a novel combination, add it to the set of known combinations
-        if novel:
+        # Generate all combinations of size self.width from the elements
+        for comb in combinations(chain(*elements), self.width):
+            froz_comb = frozenset(comb)
+            if froz_comb not in seen:
+                new_combinations.add(froz_comb)
+        
+        # If there is any novel combination, return True and update the set
+        if new_combinations:
             self.known_combinations.update(new_combinations)
+            return True
 
-        return novel
+        return False
