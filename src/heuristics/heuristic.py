@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
-from src.domain.atom import Box, Location, AtomType, atoms_by_type, get_atom_type, Pos, Atom, get_box_dict
+from src.domain.location import Location
+from src.domain.atom import Box, AtomType, atoms_by_type, Pos, Atom, get_box_dict
 from src.domain.state import State
 
 # Goal count as a default heuristic
@@ -10,8 +11,7 @@ def extract_goal_positions(atom_type: AtomType, initial_state: State) -> dict[At
 
 def count_goals_not_met(state: State, goal_positions: dict[Atom, Pos], atom_type: AtomType):
     return sum(1 for item, goal_loc in goal_positions.items()
-               if any(get_atom_type(lit) == atom_type and lit.loc != goal_loc
-                    for lit in state.literals))
+               if any(lit.loc != goal_loc for lit in state.literals[atom_type]))
 
 
 class Heuristic(metaclass=ABCMeta):

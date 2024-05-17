@@ -17,7 +17,7 @@ from src.heuristics.baseline.manhattan import HeuristicManhattan
 from src.heuristics.baseline.simple import HeuristicSimple
 from src.heuristics.baseline.simple_dijkstra import HeuristicSimpleDijkstra
 from src.heuristics.baseline.wastar import HeuristicWeightedAStar
-from src.searches.graphsearch import Info, graph_search
+from src.searches.graphsearch import SIW, Info, graph_search
 from src.utils import memory
 from src.utils.combiner import Combiner
 from src.utils.info import handle_debug
@@ -124,7 +124,10 @@ class SearchClient:
     @staticmethod
     def execute_and_print_plan(initial_state, frontier, heuristic, server_messages):
         print("Starting {}.".format(frontier.get_name()), file=sys.stderr, flush=True)
-        plan = graph_search(initial_state, frontier)
+        if args.siw:
+            plan = SIW(initial_state, frontier)
+        else: 
+            plan = graph_search(initial_state, frontier)
 
         if plan is None:
             print("Unable to solve level.", file=sys.stderr, flush=True)
@@ -206,7 +209,10 @@ class SearchClient:
 
             # create plan
             print("Starting {}.".format(frontier.get_name()), file=sys.stderr, flush=True)
-            plan = graph_search(initial_state, frontier)
+            if args.siw:
+                plan = SIW(initial_state, frontier)
+            else: 
+                plan = graph_search(initial_state, frontier)
 
             if plan is None:
                 print("Unable to solve level.", file=sys.stderr, flush=True)
@@ -240,17 +246,18 @@ class SearchClient:
             my_message = None
             if SearchClient.split_count <= 1:
                 states[ip + 1] = states[ip].result(joint_action)
-                my_message = (
-                    str(heuristic.f(states[ip + 1]))
-                    if isinstance(heuristic, HeuristicComplexDijkstra)
-                    else None
-                )
+                # my_message = (
+                #     str(heuristic.f(states[ip + 1]))
+                #     if isinstance(heuristic, HeuristicComplexDijkstra)
+                #     else None
+                # )
+                my_message = [str([*states[ip+1].agent_locations[i],a.get_name()]) for i, a in enumerate(joint_action)]
             print(
                 "|".join(
                     a.get_name()
                     + "@"
-                    + (my_message if my_message is not None else a.get_name())
-                    for a in joint_action
+                    + (my_message[i] if my_message is not None else a.get_name())
+                    for i, a in enumerate(joint_action)
                 ),
                 flush=True,
             )
@@ -383,6 +390,13 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--profile",
+        action="store_true",
+        default=False,
+        help="Enable profiling with cProfile.",
+    )
+
+    parser.add_argument(
+        "--siw",
         action="store_true",
         default=False,
         help="Enable profiling with cProfile.",

@@ -1,7 +1,7 @@
 # Manually inserted
 .vscode
 *.prof
-
+src/domain/test.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
