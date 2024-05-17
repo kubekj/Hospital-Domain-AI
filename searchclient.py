@@ -246,17 +246,18 @@ class SearchClient:
             my_message = None
             if SearchClient.split_count <= 1:
                 states[ip + 1] = states[ip].result(joint_action)
-                my_message = (
-                    str(heuristic.f(states[ip + 1]))
-                    if isinstance(heuristic, HeuristicComplexDijkstra)
-                    else None
-                )
+                # my_message = (
+                #     str(heuristic.f(states[ip + 1]))
+                #     if isinstance(heuristic, HeuristicComplexDijkstra)
+                #     else None
+                # )
+                my_message = [str([*states[ip+1].agent_locations[i],a.get_name()]) for i, a in enumerate(joint_action)]
             print(
                 "|".join(
                     a.get_name()
                     + "@"
-                    + (my_message if my_message is not None else a.get_name())
-                    for a in joint_action
+                    + (my_message[i] if my_message is not None else a.get_name())
+                    for i, a in enumerate(joint_action)
                 ),
                 flush=True,
             )
