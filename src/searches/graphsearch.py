@@ -5,7 +5,7 @@ import os.path
 import sys
 import time
 
-from src.domain.atom import atom_repr, get_atom_location, encode_agent
+from src.domain.atom import atom_repr, get_atom_location
 from src.domain.domain_types import Atom
 from src.frontiers.baseline.best_first import FrontierBestFirst
 from src.frontiers.frontier import Frontier
@@ -87,7 +87,7 @@ def graph_search(initial_state: State, frontier: FrontierIW, g: int | None = Non
             sorted_states = sorted(zip(heuristics, expanded_states), key=lambda x: x[0])
             
             #WARNING: By discarding unlikely states, we can achieve a massive speedup in some levels, but it might be problamatic in cases where our heuristic performs badly.
-            cutoff_index = max(int(len(sorted_states) * 0.2), 10) 
+            cutoff_index = max(int(len(sorted_states) * 0.2), 10)
             expanded_states = [s for _, s in sorted_states[:cutoff_index]]
 
         for expanded_state in expanded_states:
