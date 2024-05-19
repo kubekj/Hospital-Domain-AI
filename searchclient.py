@@ -82,8 +82,7 @@ class SearchClient:
                 initial_width,
             )
             print(
-                f"Defaulting to Iterated Width search with width of {width}."
-                "Use arguments -bfs, -dfs, -astar, -wastar, or -greedy to set the search strategy.",
+                f"Defaulting to Iterated Width search with width of {width}.",
                 file=sys.stderr,
                 flush=True,
             )
