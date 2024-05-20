@@ -62,7 +62,7 @@ class SearchClient:
         elif args.manhattan:
             return HeuristicManhattan(initial_state)
         else:
-            return HeuristicSimple(initial_state)
+            return HeuristicComplexDijkstra(initial_state)
 
     @staticmethod
     def set_frontier_strategy(args, initial_state: State, heuristic, initial_width=1):
@@ -76,21 +76,17 @@ class SearchClient:
             return FrontierBestFirst(HeuristicWeightedAStar(initial_state, args.wastar))
         elif args.greedy:
             return FrontierBestFirst(heuristic)
-        elif args.iw:
-            # Set initial width to the minimum of the number of agents or the initial width.
+        else:
             width = min(
                 len(initial_state.agent_locations) + len(initial_state.box_locations),
                 initial_width,
             )
-            return FrontierIW(heuristic, width)
-        else:
             print(
-                "Defaulting to BFS search. "
-                "Use arguments -bfs, -dfs, -astar, -wastar, or -greedy to set the search strategy.",
+                f"Defaulting to Iterated Width search with width of {width}.",
                 file=sys.stderr,
                 flush=True,
             )
-            return FrontierBFS()
+            return FrontierIW(heuristic, width)
 
     @staticmethod
     def init_client():
