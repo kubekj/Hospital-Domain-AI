@@ -29,6 +29,8 @@ class State:
         agent_locations_length = len(self.literals[AtomType.AGENT_AT])
         self.lastMovedBox: list[Box] = [None] * agent_locations_length
         self.recalculateDistanceOfBox: list[Box] = [None] * agent_locations_length
+
+        self.lastActions:list[Action] = None
     
     @property
     def agent_locations(self):
@@ -93,6 +95,8 @@ class State:
         copy_state.g = self.g + 1
         copy_state.recalculateDistanceOfBox = copy_recalculateDistanceOfBox
         copy_state.lastMovedBox = copy_lastMovedBox
+
+        copy_state.lastActions = joint_action
 
         return copy_state
 

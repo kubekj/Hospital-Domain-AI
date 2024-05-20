@@ -1,7 +1,9 @@
+import gc
 from itertools import chain
 import json
 import os
 import os.path
+import random
 import sys
 import time
 
@@ -19,6 +21,7 @@ from src.utils.info import Info
 
 start_time = time.perf_counter()
 SAVED_ONCE = True
+random.seed(42)
 
 def sort_by_y(x: Atom):
     return get_atom_location(x)[0]
@@ -43,22 +46,17 @@ def SIW(initial_state: State, frontier: FrontierIW):
     print("#", n_expl, n_front, n_expl + n_front)
 
     plan = current_state.extract_plan()
-    save_run_information(n_expl, n_front, plan)
+    # save_run_information(n_expl, n_front, plan)
     return plan
 
 
 def graph_search(initial_state: State, frontier: FrontierIW, g: int | None = None):
-    if not SAVED_ONCE:
-        save_run_information(None, None, None, {"Passed": False})
-
     iterations = 0
     frontier.add(initial_state)
     explored = set()
 
     while True:
         iterations += 1
-        # log_search_status(iterations, explored, frontier)
-        # print("#"+str(iterations),file=sys.stderr,flush=True,)
 
         if frontier.is_empty():
             if isinstance(frontier, FrontierIW):
@@ -66,29 +64,30 @@ def graph_search(initial_state: State, frontier: FrontierIW, g: int | None = Non
                 frontier.add(initial_state)
                 explored = set()
                 if frontier.is_empty():
-                    return None
+                    return None, len(explored), frontier.size()
             else:
-                return None
+                return None, len(explored), frontier.size()
 
         state = frontier.pop()
         explored.add(state)
 
         if state.is_goal_state(g):
             if g is not None: 
-                return state, explored, frontier
+                return state, len(explored), frontier.size()
             plan = state.extract_plan()
-            save_run_information(explored, frontier, plan)
-            return plan
+            # save_run_information(explored, frontier, plan)
+            return plan, len(explored), frontier.size()
 
         expanded_states = state.get_expanded_states()
 
         if isinstance(frontier, (FrontierIW, FrontierBestFirst)):
             heuristics = [frontier.heuristic.h(s) for s in expanded_states]
-            sorted_states = sorted(zip(heuristics, expanded_states), key=lambda x: x[0])
+            randoms = [random.random() for _ in heuristics]
+            sorted_states = sorted(zip(heuristics, expanded_states, randoms), key=lambda x: (x[0], x[2]))
             
             #WARNING: By discarding unlikely states, we can achieve a massive speedup in some levels, but it might be problamatic in cases where our heuristic performs badly.
             cutoff_index = max(int(len(sorted_states) * 0.2), 10)
-            expanded_states = [s for _, s in sorted_states[:cutoff_index]]
+            expanded_states = [s for _, s, _ in sorted_states[:cutoff_index]]
 
         for expanded_state in expanded_states:
             if not frontier.contains(expanded_state) and expanded_state not in explored:
@@ -104,7 +103,8 @@ def log_search_status(iterations, explored: set[State], frontier):
         print_search_status(explored, frontier)
         # TODO: Reset frontier after memory limit is reached, go to next width for IW
         print("Maximum memory usage exceeded.", file=sys.stderr, flush=True)
-        return None
+        return True
+    return False
 
 
 def print_search_status(explored: set[State], frontier):
@@ -130,7 +130,7 @@ def print_search_status(explored: set[State], frontier):
     )
 
 
-def save_run_information(explored: set[State] | int, frontier: Frontier | int, plan: list[list[Action]], information=None):
+def save_run_information(explored: set[State] | int, frontier: Frontier | int, plan: list[list[Action]], width=None, information=None):
     """
     This function saves the information about the current run of the search algorithm.
 
@@ -166,6 +166,7 @@ def save_run_information(explored: set[State] | int, frontier: Frontier | int, p
             "Generated": n_expl + n_front,
             "Solution length": len(plan),
             "Time": elapsed_time,
+            "Width": width,
         }
 
     all_data[Info.level_name] = information

@@ -93,7 +93,7 @@ class HeuristicComplexDijkstra(Heuristic):
                != state.box_locations[b]
         ]
 
-    def calculate_total_distance(self, agent, agent_loc, boxes_not_in_goal, state):
+    def calculate_total_distance(self, agent:int, agent_loc: Pos, boxes_not_in_goal, state: State):
         total_distance = 0
         for box in self.agent_assigned_to_box[agent]:
             if box in self.box_goal_assigned_to_box and box in boxes_not_in_goal:
@@ -107,11 +107,18 @@ class HeuristicComplexDijkstra(Heuristic):
             total_distance += self.get_distances(
                 state, self.agent_goal_positions[agent]
             )[agent_loc.row][agent_loc.col] * self.get_priority(len(self.box_priority))
+        if total_distance != 0 and state.lastActions:
+            close_agents = HeuristicComplexDijkstra.get_close_agents(agent_loc, state.agent_locations)
+            # close_boxes = HeuristicComplexDijkstra.get_close_boxes(agent_loc, state.box_locations)
+            if len(close_agents) > 0:
+                min_agent = min(close_agents, key=close_agents.get)
+                if agent < min_agent and state.lastActions[agent].get_name() == "NoOp":
+                    total_distance += 1
         return total_distance
 
     def calculate_box_distance(self, agent_loc, box_loc, state, box):
         box_distance = 0
-        if not self.is_box_close(agent_loc, box_loc):
+        if not self.is_close(agent_loc, box_loc):
             box_distance += (
                     self.get_distances(state, box_loc)[agent_loc.row][agent_loc.col] - 1
             )
@@ -435,9 +442,21 @@ class HeuristicComplexDijkstra(Heuristic):
                     close_boxes[box] = neighbour
 
         return close_boxes
+    
+    @staticmethod
+    def get_close_agents(loc: Location, agents: dict):
+        close_agents = {}
+
+        for neighbour in Location.get_neighbours(loc):
+            for agent, agent_loc in agents.items():
+                if agent_loc == neighbour:
+                    close_agents[agent] = neighbour
+
+        return close_agents
 
     @staticmethod
-    def is_box_close(agent_loc: Pos, box_loc: Pos):
-        return (abs(agent_loc.row - box_loc.row) == 1 and agent_loc.col == box_loc.col) or (
-                abs(agent_loc.col - box_loc.col) == 1 and agent_loc.row == box_loc.row
+    def is_close(element1: Pos, element2: Pos):
+        return (abs(element1.row - element2.row) == 1 and element1.col == element2.col) or (
+                abs(element1.col - element2.col) == 1 and element1.row == element2.row
         )
+    

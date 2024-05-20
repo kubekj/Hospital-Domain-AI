@@ -1,0 +1,175 @@
+{
+    "AIAgents": {
+        "Passed": true,
+        "Expanded": 555,
+        "Frontier": 125,
+        "Generated": 680,
+        "Solution length": 43,
+        "Time": 0.7531626000418328,
+        "Width": 1
+    },
+    "aMAzing": {
+        "Passed": true,
+        "Expanded": 96,
+        "Frontier": 333,
+        "Generated": 429,
+        "Solution length": 51,
+        "Time": 0.19832020002650097,
+        "Width": 1
+    },
+    "Cliff": {
+        "Passed": true,
+        "Expanded": 190,
+        "Frontier": 1016,
+        "Generated": 1206,
+        "Solution length": 128,
+        "Time": 1.6383189999614842,
+        "Width": 1
+    },
+    "CompCheck": {
+        "Passed": true,
+        "Expanded": 18673,
+        "Frontier": 4358,
+        "Generated": 23031,
+        "Solution length": 246,
+        "Time": 47.85131559998263
+    },
+    "EulerPpl": {
+        "Passed": true,
+        "Expanded": 10,
+        "Frontier": 8,
+        "Generated": 18,
+        "Solution length": 62,
+        "Time": 0.7814536999794655
+    },
+    "Happyya": {
+        "Passed": true,
+        "Expanded": 86,
+        "Frontier": 6424,
+        "Generated": 6510,
+        "Solution length": 85,
+        "Time": 2.5541795000317506
+    },
+    "Hashtag": {
+        "Passed": true,
+        "Expanded": 105,
+        "Frontier": 3513,
+        "Generated": 3618,
+        "Solution length": 82,
+        "Time": 2.0305428000283428
+    },
+    "JarvisExe": {
+        "Passed": true,
+        "Expanded": 80,
+        "Frontier": 655,
+        "Generated": 735,
+        "Solution length": 78,
+        "Time": 0.14563040004577488
+    },
+    "Monad": {
+        "Passed": true,
+        "Expanded": 236,
+        "Frontier": 9612,
+        "Generated": 9848,
+        "Solution length": 92,
+        "Time": 11.341009200026747
+    },
+    "MSPaint": {
+        "Passed": true,
+        "Expanded": 1,
+        "Frontier": 0,
+        "Generated": 1,
+        "Solution length": 263,
+        "Time": 71.73501609999221
+    },
+    "OnlyLast": {
+        "Passed": true,
+        "Expanded": 16,
+        "Frontier": 1404,
+        "Generated": 1420,
+        "Solution length": 15,
+        "Time": 0.3420417999732308
+    },
+    "PIAF": {
+        "Passed": true,
+        "Expanded": 18,
+        "Frontier": 15,
+        "Generated": 33,
+        "Solution length": 17,
+        "Time": 0.008837600005790591
+    },
+    "planB": {
+        "Passed": true,
+        "Expanded": 25,
+        "Frontier": 1839,
+        "Generated": 1864,
+        "Solution length": 21,
+        "Time": 0.7797648999840021
+    },
+    "Raffaello": {
+        "Passed": true,
+        "Expanded": 21,
+        "Frontier": 203,
+        "Generated": 224,
+        "Solution length": 20,
+        "Time": 0.04618920001666993
+    },
+    "Roundbout": {
+        "Passed": true,
+        "Expanded": 9986,
+        "Frontier": 1513,
+        "Generated": 11499,
+        "Solution length": 72,
+        "Time": 15.333040199999232
+    },
+    "sadbois": {
+        "Passed": true,
+        "Expanded": 25,
+        "Frontier": 760,
+        "Generated": 785,
+        "Solution length": 24,
+        "Time": 0.18453430000226945
+    },
+    "SinbadAil": {
+        "Passed": true,
+        "Expanded": 91,
+        "Frontier": 9249,
+        "Generated": 9340,
+        "Solution length": 86,
+        "Time": 5.638305200031027
+    },
+    "Spds": {
+        "Passed": true,
+        "Expanded": 16,
+        "Frontier": 154,
+        "Generated": 170,
+        "Solution length": 14,
+        "Time": 0.0278243999928236
+    },
+    "YSERIOUS": {
+        "Passed": true,
+        "Expanded": 15923,
+        "Frontier": 13236,
+        "Generated": 29159,
+        "Solution length": 298,
+        "Time": 28.844071500003338
+    },
+    "Tahini": {
+        "Passed": true,
+        "Expanded": 2662,
+        "Frontier": 3708,
+        "Generated": 6370,
+        "Solution length": 511,
+        "Time": 4.533351799997035,
+        "Width": 1
+    },
+    "Eighty": {
+        "Passed": true,
+        "Expanded": 193,
+        "Frontier": 4973,
+        "Generated": 5166,
+        "Solution length": 180,
+        "Time": 21.98719719995279,
+        "Width": 1
+    }
+}

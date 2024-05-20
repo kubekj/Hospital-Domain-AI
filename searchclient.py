@@ -17,7 +17,7 @@ from src.heuristics.baseline.manhattan import HeuristicManhattan
 from src.heuristics.baseline.simple import HeuristicSimple
 from src.heuristics.baseline.simple_dijkstra import HeuristicSimpleDijkstra
 from src.heuristics.baseline.wastar import HeuristicWeightedAStar
-from src.searches.graphsearch import SIW, Info, graph_search
+from src.searches.graphsearch import SIW, Info, graph_search, save_run_information
 from src.utils import memory
 from src.utils.combiner import Combiner
 from src.utils.info import handle_debug
@@ -65,7 +65,7 @@ class SearchClient:
             return HeuristicSimple(initial_state)
 
     @staticmethod
-    def set_frontier_strategy(args, initial_state: State, heuristic, initial_width=3):
+    def set_frontier_strategy(args, initial_state: State, heuristic, initial_width=1):
         if args.bfs:
             return FrontierBFS()
         elif args.dfs:
@@ -104,7 +104,7 @@ class SearchClient:
             sys.stdout.reconfigure(encoding="ASCII")
 
         print("SearchClient", flush=True)
-        print("#This is a comment.", flush=True)
+        # print("#This is a comment.", flush=True)
 
         server_messages = sys.stdin
         if hasattr(server_messages, "reconfigure"):
@@ -123,7 +123,7 @@ class SearchClient:
 
     @staticmethod
     def execute_and_print_plan(initial_state, frontier, heuristic, server_messages):
-        print("Starting {}.".format(frontier.get_name()), file=sys.stderr, flush=True)
+        # print("Starting {}.".format(frontier.get_name()), file=sys.stderr, flush=True)
         if args.siw:
             plan = SIW(initial_state, frontier)
         else: 
@@ -194,12 +194,14 @@ class SearchClient:
         sub_levels = SearchClient.iterative_splitting(sub_levels)
         # print("total-splitting: " + str(len(sub_levels)))
         SearchClient.split_count = len(sub_levels)
-        print("total-splitting: " + str(len(sub_levels)), file=sys.stderr, flush=True)
+        # print("total-splitting: " + str(len(sub_levels)), file=sys.stderr, flush=True)
 
         # do everything and create all plans from a-z, loop for all leveldatas
         # planCreationLoop
         plans = []
-        for level in sub_levels:
+        exploreds = 0
+        frontier_sizes = 0
+        for i, level in enumerate(sub_levels):
             # setup
             level.convert_dead_boxes_to_walls()
             level.normalize_agent_identifiers()
@@ -208,11 +210,11 @@ class SearchClient:
             initial_state, heuristic, frontier = SearchClient.initialize_and_configure(args, level)
 
             # create plan
-            print("Starting {}.".format(frontier.get_name()), file=sys.stderr, flush=True)
+            print(f"Starting {frontier.get_name()} for level {i}.", file=sys.stderr, flush=True)
             if args.siw:
                 plan = SIW(initial_state, frontier)
             else: 
-                plan = graph_search(initial_state, frontier)
+                plan, n_explored, frontier_size = graph_search(initial_state, frontier)
 
             if plan is None:
                 print("Unable to solve level.", file=sys.stderr, flush=True)
@@ -220,10 +222,13 @@ class SearchClient:
             else:
                 plan = Combiner.revert_plan_identifiers_listofactions(level, plan)
                 plans.append(plan)
+                exploreds += n_explored
+                frontier_sizes += frontier_size
 
         # combine plans
         final_plan = Combiner.combine_plans(plans, leveldata)
-
+        save_run_information(n_explored, frontier_size, final_plan, width=frontier.width if isinstance(frontier, FrontierIW) else None)
+        
         # global object reset, necessary
         initial_state, heuristic, frontier = SearchClient.initialize_and_configure(args, leveldata)
 
@@ -236,22 +241,21 @@ class SearchClient:
             file=sys.stderr,
             flush=True,
         )
-        states: list[State] = [None] * (len(plan) + 1)
-        states[0] = initial_state
-        heuristic = SearchClient.set_heuristic_strategy(args, initial_state)
-        frontier = SearchClient.set_frontier_strategy(args, initial_state, heuristic)
-        with open("plans/plan.pkl", "wb") as f:
-            pickle.dump(plan, file=f)
+        # states: list[State] = [None] * (len(plan) + 1)
+        # states[0] = initial_state
+        # heuristic = SearchClient.set_heuristic_strategy(args, initial_state)
+        # with open("plans/plan.pkl", "wb") as f:
+        #     pickle.dump(plan, file=f)
         for ip, joint_action in enumerate(plan):
             my_message = None
-            if SearchClient.split_count <= 1:
-                states[ip + 1] = states[ip].result(joint_action)
+            # if SearchClient.split_count <= 1:
+                # states[ip + 1] = states[ip].result(joint_action)
                 # my_message = (
                 #     str(heuristic.f(states[ip + 1]))
                 #     if isinstance(heuristic, HeuristicComplexDijkstra)
                 #     else None
                 # )
-                my_message = [str([*states[ip+1].agent_locations[i],a.get_name()]) for i, a in enumerate(joint_action)]
+                # my_message = [my_message for i, a in enumerate(joint_action)]
             print(
                 "|".join(
                     a.get_name()

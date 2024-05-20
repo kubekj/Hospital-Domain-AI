@@ -1,0 +1,155 @@
+{
+    "AIAgents": {
+        "Passed": true,
+        "Expanded": 2199,
+        "Frontier": 870,
+        "Generated": 3069,
+        "Solution length": 37,
+        "Time": 7.704746800009161,
+        "Width": 1
+    },
+    "aMAzing": {
+        "Passed": true,
+        "Expanded": 98,
+        "Frontier": 329,
+        "Generated": 427,
+        "Solution length": 51,
+        "Time": 0.19950440002139658,
+        "Width": 1
+    },
+    "Cliff": {
+        "Passed": true,
+        "Expanded": 180,
+        "Frontier": 949,
+        "Generated": 1129,
+        "Solution length": 119,
+        "Time": 1.3490469999960624,
+        "Width": 1
+    },
+    "CompCheck": {
+        "Passed": true,
+        "Expanded": 7236,
+        "Frontier": 1336,
+        "Generated": 8572,
+        "Solution length": 277,
+        "Time": 19.99037740001222,
+        "Width": 1
+    },
+    "EulerPpl": {
+        "Passed": true,
+        "Expanded": 10,
+        "Frontier": 8,
+        "Generated": 18,
+        "Solution length": 68,
+        "Time": 3.6977434000000358,
+        "Width": 1
+    },
+    "Happyya": {
+        "Passed": true,
+        "Expanded": 86,
+        "Frontier": 235,
+        "Generated": 321,
+        "Solution length": 85,
+        "Time": 2.062216900056228,
+        "Width": 1
+    },
+    "Hashtag": {
+        "Passed": true,
+        "Expanded": 72,
+        "Frontier": 1240,
+        "Generated": 1312,
+        "Solution length": 61,
+        "Time": 11.321250399982091,
+        "Width": 1
+    },
+    "JarvisExe": {
+        "Passed": true,
+        "Expanded": 135,
+        "Frontier": 699,
+        "Generated": 834,
+        "Solution length": 125,
+        "Time": 0.4814802000182681,
+        "Width": 1
+    },
+    "Monad": {
+        "Passed": true,
+        "Expanded": 174,
+        "Frontier": 2742,
+        "Generated": 2916,
+        "Solution length": 90,
+        "Time": 42.17928019998362,
+        "Width": 1
+    },
+    "MSPaint": {
+        "Passed": true,
+        "Expanded": 1,
+        "Frontier": 0,
+        "Generated": 1,
+        "Solution length": 259,
+        "Time": 76.58780579996528,
+        "Width": 1
+    },
+    "OnlyLast": {
+        "Passed": true,
+        "Expanded": 16,
+        "Frontier": 44,
+        "Generated": 60,
+        "Solution length": 15,
+        "Time": 0.30180230003315955,
+        "Width": 1
+    },
+    "planB": {
+        "Passed": true,
+        "Expanded": 54,
+        "Frontier": 45,
+        "Generated": 99,
+        "Solution length": 24,
+        "Time": 0.8407913999981247,
+        "Width": 1
+    },
+    "Raffaello": {
+        "Passed": true,
+        "Expanded": 21,
+        "Frontier": 23,
+        "Generated": 44,
+        "Solution length": 20,
+        "Time": 0.040133000002242625,
+        "Width": 1
+    },
+    "Roundbout": {
+        "Passed": true,
+        "Expanded": 2338,
+        "Frontier": 287,
+        "Generated": 2625,
+        "Solution length": 68,
+        "Time": 3.661207100027241,
+        "Width": 1
+    },
+    "sadbois": {
+        "Passed": true,
+        "Expanded": 27,
+        "Frontier": 53,
+        "Generated": 80,
+        "Solution length": 26,
+        "Time": 0.1566587000270374,
+        "Width": 1
+    },
+    "Spds": {
+        "Passed": true,
+        "Expanded": 16,
+        "Frontier": 19,
+        "Generated": 35,
+        "Solution length": 15,
+        "Time": 0.025539099995512515,
+        "Width": 1
+    },
+    "YSERIOUS": {
+        "Passed": true,
+        "Expanded": 21836,
+        "Frontier": 18747,
+        "Generated": 40583,
+        "Solution length": 312,
+        "Time": 41.569896499975584,
+        "Width": 1
+    }
+}

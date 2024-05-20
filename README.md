@@ -37,5 +37,8 @@ java -jar ./server.jar -l ./levels/MAPF01.lvl -c "python searchclient.py -greedy
 #### Iterated Width Search with Customized UCF
 ```bash
 java -jar ./server.jar -l ./complevels/mishmash.lvl -c "python searchclient.py -iw -c_dij" -g
+java -jar ./server.jar -l ./complevels2024/Happyya.lvl -c "python searchclient.py -iw -c_dij" -g
+
+java -jar ./server.jar -l ./complevels2024 -c "python searchclient.py -iw -c_dij --test-name=random" -t 180
 ```
 
