@@ -10,7 +10,7 @@ The goal of this project is to create an efficient client for the MAvis server, 
   - psutil  
 
 ## Usage
-The project supports various search strategies to tackle the MAPF/APF problems. Below are the commands to execute each strategy with level **MAPF01** as an example with a graphical representation:
+The project supports various search strategies to tackle the MAPF problems. Below are the commands to execute each strategy with level **MAPF01** as an example with a graphical representation, every bash command is equipped with a 180 seconds timeout indicated by "-t 180":
 
 #### Breadth-First Search (BFS)
 ```bash
@@ -39,7 +39,7 @@ java -jar ./server.jar -l ./all_levels/levels/MAPF01.lvl -c "python searchclient
 
 ### Running all levels at once without visual representation (performance checking)
 ```bash
-java -jar ./server.jar -l ./all_levels/levels -c "python searchclient.py" -g -t 180
+java -jar ./server.jar -l ./all_levels/levels -c "python searchclient.py" -t 180
 ```
 
 #### Project Completed in Course 02285 Artificial Intelligence and Multi-Agent Systems - Technical University of Denmark (DTU)
