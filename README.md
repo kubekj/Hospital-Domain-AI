@@ -1,6 +1,6 @@
 # Hospital-Domain-AI
 ## Project Overview
-The goal of the Hospital-Domain-AI project is to create an efficient client for the MAvis server that specifically complies with the hospital domain presented during the course. This project utilizes various search strategies to efficiently navigate through complex hospital layouts, allowing for the resolution of multi-agent pathfinding (MAPF) issues. Additionally, we offer the option to use basic as well as advanced algorithms for search problems, which enables the comparison of different approaches.
+The goal of this project is to create an efficient client for the MAvis server, specifically designed to comply with the hospital domain (described during the course). This project employs various search strategies to effectively navigate complex hospital layouts, addressing multi-agent pathfinding (MAPF) issues. Additionally, it offers the option to use both basic and advanced algorithms for search problems, enabling the comparison of different approaches, including problem planning and maze solving through Iterated Width (IW) search.
 
 ### Prerequisites
 - Java Runtime Environment (JRE) version 11 or above
@@ -37,7 +37,12 @@ java -jar ./server.jar -l ./all_levels/levels/MAPF01.lvl -c "python searchclient
 java -jar ./server.jar -l ./all_levels/levels/MAPF01.lvl -c "python searchclient.py -iw -c_dij" -g -t 180
 ```
 
-## Running all levels at once without visual representation (performance checking)
+### Running all levels at once without visual representation (performance checking)
 ```bash
 java -jar ./server.jar -l ./all_levels/levels -c "python searchclient.py" -g -t 180
 ```
+
+#### Project Completed in Course 02285 Artificial Intelligence and Multi-Agent Systems - Technical University of Denmark (DTU)
+<img src="https://user-images.githubusercontent.com/65953954/120001846-7f05f180-bfd4-11eb-8c11-2379a547dc9f.jpg" alt="drawing" width="100"/>
+
+
