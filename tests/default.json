@@ -187,5 +187,14 @@
         "Solution length": 45,
         "Time": 0.27071083299961174,
         "Width": 1
+    },
+    "MAPF01": {
+        "Passed": true,
+        "Expanded": 16,
+        "Frontier": 25,
+        "Generated": 41,
+        "Solution length": 15,
+        "Time": 0.48198820801917464,
+        "Width": 1
     }
 }
