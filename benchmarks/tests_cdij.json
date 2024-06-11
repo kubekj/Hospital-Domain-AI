@@ -105,11 +105,12 @@
     },
     "mishmash": {
         "Passed": true,
-        "Expanded": 65,
-        "Frontier": 321,
-        "Generated": 386,
-        "Solution length": 25,
-        "Time": 0.0854217919986695
+        "Expanded": 48,
+        "Frontier": 158,
+        "Generated": 206,
+        "Solution length": 23,
+        "Time": 0.10686266698758118,
+        "Width": 1
     },
     "NoOp": {
         "Passed": true,

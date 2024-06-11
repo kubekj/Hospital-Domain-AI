@@ -44,7 +44,6 @@ class SearchClient:
         leveldata.to_string_representation()  #important don't remove
         Info.level_name = leveldata.levelname
         return leveldata
-        # return State.make_initial_state(server_messages)
 
     @staticmethod
     def generate_state(leveldata: LevelData) -> State:
@@ -82,7 +81,7 @@ class SearchClient:
                 initial_width,
             )
             print(
-                f"Defaulting to Iterated Width search with width of {width}.",
+                f"Starting Iterated Width search with the width of {width}.",
                 file=sys.stderr,
                 flush=True,
             )
@@ -100,7 +99,6 @@ class SearchClient:
             sys.stdout.reconfigure(encoding="ASCII")
 
         print("SearchClient", flush=True)
-        # print("#This is a comment.", flush=True)
 
         server_messages = sys.stdin
         if hasattr(server_messages, "reconfigure"):
@@ -119,7 +117,6 @@ class SearchClient:
 
     @staticmethod
     def execute_and_print_plan(initial_state, frontier, heuristic, server_messages):
-        # print("Starting {}.".format(frontier.get_name()), file=sys.stderr, flush=True)
         if args.siw:
             plan = SIW(initial_state, frontier)
         else: 
@@ -136,12 +133,10 @@ class SearchClient:
             )
             states: list[State] = [None] * (len(plan) + 1)
             states[0] = initial_state
-            # heuristic = SearchClient.set_heuristic_strategy(args, initial_state)
-            # frontier = SearchClient.set_frontier_strategy(
-            #     args, initial_state, heuristic
-            # )
+            
             with open("plans/plan.pkl", "wb") as f:
                 pickle.dump(plan, file=f)
+                
             for ip, joint_action in enumerate(plan):
                 states[ip + 1] = states[ip].result(joint_action)
                 my_message = None
@@ -188,9 +183,7 @@ class SearchClient:
         sub_levels: List[LevelData] = leveldata.segment_regions()
 
         sub_levels = SearchClient.iterative_splitting(sub_levels)
-        # print("total-splitting: " + str(len(sub_levels)))
         SearchClient.split_count = len(sub_levels)
-        # print("total-splitting: " + str(len(sub_levels)), file=sys.stderr, flush=True)
 
         # do everything and create all plans from a-z, loop for all leveldatas
         # planCreationLoop
@@ -237,21 +230,8 @@ class SearchClient:
             file=sys.stderr,
             flush=True,
         )
-        # states: list[State] = [None] * (len(plan) + 1)
-        # states[0] = initial_state
-        # heuristic = SearchClient.set_heuristic_strategy(args, initial_state)
-        # with open("plans/plan.pkl", "wb") as f:
-        #     pickle.dump(plan, file=f)
-        for ip, joint_action in enumerate(plan):
+        for _, joint_action in enumerate(plan):
             my_message = None
-            # if SearchClient.split_count <= 1:
-                # states[ip + 1] = states[ip].result(joint_action)
-                # my_message = (
-                #     str(heuristic.f(states[ip + 1]))
-                #     if isinstance(heuristic, HeuristicComplexDijkstra)
-                #     else None
-                # )
-                # my_message = [my_message for i, a in enumerate(joint_action)]
             print(
                 "|".join(
                     a.get_name()

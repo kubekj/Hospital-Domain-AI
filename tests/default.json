@@ -169,5 +169,23 @@
         "Solution length": 300,
         "Time": 26.080056700040586,
         "Width": 1
+    },
+    "MAPFreorder": {
+        "Passed": true,
+        "Expanded": 8736,
+        "Frontier": 1420,
+        "Generated": 10156,
+        "Solution length": 49,
+        "Time": 38.06111491599586,
+        "Width": 1
+    },
+    "SACrunch": {
+        "Passed": true,
+        "Expanded": 46,
+        "Frontier": 62,
+        "Generated": 108,
+        "Solution length": 45,
+        "Time": 0.27071083299961174,
+        "Width": 1
     }
 }
